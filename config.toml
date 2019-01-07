@@ -14,7 +14,7 @@ theme = "blackburn"
 [params]
   # Shown in the home page
   subtitle = "Tech, beer, and the occassional banjo tune"
-  brand = "Blackburn"
+  #brand = "Blackburn"
   googleAnalytics = "Your Google Analytics tracking ID"
   disqus = "aaronmsachs"
   # CSS name for highlight.js
