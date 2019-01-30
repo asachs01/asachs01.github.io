@@ -16,6 +16,7 @@ Now that I've been working with Sensu for a few months (and am officially on pat
 
 ### The Setup
 Here are the prerequisites for getting Sensu to work on your Raspberry Pi:
+
 * Ruby > 2.0 
 * Rubygems
 `sudo apt-get install ruby ruby-dev` (this should install rubygems by default)
