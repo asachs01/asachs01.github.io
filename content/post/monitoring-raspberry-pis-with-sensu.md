@@ -26,6 +26,7 @@ Here are the prerequisites for getting Sensu to work on your Raspberry Pi:
 
 ### Configuration
 Before you get started, ensure you've added the `sensu` user:
+
 * `useradd sensu`
 
 #### Sensu
@@ -36,6 +37,7 @@ Presuming you've already installed the gem, the commands to manage the Sensu cli
 `sudo mkdir -p /etc/sensu/conf.d`
 
 From there, we'll add three different configuration files, as per the [Sensu Documentation](https://sensuapp.org/docs):
+
 * `client.json`
 * `rabbitmq.json`
 
