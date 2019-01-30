@@ -49,7 +49,7 @@ theme = "blackburn"
     pre = "<i class='fa fa-list fa-fw'></i>"
     weight = 3
     identifier = "posts"
-    url = "/posts/"
+    url = "/post/"
 #  [[menu.main]]
 #    name = "Contact"
 #    pre = "<i class='fa fa-phone fa-fw'></i>"
