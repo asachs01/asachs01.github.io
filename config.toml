@@ -45,9 +45,15 @@ theme = "blackburn"
     identifier = "about"
     url = "/about/"
   [[menu.main]]
+    name = "Talks"
+    pre = "<i class='fa fa-user fa-fw'></i>"
+    weight = 3
+    identifier = "talks"
+    url = "/talks/"
+  [[menu.main]]
     name = "Posts"
     pre = "<i class='fa fa-list fa-fw'></i>"
-    weight = 3
+    weight = 4
     identifier = "posts"
     url = "/post/"
 #  [[menu.main]]
