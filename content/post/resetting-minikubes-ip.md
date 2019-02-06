@@ -7,6 +7,11 @@ description = "How to reset Minikube's IP to 192.168.99.100"
 slug = "resetting-minikubes-ip-address"
 
 +++
+## UPDATED
+
+I found that there is an exception to what the solution is here, namely that this only applies to _VirtualBox 5.2_. If you end up using Virtualbox 6.0, note that this won't work. the longer term fix would be to downgrade your VirtualBox version.
+
+## ORIGINAL POST
 
 I use [minikube][1] for a lot of quick troubleshooting and demos. I recently found myself in a situation where the IP address kept incrementing. Instead of the standard `192.168.99.100`, every restart found the minikube VM with a new IP address, which made demos that relied on the standard IP difficult to demo. 
 
@@ -19,6 +24,8 @@ I ended up finding the solution on [Stackoverflow][2]. To reset minikube's IP ba
 5. `minikube ip`
 
 That should give you the good ole `192.168.99.100` IP address that you know and love. 
+
+
 
 <!--LINKS-->
 
