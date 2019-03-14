@@ -56,6 +56,12 @@ theme = "blackburn"
     weight = 4
     identifier = "posts"
     url = "/post/"
+  [[menu.main]]
+    name = "Reading List"
+    pre = "<i class='fa fa-list fa-fw'></i>"
+    weight = 5
+    identifier = "currently-reading"
+    url = "/currently-reading/"
 #  [[menu.main]]
 #    name = "Contact"
 #    pre = "<i class='fa fa-phone fa-fw'></i>"
