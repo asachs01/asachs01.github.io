@@ -5,7 +5,7 @@ title: "A minimal Sensu environment with Docker"
 date: 2019-05-06T11:32:56-05:00
 description: "A quick rundown of how I spin up minimal Sensu environments with Docker"
 categories: ["tech"]
-tags: ["productivity"]
+tags: ["productivity", "docker", "sensu", "monitoring"]
 ---
 
 This past week, I had the pleaseure of attending Dockercon. While I was there primarily working the [Sensu][1] booth, it occurred to me that Docker presents an ideal way to demo what Sensu does, and I can quickly get an environment up without having to go through the rigmarole that I previously did using [Vagrant][2]. Now, that's not saying that I think one tool is better than the other, but for the purposes of quick demos, Docker is more useful to me. 
