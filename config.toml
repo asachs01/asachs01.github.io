@@ -6,8 +6,6 @@ copyright = "&copy; 2019. All rights reserved."
 canonifyurls = true
 paginate = 10
 theme = "blackburn"
-googleAnalytics = "UA-58110464-1"
-disqus = "aaronmsachs"
 
 [indexes]
   tag = "tags"
@@ -17,8 +15,8 @@ disqus = "aaronmsachs"
   # Shown in the home page
   subtitle = "Tech, beer, and the occassional banjo tune"
   #brand = "Blackburn"
-  googleAnalytics = "Your Google Analytics tracking ID"
-  disqus = "aaronmsachs"
+  googleAnalytics = "UA-58110464-1"
+  disqus = "aaronmsachs"  
   # CSS name for highlight.js
   highlightjs = "androidstudio"
   highlightjs_extra_languages = ["yaml"]
