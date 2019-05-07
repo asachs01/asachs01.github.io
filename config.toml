@@ -6,6 +6,8 @@ copyright = "&copy; 2019. All rights reserved."
 canonifyurls = true
 paginate = 10
 theme = "blackburn"
+googleAnalytics = "UA-58110464-1"
+disqus = "aaronmsachs"
 
 [indexes]
   tag = "tags"
