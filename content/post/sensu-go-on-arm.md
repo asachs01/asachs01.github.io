@@ -123,6 +123,10 @@ WorkingDirectory=/
 WantedBy=multi-user.target
 ```
 
+To make this a bit easier, you can do the following:
+
+`sudo curl -L https://gist.githubusercontent.com/asachs01/497ede01e9905e7917d577451ac51c1b/raw/141aa960a5481e4c536ff790561c5effd0f3b058/sensu-backend.service -o /lib/systemd/system/sensu-backend.service`
+
 **Sensu Agent Service File**
 ```
 [Unit]
@@ -148,7 +152,11 @@ WorkingDirectory=/
 WantedBy=multi-user.target
 ```
 
-These will need to live at `/lib/systemd/system/sensu-backend.service` and `/lib/systemd/system/sensu-agent.service` respectively. Once you've got those in place, let's move onto the next step.
+And the same with this one: 
+
+`sudo curl -L https://gist.githubusercontent.com/asachs01/497ede01e9905e7917d577451ac51c1b/raw/141aa960a5481e4c536ff790561c5effd0f3b058/sensu-agent.service -o /lib/systemd/system/sensu-agent.service`
+
+Again, these will need to live at `/lib/systemd/system/sensu-backend.service` and `/lib/systemd/system/sensu-agent.service` respectively. Once you've got those in place, let's move onto the next step.
 
 ## Create the Sensu User/Group
 
