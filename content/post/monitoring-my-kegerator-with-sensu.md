@@ -285,20 +285,11 @@ _**metrics-temp-sensor**_
 ```
 
 Those are what the checks look like on a practical level. You'll notice the `contact` attribute is present in these checks. That's because I'm running a Sensu Enterprise deployment and taking advantage of contact routing...even though I'm the only one monitoring the kegerator. <insert shrug here>
-    
-So you can get a good idea of what these checks might look like in a dashboard (Uchiwa, or Sensu Enterpise), let's take a look at the checks as they're currently running:
 
-![temp-sensor-1](/content/images/2018/04/temp-sensor-1.PNG)
-
-![contact-sensor-1](/content/images/2018/04/contact-sensor-1.PNG)
-
-![metric-temp-1](/content/images/2018/04/metric-temp-1.PNG)
 
 So there you have it--some working checks that are at this point in time, checking the contact and temperature sensors attached ot the Pi. 
 # Sending the Data to Other Sources
 Before I wrap this up, let's do a quick discussion about how you can send the data to other sources and get some cool graphs out of the deal. Personally, I have the data being sent to two sources: an InfluxDB instance and a Graphite instance. The reason for exporting to two data sources simply comes down to the fact that I can perform a quick bit of magic in my check and embed my Graphite graph into my check for a quick visualization of the temperature. Also, I much prefer the graphs I can get out of Influx, but alas, those aren't embeddable. 
-
-![influx-kegpi](/content/images/2018/04/influx-kegpi.PNG)
 
 So how does the data make it to the Graphite and InfluxDB instances? Enter our handlers. You'll notice in the checks defined above, I have my influxdb and graphite handlers specified. Just like everything else in Sensu, this is done via JSON configuration files:
 
