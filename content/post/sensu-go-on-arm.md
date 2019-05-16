@@ -3,7 +3,7 @@ author: Aaron Sachs
 slug: sensu-go-on-arm
 title: "Compiling and Running Sensu Go on ARM"
 date: 2019-05-09T19:49:32-05:00
-description: "How to compile and run Sensu Go on ARMV7 platforms"
+description: "How to compile and run Sensu Go on arm boards"
 categories: ["monitoring", "sensu", "arm"]
 tags: ["sensu", "monitoring", "arm", "raspberry pi", "jetson"]
 ---
