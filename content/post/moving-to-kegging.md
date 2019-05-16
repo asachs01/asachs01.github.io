@@ -12,7 +12,7 @@ title = "Moving to Kegging my Homebrew"
 
 I've posted previously about [homebrewing](http://aaron.sachs.blog/how-homebrewing-saved-me-from-burnout/) and have been brewing for almost three years now. Back in April, I took to destroying a perfectly good mini fridge to turn it into a kegerator. 
 
-![IMG_20170403_105320](/content/images/2017/08/IMG_20170403_105320.jpg)
+![IMG_20170403_105320](/img/IMG_20170403_105320.jpg)
 
 As any homebrewer can tell you, bottling is a pain in the ass. The delabling (if you're reusing bottles), the santization, and the bottle carbonization makes for a rather long and laborious process. Because I'd finally had it with bottling, I decided that kegging would be a wiser choice since:
 
@@ -24,6 +24,7 @@ Thankfully, my assumptions have proven to be true. So let's walk through what it
 
 ### The Build
 I started off with the following hardware:
+
 * [Whirlpool 4.3 cu ft mini fridge](https://www.amazon.com/Whirlpool-Stainless-Compact-Refrigerator-Fridge/dp/B00XQLQXMY)
 * [Chrome plated dual faucet tower](http://www.beveragefactory.com/draftbeer/towers/doublefaucet/D4743DT___6843.shtml)
 * [Draft Brewer Flex Keg System](https://www.midwestsupplies.com/draft-brewer-flex-keg-system)
@@ -37,18 +38,18 @@ I won't go through the whole process of assembling, since the post over at [miss
 
 Now, some pics of the kegerator:
 
-![IMG_20170403_162917](/content/images/2017/08/IMG_20170403_162917.jpg)
+![IMG_20170403_162917](/img/IMG_20170403_162917.jpg)
 
-![IMG_20170403_193658](/content/images/2017/08/IMG_20170403_193658.jpg)
+![IMG_20170403_193658](/img/IMG_20170403_193658.jpg)
 
-![IMG_20170403_193702](/content/images/2017/08/IMG_20170403_193702.jpg)
+![IMG_20170403_193702](/img/IMG_20170403_193702.jpg)
 
-![IMG_20170403_193658-1](/content/images/2017/08/IMG_20170403_193658-1.jpg)
+![IMG_20170403_193658-1](/img/IMG_20170403_193658-1.jpg)
 
-![IMG_20170403_193706](/content/images/2017/08/IMG_20170403_193706.jpg)
+![IMG_20170403_193706](/img/IMG_20170403_193706.jpg)
 
-![IMG_20170403_193711](/content/images/2017/08/IMG_20170403_193711.jpg)
+![IMG_20170403_193711](/img/IMG_20170403_193711.jpg)
 
-![IMG_20170403_231824](/content/images/2017/08/IMG_20170403_231824.jpg)
+![IMG_20170403_231824](/img/IMG_20170403_231824.jpg)
 
 If you've got any questions, feel free to reach out and let me know!
