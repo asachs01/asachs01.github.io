@@ -106,7 +106,7 @@ And set it to start at boot:
 
 Which, if you're using the Sensu Up and Running repo I mentioned earlier, should get you something that looks like this:
 
-![kegpi-sensu](/content/images/2017/11/kegpi-sensu.png)
+![kegpi-sensu](/img/kegpi-sensu.png)
 
 ### Next Steps
 So what do you do after getting Sensu working on your Raspi? Well, it's up to you! In my case, I'll use it to monitor the temperature, whether or not the door is open, and remaining liquid in the kegs for my kegerator. 
