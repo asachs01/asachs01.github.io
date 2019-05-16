@@ -8,6 +8,26 @@ categories: ["monitoring", "sensu", "arm"]
 tags: ["sensu", "monitoring", "arm", "raspberry pi", "jetson"]
 ---
 
+# UPDATES
+
+When I originally wrote this post, I was operating under some outdated assumptions when it comes to building Sensu on arm devices. I'll post the updates here at the beginning of the article, and you can read on to see how I'd previously set up Sensu on my Nvidia Jetson Nanos.
+
+## Compiling Sensu Go
+
+As a Go novice, I didn't fully understand the workflow for compiling Sensu for arm devices. As it so happens, it's fairly easy to cross-compile from whatever device you're on and then just transfer the binaries to the system you want to run on. I found this out the hard way by trying to compile on the Raspberry Pi's I have. This resulted in them locking up. 
+
+So let's walk through the non-build-script way of doing this:
+
+1. Install Go
+2. [Obtain Sensu Go](#obtaining-sensu-go)
+3. Build the binary for your arm system of choice using `GOOS=linux GOARCH=arm go install ./...` from inside the project root (`$GOPATH/src/github/sensu/sensu-go`)
+4. Transfer to the binary/binaries to your Pi's, Nano's, or other arm board
+5. Proceed through the [rest of the setup](#running-sensu-go)
+
+Now, you can absolutely run through the original post as it was and _still_ run Sensu. However, I find that cross compiling from a system with a bit more oomph is going to make things easier. 
+
+# Original post
+
 In this post, I'll cover how I am running Sensu Go on several NVIDIA Jetson Nanos. Though this is being done on a Nano, you could use the same approach I use here on a Raspberry Pi, or any other armv7 board. I would note that this is a temporary until official Sensu Go arm packages are released.
 
 # The Setup
@@ -28,7 +48,7 @@ To install Go, run:
 
 You should then have it installed on your system. If you need more complete documentation on installing Go, please see [Go's docs on downloading and installing Go onto your system][1].
 
-## Obtaining Sensu Go
+## Obtaining Sensu Go{#obtaining-sensu-go}
 
 Once you've installed Go, the next step is to obtain Sensu Go. To get the package, run the following:
 
