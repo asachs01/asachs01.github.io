@@ -6,7 +6,6 @@ date: 2019-05-30T09:03:24-05:00
 description: "Using chaos engineering principles to enhance your monitoring tools"
 categories: ["monitoring", "sensu"]
 tags: ["sensu", "gremlin", "monitoring", "chaos engineering"]
-draft: true
 ---
 
 One of my earliest jobs was as an admin for an MSP. We'd routinely generate alerts that weren't actionable, lacked context, and for most of our customers, were considered noise. From a monitoring perspective, it was bad. Customers didn't trust in the alerts they received and often resorted to having some additional monitoring product installed on their systems. It's safe to say that our auto-generated tickets and emails were largely ignored.
