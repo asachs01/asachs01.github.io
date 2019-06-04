@@ -29,7 +29,7 @@ title = "Talks"
 ## 2019
 
 * [Pragmatic Ops  - Customer Reliability Engineering][5]
-* [Real World Devops - Mentoring][]
+* [Real World Devops - Mentoring][6]
 <!--* [Practical Ops][6]-->
 
   
