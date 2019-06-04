@@ -77,10 +77,10 @@ Just like we tested Sensu to make sure we're able to receive events, we're going
 There we have it! Both Sensu and Gremlin are working like we expect them to. In the next post, I'll cover how to start making your monitoring alerts more useful.
 
 *<!--LINKS-->*
-[1]: [https://media.giphy.com/media/BqPljBK6V9ZPG/giphy.gif](https://media.giphy.com/media/BqPljBK6V9ZPG/giphy.gif)
-[2]: [https://www.gremlin.com/](https://www.gremlin.com/)
-[3]: [https://principlesofchaos.org/](https://principlesofchaos.org/)
-[4]: [http://onemogin.com/monitoring/case-method-better-monitoring-for-humans.html](http://onemogin.com/monitoring/case-method-better-monitoring-for-humans.html)
-[5]: [https://docs.sensu.io/sensu-go/latest/installation/install-sensu/#install-the-sensu-backend](https://docs.sensu.io/sensu-go/5.9/installation/install-sensu/#install-the-sensu-backend)
-[6]: [https://docs.sensu.io/sensu-go/latest/guides/clustering/](https://docs.sensu.io/sensu-go/5.9/guides/clustering/)
-[7]: [https://www.gremlin.com/community/tutorials/how-to-install-and-use-gremlin-on-ubuntu-16-04/](https://www.gremlin.com/community/tutorials/how-to-install-and-use-gremlin-on-ubuntu-16-04/)
+[1]: https://media.giphy.com/media/BqPljBK6V9ZPG/giphy.gif
+[2]: https://www.gremlin.com/
+[3]: https://principlesofchaos.org/
+[4]: http://onemogin.com/monitoring/case-method-better-monitoring-for-humans.html
+[5]: https://docs.sensu.io/sensu-go/5.9/installation/install-sensu/#install-the-sensu-backend
+[6]: https://docs.sensu.io/sensu-go/5.9/guides/clustering/
+[7]: https://www.gremlin.com/community/tutorials/how-to-install-and-use-gremlin-on-ubuntu-16-04/
