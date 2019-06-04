@@ -1,14 +1,15 @@
 +++
 author = "Aaron Sachs"
 date = 2019-01-31 
-description = "A list of talks that I've given."
+description = "Various and sundry public chats, at conferences or otherwise"
 draft = false
 slug = "talks"
-title = "Talks I've Given"
+title = "Talks"
 
 +++
 
 
+# Talks
 
 ## 2018
 
@@ -22,6 +23,14 @@ title = "Talks I've Given"
 
 * Intro to Sensu Go
   * [ChaDevOps][4]
+  
+# Podcasts
+
+## 2019
+
+* [Pragmatic Ops  - Customer Reliability Engineering][5]
+* [Real World Devops - Mentoring][]
+<!--* [Practical Ops][6]-->
 
   
 <!--LINKS-->
@@ -29,3 +38,5 @@ title = "Talks I've Given"
 [2]: https://www.youtube.com/watch?v=bn9FDCzlyG0&list=PLqLtpBjHqwC8S6D_VaVEf8aaXixNEvjIC&index=7
 [3]: https://soapbox.wistia.com/videos/lC5d35JbkB
 [4]: https://www.meetup.com/chadevops/events/258601724/
+[5]: https://www.pragmaticopsweekly.com/
+[6]: #
