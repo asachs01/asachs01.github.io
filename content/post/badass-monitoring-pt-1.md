@@ -72,7 +72,7 @@ BOOM! 💥 Our test worked! Let's just run a quick sample attack with Gremlin no
 
 Just like we tested Sensu to make sure we're able to receive events, we're going to test our Gremlin agent. You can see me run the attack below:
 
-<div nobranding notitle class="cloudapp-embed" data-slug="eae39a428ba8"><a href="[http://share.sachshaus.net/eae39a428ba8](http://share.sachshaus.net/eae39a428ba8)">Screen Recording 2019-05-31 at 04.57 PM.mov</a><script async src="[https://embed.cl.ly/embedded.gz.js](https://embed.cl.ly/embedded.gz.js)" charset="utf-8"></script></div>
+<video src="https://dad6pq311uj47.cloudfront.net/items/0v2D2J0Z3p1L190a1c0E/Screen%20Recording%202019-05-31%20at%2004.57%20PM.mov" controls style="display: block;height: auto;width: 100%;">Screen Recording 2019-05-31 at 04.57 PM.mov</video>
 
 There we have it! Both Sensu and Gremlin are working like we expect them to. In the next post, I'll cover how to start making your monitoring alerts more useful.
 
