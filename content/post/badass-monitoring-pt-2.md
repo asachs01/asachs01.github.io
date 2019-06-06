@@ -6,7 +6,6 @@ date: 2019-06-06T10:31:40
 description: "A short discussion on why we're using Sensu and Gremlin"
 categories: ["monitoring", "sensu"]
 tags: ["sensu"", "monitoring", "chaos engineering"]
-draft: true
 ---
 
 # Back it up
