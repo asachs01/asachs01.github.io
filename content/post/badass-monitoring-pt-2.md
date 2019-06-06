@@ -5,7 +5,7 @@ title: "Badass Monitoring, Pt 2: The 'Why'"
 date: 2019-06-06T10:31:40
 description: "A short discussion on why we're using Sensu and Gremlin"
 categories: ["monitoring", "sensu"]
-tags: ["sensu"", "monitoring", "chaos engineering"]
+tags: ["sensu", "monitoring", "chaos engineering"]
 ---
 
 # Back it up
