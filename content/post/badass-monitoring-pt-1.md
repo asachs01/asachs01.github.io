@@ -24,7 +24,7 @@ For this series, I'll be using Sensu as my monitoring tool of choice.
 
 ## **Gremlin**
 
-Being in IT, you're probably familiar with Gremlins.
+If you're in IT, you're probably familiar with Gremlins.
 
 ![gremlin gif][1]
 
@@ -40,15 +40,15 @@ I've already set up Sensu in my own environment (which is Ubuntu 18.04), so I'm 
 
 ## **Gremlin**
 
-Just like Sensu, we'll need to install Gremlin's agent so we can start ~~doing pseudo-nefarious stuff~~ performing attacks on our test boxen 😈. In this case, since I'm using Ubuntu 18.04 as my test box of choice, I'll also follow [Gremlin's installation guide][7] for Ubuntu as well (though it's for Ubuntu 16.04, this should still work in our case). 
+Just like Sensu, we'll need to install Gremlin's agent so we can start ~~doing pseudo-nefarious stuff~~ performing attacks on our test boxen. 😈 In this case, since I'm using Ubuntu 18.04 as my test box of choice, I'll also follow [Gremlin's installation guide][7] for Ubuntu as well (though it's for Ubuntu 16.04, this should still work in our case). 
 
 # Next Steps
 
-Once you've got both Sensu and Gremlin installed, let's run a couple of test just to make sure things are working like we expect them to. 
+Once you've got both Sensu and Gremlin installed, let's run a couple of tests to make sure things are working like we expect them to. 
 
 ## Sensu
 
-One of the cool things about Sensu is that you can monitor anything with it and you can have alerts generated from any number of things, not just the [community plugins][8] or [assets][8] Sensu offers. We can create some ad-hoc alerts using the [agent API][9] just to see what an alert might look like in our dashboard. To do that, run the following on your test VM:
+One of the cool things about Sensu is that you can monitor anything and you can have alerts generated from any number of things, not just the [community plugins][8] or [assets][8] Sensu offers. We can create some ad-hoc alerts using the [agent API][9] just to see what an alert might look like in our dashboard. To do that, run the following on your test VM:
 
     curl -X POST \
     -H 'Content-Type: application/json' \
@@ -74,7 +74,7 @@ Just like we tested Sensu to make sure we're able to receive events, we're going
 
 <video src="https://dad6pq311uj47.cloudfront.net/items/0v2D2J0Z3p1L190a1c0E/Screen%20Recording%202019-05-31%20at%2004.57%20PM.mov" controls style="display: block;height: auto;width: 100%;">Screen Recording 2019-05-31 at 04.57 PM.mov</video>
 
-There we have it! Both Sensu and Gremlin are working like we expect them to. In the next post, I'll cover how to start making your monitoring alerts more useful.
+There we have it! Both Sensu and Gremlin are working like we expect them to. In the next post, I'm going to dig a bit more into the "why" of using a chaos engineering tool like Gremlin to test monitoring tools like Sensu.
 
 *<!--LINKS-->*
 [1]: https://media.giphy.com/media/BqPljBK6V9ZPG/giphy.gif
