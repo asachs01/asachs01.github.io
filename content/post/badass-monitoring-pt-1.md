@@ -72,7 +72,7 @@ BOOM! 💥 Our test worked! Let's just run a quick sample attack with Gremlin no
 
 Just like we tested Sensu to make sure we're able to receive events, we're going to test our Gremlin agent. You can see me run the attack below:
 
-<video src="https://dad6pq311uj47.cloudfront.net/items/0v2D2J0Z3p1L190a1c0E/Screen%20Recording%202019-05-31%20at%2004.57%20PM.mov" controls style="display: block;height: auto;width: 100%;">Screen Recording 2019-05-31 at 04.57 PM.mov</video>
+<video src="https://dad6pq311uj47.cloudfront.net/items/3r042g3v3d3A3N04383U/Screen%20Recording%202019-06-14%20at%2003.25%20PM.mov" controls style="display: block;height: auto;width: 100%;">Screen Recording 2019-06-14 at 03.25 PM.mov</video>
 
 There we have it! Both Sensu and Gremlin are working like we expect them to. In the next post, I'm going to dig a bit more into the "why" of using a chaos engineering tool like Gremlin to test monitoring tools like Sensu.
 
