@@ -66,6 +66,8 @@ One of the cool things about Sensu is that you can monitor anything and you can 
 
 That command creates a mock event and sends it to the agent API. Now, this might be useful if I had some sort of code that monitored a mysql backup job and emitted this message. In our case, it's just for us to make sure that we've set up and configured Sensu correctly. A successful test should leave you with an event that looks something like this:
 
+<a href="http://share.sachshaus.net/325f03a6f1a2" target="_blank"><img src="https://dad6pq311uj47.cloudfront.net/items/2y1c1I1B2h1B050h142F/Image%202019-06-14%20at%209.48.37%20PM.png" style="display: block;height: auto;width: 100%;"/></a>
+
 BOOM! 💥 Our test worked! Let's just run a quick sample attack with Gremlin now.
 
 ## Gremlin
