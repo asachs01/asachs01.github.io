@@ -213,7 +213,7 @@ tail -f /var/log/sensu/sensu-agent.log
 
 Which should give us logs that show we're doing things and then also check to see that the agent shows up in the dashboard:
 
-<a href="http://share.sachshaus.net/f0a256c17af0" target="_blank"><img src="https://d1c0hjomoutdrw.cloudfront.net/items/2Z3s2V162A3a3D3D2d2N/Image%202019-05-17%20at%203.09.24%20PM.png" style="display: block;height: 600px;width: 900px;"/></a>
+![screenshot of sensu on osx](/img/sensu_osx.png)
 
 Boom! There you have it!
 
