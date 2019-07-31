@@ -57,7 +57,7 @@ theme = "blackburn"
     identifier = "posts"
     url = "/post/"
   [[menu.main]]
-    name = "Reading List"
+    name = "Stuff I've Written"
     pre = "<i class='fa fa-list fa-fw'></i>"
     weight = 5
     identifier = "stuff-ive-written"
