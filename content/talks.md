@@ -30,8 +30,6 @@ title = "Talks"
 
 * [Pragmatic Ops  - Customer Reliability Engineering][5]
 * [Real World Devops - Mentoring][6]
-<!--* [Practical Ops][6]-->
-
   
 <!--LINKS-->
 [1]: https://www.youtube.com/watch?v=bFICVwvlBXM
@@ -39,4 +37,4 @@ title = "Talks"
 [3]: https://soapbox.wistia.com/videos/lC5d35JbkB
 [4]: https://www.meetup.com/chadevops/events/258601724/
 [5]: https://www.pragmaticopsweekly.com/
-[6]: #
+[6]: https://www.realworlddevops.com/episodes/mentorship-in-tech-with-aaron-sachs

@@ -60,8 +60,8 @@ theme = "blackburn"
     name = "Reading List"
     pre = "<i class='fa fa-list fa-fw'></i>"
     weight = 5
-    identifier = "currently-reading"
-    url = "/currently-reading/"
+    identifier = "stuff-ive-written"
+    url = "/stuff-ive-written/"
 #  [[menu.main]]
 #    name = "Contact"
 #    pre = "<i class='fa fa-phone fa-fw'></i>"
