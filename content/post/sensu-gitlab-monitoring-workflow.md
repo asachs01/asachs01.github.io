@@ -100,9 +100,6 @@ configure sensu go:
   - sleep 10
   - sensuctl configure -n --username "admin" --password 'P@ssw0rd!' --url "http://127.0.0.1:8080"
 
-# This stage presently works even if resources aren't applied
-# Error is "Error: No API URL is defined. You can configure an API URL by running "sensuctl configure""
-# Need to figure out a way to fail if this message is encountered
 deploy checks to staging:
   stage: deploy-staging
   rules:
