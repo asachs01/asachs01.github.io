@@ -2,6 +2,7 @@
 title: Automated Monitoring Deployments with Sensu & Gitlab
 date: 2020-01-03T13:28:53.000Z
 description: Using CI/CD pipelines in Gitlab to push resources to Sensu
+
 ---
 Work has kept me busy lately, but one thing that I've been working on is a Git-centric workflow for publishing Sensu resources. It's still a work in progress, but I figured I'd share the progress so far. 
 
