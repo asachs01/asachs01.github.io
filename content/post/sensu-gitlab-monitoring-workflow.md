@@ -1,25 +1,152 @@
 ---
-author: Aaron Sachs
-categories:
-  - sensu
-  - monitoring
-  - git
-slug: sensu-gitlab-monitoring-workflow
-tags:
-  - ''
 title: Automated Monitoring Deployments with Sensu & Gitlab
 date: 2020-01-03T13:28:53.000Z
-description: ''
+description: Using CI/CD pipelines in Gitlab to push resources to Sensu
 ---
+Work has kept me busy lately, but one thing that I've been working on is a Git-centric workflow for publishing Sensu resources. It's still a work in progress, but I figured I'd share the progress so far. 
+
+## My Setup
+
+### Gitlab
+
+I'm currently using [Gitlab's][1] community edition in my home lab, which features the built-in CI/CD pipelines. My runners are all using their Docker executor, so all of the stages that are run are run inside containers.
+
+### Stages
+
+The CI config that I'm using looks like this:
+
+```yaml
+default:
+  image: 
+    name: sensu/sensu:5.15.0
+
+stages:
+  - lint-yaml
+  - start-sensu
+  - configure
+  - deploy-staging
+  - open-mr
+  - deploy-prod
+
+lint yaml:
+  stage: lint-yaml
+  rules:
+    - if: '$CI_COMMIT_REF_NAME != "master"'
+      when: always
+  script:
+  - apk add --no-cache py3-setuptools
+  - pip3 install --no-cache-dir yamllint
+  - yamllint .
+
+configure sensu go:
+  stage: configure
+  rules:
+    - if: '$CI_COMMIT_REF_NAME != "master"'
+      when: always
+  script:
+  - sensu-backend start &
+  - sleep 10
+  - sensuctl configure -n --username "admin" --password 'P@ssw0rd!' --url "http://127.0.0.1:8080"
+
+deploy checks to staging:
+  stage: deploy-staging
+  rules:
+    - if: '$CI_COMMIT_REF_NAME != "master"'
+      when: always
+  script:
+  - sensu-backend start &
+  - sleep 10
+  - sensuctl configure -n --username "admin" --password 'P@ssw0rd!' --url "http://127.0.0.1:8080"
+  - find . -type f \( -iname "*.yml" ! -iname ".*" \) -exec sensuctl create -f {} \;
+  - sensuctl check list
+
+open merge request:
+  stage: open-mr
+  image: centos:7
+  only:
+    - /^add-resource\/*/
+  script:
+  - HOST=${CI_PROJECT_URL} CI_PROJECT_ID=${CI_PROJECT_ID} CI_COMMIT_REF_NAME=${CI_COMMIT_REF_NAME} GITLAB_USER_ID=${GITLAB_USER_ID} PRIVATE_TOKEN=${PRIVATE_TOKEN} ./utils/autoMergeRequest.sh
+
+deploy checks to prod:
+  stage: deploy-prod
+  rules:
+    - if: '$CI_COMMIT_REF_NAME == "master"'
+      when: always
+  script:
+  - apk add --no-cache curl 
+  - curl -L https://letsencrypt.org/certs/lets-encrypt-x3-cross-signed.pem.txt -o letsencrypt_ca_cert.pem
+  - sensuctl configure -n --username "admin" --password 'P@ssw0rd!' --url "https://sensu00.sachshaus.net:8080" --trusted-ca-file letsencrypt_ca_cert.pem
+  - find . -type f \( -iname "*.yml" ! -iname ".*" \) -exec sensuctl create -f {} \;
+  - sensuctl check listdefault:
+  image: 
+    name: sensu/sensu:5.15.0
+
+stages:
+  - lint-yaml
+  - start-sensu
+  - configure
+  - deploy-staging
+  - deploy-prod
+
+lint yaml:
+  stage: lint-yaml
+  rules:
+    - if: '$CI_COMMIT_REF_NAME != "master"'
+      when: always
+  script:
+  - apk add --no-cache py3-setuptools
+  - pip3 install --no-cache-dir yamllint
+  - yamllint .
+
+configure sensu go:
+  stage: configure
+  rules:
+    - if: '$CI_COMMIT_REF_NAME != "master"'
+      when: always
+  script:
+  - sensu-backend start &
+  - sleep 10
+  - sensuctl configure -n --username "admin" --password 'P@ssw0rd!' --url "http://127.0.0.1:8080"
+
+# This stage presently works even if resources aren't applied
+# Error is "Error: No API URL is defined. You can configure an API URL by running "sensuctl configure""
+# Need to figure out a way to fail if this message is encountered
+deploy checks to staging:
+  stage: deploy-staging
+  rules:
+    - if: '$CI_COMMIT_REF_NAME != "master"'
+      when: always
+  script:
+  - sensu-backend start &
+  - sleep 10
+  - sensuctl configure -n --username "admin" --password 'P@ssw0rd!' --url "http://127.0.0.1:8080"
+  - find . -type f \( -iname "*.yml" ! -iname ".*" \) -exec sensuctl create -f {} \;
+  - sensuctl check list
+
+deploy checks to prod:
+  stage: deploy-prod
+  rules:
+    - if: '$CI_COMMIT_REF_NAME == "master"'
+      when: always
+  script:
+  - apk add --no-cache curl 
+  - curl -L https://letsencrypt.org/certs/lets-encrypt-x3-cross-signed.pem.txt -o letsencrypt_ca_cert.pem
+  - sensuctl configure -n --username "XXXXXXXXX" --password 'XXXXXXXXXXX' --url "https://sensu00.example.com:8080" 
+  - find . -type f \( -iname "*.yml" ! -iname ".*" \) -exec sensuctl create -f {} \;
+  - sensuctl check list
+
+```
+
 
 * Intro
-* 
+*
 * How you can do it
 
 <!--LINKS-->
-[1]:
-[2]:
-[3]:
-[4]:
-[5]:
 
+[1]: http://gitlab.com/http://gitlab.com/
+[2]: 
+[3]: 
+[4]: 
+[5]:
