@@ -25,7 +25,6 @@ stages:
   - start-sensu
   - configure
   - deploy-staging
-  - open-mr
   - deploy-prod
 
 lint yaml:
@@ -60,14 +59,6 @@ deploy checks to staging:
   - find . -type f \( -iname "*.yml" ! -iname ".*" \) -exec sensuctl create -f {} \;
   - sensuctl check list
 
-open merge request:
-  stage: open-mr
-  image: centos:7
-  only:
-    - /^add-resource\/*/
-  script:
-  - HOST=${CI_PROJECT_URL} CI_PROJECT_ID=${CI_PROJECT_ID} CI_COMMIT_REF_NAME=${CI_COMMIT_REF_NAME} GITLAB_USER_ID=${GITLAB_USER_ID} PRIVATE_TOKEN=${PRIVATE_TOKEN} ./utils/autoMergeRequest.sh
-
 deploy checks to prod:
   stage: deploy-prod
   rules:
@@ -76,7 +67,7 @@ deploy checks to prod:
   script:
   - apk add --no-cache curl 
   - curl -L https://letsencrypt.org/certs/lets-encrypt-x3-cross-signed.pem.txt -o letsencrypt_ca_cert.pem
-  - sensuctl configure -n --username "admin" --password 'P@ssw0rd!' --url "https://sensu00.sachshaus.net:8080" --trusted-ca-file letsencrypt_ca_cert.pem
+  - sensuctl configure -n --username "admin" --password 'XXXXXXXXXXX' --url "https://sensu.example.com:8080"
   - find . -type f \( -iname "*.yml" ! -iname ".*" \) -exec sensuctl create -f {} \;
   - sensuctl check listdefault:
   image: 
