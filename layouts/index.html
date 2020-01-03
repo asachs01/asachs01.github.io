@@ -1,0 +1,18 @@
+{{ partial "header.html" . }}
+
+<div class="header">
+  <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
+  <h1>{{ .Title }}</h1>
+  <h2>{{ .Site.Params.subtitle }}</h2>
+</div>
+
+<div class="content">
+  {{ range ( .Paginate (where .Site.RegularPages "Type" "post")).Pages }}
+    {{ .Render "summary"}}
+  {{ end }}
+
+  {{ partial "pagination.html" . }}
+
+</div>
+
+{{ partial "footer.html" . }}
