@@ -6,7 +6,6 @@ date: 2020-01-03T08:28:53-05:00
 description: ""
 categories: ["sensu", "monitoring", "git"]
 tags: [""]
-draft: true
 ---
 
 * Intro
