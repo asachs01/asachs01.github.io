@@ -212,7 +212,7 @@ sudo systemctl start sensu-{agent,backend}
 
 To ensure that Sensu is running as we expect, do a quick `sudo journalctl -fu sensu-backend`. Journald should be free of any errors and if you go to http://IPOFYOURSYSTEM:3000, you should get a nice dashboard that looks like:
 
-![](https://d1c0hjomoutdrw.cloudfront.net/items/121T2B171H1O2c210e2B/Webp.net-resizeimage.png)
+![sensu go dashboard](https://p299.p4.n0.cdn.getcloudapp.com/items/OAuL7wme/Image+2020-01-17+at+12.25.47+PM.png?v=c53eadf0f22ed4865e2e5971c164b759)
 
 There you have it! If you want to cluster a few Jetson Nanos, or Raspberry Pis up, head over to [Sensu's clustering guide][2]. 
 
