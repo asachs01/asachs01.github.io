@@ -11,6 +11,10 @@ title = "Talks"
 
 # Talks
 
+## 2017
+
+* [Sensu Fall 2017 Training][sensu-training]
+
 ## 2018
 
 * Where's My Beer? Building a Bettter Kegerator with a Raspberry Pi & Sensu
@@ -38,3 +42,4 @@ title = "Talks"
 [4]: https://www.meetup.com/chadevops/events/258601724/
 [5]: https://www.pragmaticopsweekly.com/
 [6]: https://www.realworlddevops.com/episodes/mentorship-in-tech-with-aaron-sachs
+[sensu-training]: https://www.youtube.com/watch?v=-j6-PVKs-X8&list=PLqLtpBjHqwC-4o7HLtK3MM2V_GdtSh-Dw
