@@ -30,7 +30,8 @@ title = "Talks"
 
 ## 2021
 
-* [Pay (no) attention to the index behind the curtain][graylog-go]
+* Pay (no) attention to the index behind the curtain
+  * [Graylog GO][graylog-go]
   
 # Podcasts
 
