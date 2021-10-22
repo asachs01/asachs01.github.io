@@ -47,4 +47,4 @@ title = "Talks"
 [5]: https://www.listennotes.com/podcasts/pragmatic-ops-weekly/episode-18-customer-_1uJqCXVGem/
 [6]: https://www.realworlddevops.com/episodes/mentorship-in-tech-with-aaron-sachs
 [sensu-training]: https://www.youtube.com/watch?v=-j6-PVKs-X8&list=PLqLtpBjHqwC-4o7HLtK3MM2V_GdtSh-Dw
-[graylog-go]: 
+[graylog-go]: https://
