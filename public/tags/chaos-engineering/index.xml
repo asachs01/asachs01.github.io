@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+    <channel>
+        <title>Chaos Engineering on Staring Blankly at a Screen</title>
+        <link>http://localhost:1313/tags/chaos-engineering/</link>
+        <description>Recent content in Chaos Engineering on Staring Blankly at a Screen</description>
+        <generator>Hugo -- gohugo.io</generator>
+        <language>en-us</language>
+        <copyright>© 2025 Aaron Sachs. All rights reserved.</copyright>
+        <lastBuildDate>Thu, 06 Jun 2019 10:31:40 +0000</lastBuildDate><atom:link href="http://localhost:1313/tags/chaos-engineering/index.xml" rel="self" type="application/rss+xml" /><item>
+        <title>Badass Monitoring, Pt 2: The &#39;Why&#39;</title>
+        <link>http://localhost:1313/archive/sensu-gremlin-part-2/</link>
+        <pubDate>Thu, 06 Jun 2019 10:31:40 +0000</pubDate>
+        
+        <guid>http://localhost:1313/archive/sensu-gremlin-part-2/</guid>
+        <description>&lt;h1 id=&#34;back-it-up&#34;&gt;Back it up
+&lt;/h1&gt;&lt;p&gt;Oh man, did I get ahead of myself in my [last post][1]. I started chatting tools, and I realize now that I really should have been talking more about why I&amp;rsquo;m using Sensu and Gremlin. But it didn&amp;rsquo;t occur to me until this past week at [Monitorama][2].&lt;/p&gt;
+&lt;p&gt;[John Allspaw][3] gave the keynote talk (Taking Human Performance Seriously) this year. While you can watch the talk [here][4], I&amp;rsquo;ll highlight a few points here:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;People will pursue what they think will be productive, and won&amp;rsquo;t pursue that which they feel isn&amp;rsquo;t productive&lt;/li&gt;
+&lt;li&gt;Monitoring &amp;amp; observability are inextricably linked with other activities&lt;/li&gt;
+&lt;li&gt;Ask and develop better questions when doing incident analysis&lt;/li&gt;
+&lt;li&gt;Disagreements are data&lt;/li&gt;
+&lt;li&gt;Incidents are investments that your organization accidentally made&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;There are a ton of other great points that John makes. Please, take a few minutes and give it a listen.&lt;/p&gt;
+&lt;h1 id=&#34;what-does-it-mean-basil&#34;&gt;What does it mean, Basil?
+&lt;/h1&gt;&lt;p&gt;Ok, so what does all of that mean and what does it have to do with chaos engineering experiments and monitoring? Everything! When you consider what happens with an incident, the last thing anyone wants is more monitoring noise, or to be surprised by the information they receive. It&amp;rsquo;s not useful.&lt;/p&gt;
+&lt;p&gt;The tools we use when making sense of an incident should provide us with information in such a way that our reasoning about and making inferences during an incident are better because of that information. Informational cruft (i.e., contextless, repeated, action-less alerts) ultimately do damage, or at the very least, don&amp;rsquo;t contribute to making sense of an incident.&lt;/p&gt;
+&lt;p&gt;This is why I&amp;rsquo;m using Sensu and Gremlin&amp;ndash;to refine the tool that I use for monitoring so that the information I have is of high quality and is a useful part of my information gathering and sense-making processes.&lt;/p&gt;
+&lt;h1 id=&#34;oh-the-places-well-go&#34;&gt;Oh the places we&amp;rsquo;ll go
+&lt;/h1&gt;&lt;p&gt;The rest of this series is going to focus on this: making Sensu a high-quality information gathering and sense-making tool for incidents. Not that it isn&amp;rsquo;t already a great tool, but just slapping a status check on a group of boxen doesn&amp;rsquo;t 👏 make 👏 for 👏 useful 👏 monitoring! There&amp;rsquo;s more to metric gathering and status checks. So we&amp;rsquo;re going to work through that. We&amp;rsquo;ll go from the most minimal thing we can do (a status check) to an alert that provide us with high-quality information for future troubleshooting. We&amp;rsquo;ll use Gremlin along the way as the means of refining those alerts.&lt;/p&gt;
+&lt;p&gt;Cheers,&lt;/p&gt;
+&lt;p&gt;Aaron&lt;/p&gt;
+&lt;p&gt;&lt;em&gt;&lt;/em&gt;
+[1]: ../sensu-gremlin-intro/
+[2]: &lt;a class=&#34;link&#34; href=&#34;https://monitorama.com/2019/pdx.html&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;https://monitorama.com/2019/pdx.html&lt;/a&gt;&lt;br&gt;
+[3]: &lt;a class=&#34;link&#34; href=&#34;https://twitter.com/allspaw&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;https://twitter.com/allspaw&lt;/a&gt;
+[4]: &lt;a class=&#34;link&#34; href=&#34;https://youtu.be/eZJoevaojyE?t=2497&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;https://youtu.be/eZJoevaojyE?t=2497&lt;/a&gt;&lt;/p&gt;
+</description>
+        </item>
+        <item>
+        <title>Badass Monitoring, Pt 1: Sensu &amp; Gremlin</title>
+        <link>http://localhost:1313/archive/sensu-gremlin-intro/</link>
+        <pubDate>Thu, 30 May 2019 09:03:24 -0500</pubDate>
+        
+        <guid>http://localhost:1313/archive/sensu-gremlin-intro/</guid>
+        <description>&lt;p&gt;One of my earliest jobs was as an admin for an MSP. We&amp;rsquo;d routinely generate alerts that weren&amp;rsquo;t actionable, lacked context, and for most of our customers, were considered noise. From a monitoring perspective, it was bad. Customers didn&amp;rsquo;t trust in the alerts they received and often resorted to having some additional monitoring product installed on their systems. It&amp;rsquo;s safe to say that our auto-generated tickets and emails were largely ignored.&lt;/p&gt;
+&lt;p&gt;In an effort to avoid repeating mistakes of the past, I want to ensure that I have actionable alerts that are context heavy. Thankfully, there are a couple of tools that I&amp;rsquo;ve found go a long way in helping me with that effort: Sensu and Gremlin. I&amp;rsquo;ll do an intro to those tools today, and we&amp;rsquo;ll pick up on how these tools work together in the next post. It&amp;rsquo;s worth mentioning that I am a Sensu employee.&lt;/p&gt;
+&lt;p&gt;With that out of the way, let&amp;rsquo;s get to the tools!&lt;/p&gt;
+&lt;h1 id=&#34;the-tools&#34;&gt;&lt;strong&gt;The Tools&lt;/strong&gt;
+&lt;/h1&gt;&lt;h2 id=&#34;sensu&#34;&gt;&lt;strong&gt;Sensu&lt;/strong&gt;
+&lt;/h2&gt;&lt;p&gt;If you&amp;rsquo;ve not used &lt;a class=&#34;link&#34; href=&#34;https://sensu.io&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;Sensu&lt;/a&gt; before, allow me to make a formal introduction. At Sensu, we talk about it as a &amp;ldquo;monitoring event pipeline.&amp;rdquo; The concept is similar to a CI/CD pipeline, except that instead of releasing software software, I&amp;rsquo;m sending monitoring event data. The goal with the pipeline being that by the time I receive a monitoring event or alert, I know beyond a shadow of a doubt that what I have in front of me has been verified and provides me with exactly what I need to act on the data.&lt;/p&gt;
+&lt;p&gt;For this series, I&amp;rsquo;ll be using Sensu as my monitoring tool of choice.&lt;/p&gt;
+&lt;h2 id=&#34;gremlin&#34;&gt;&lt;strong&gt;Gremlin&lt;/strong&gt;
+&lt;/h2&gt;&lt;p&gt;If you&amp;rsquo;re in IT, you&amp;rsquo;re probably familiar with Gremlins.&lt;/p&gt;
+&lt;p&gt;![gremlin gif][1]&lt;/p&gt;
+&lt;p&gt;Yes, those ones. They&amp;rsquo;ve been known to cause many an issue, but in this case, I&amp;rsquo;m talking about this [Gremlin][2] in particular. Gremlin is a [chaos engineering][3] tool that allows you to run targeted attacks on your infrastructure. This can be anything from a time-drift attack to more complicated types of attacks. The goal here will be to apply the principles of chaos engineering to uncover any weaknesses in our Sensu deployment and ensure that it is able to withstand real-world conditions.&lt;/p&gt;
+&lt;p&gt;We&amp;rsquo;ll also use Gremlin to introduce conditions that will generate Sensu alerts. By introducing those conditions, we&amp;rsquo;ll be able to ensure that the alerts generated follow the [CASE][4] method.&lt;/p&gt;
+&lt;h1 id=&#34;the-setup&#34;&gt;&lt;strong&gt;The Setup&lt;/strong&gt;
+&lt;/h1&gt;&lt;h2 id=&#34;sensu-1&#34;&gt;&lt;strong&gt;Sensu&lt;/strong&gt;
+&lt;/h2&gt;&lt;p&gt;I&amp;rsquo;ve already set up Sensu in my own environment (which is Ubuntu 18.04), so I&amp;rsquo;m not going to walk through that here. However, if you don&amp;rsquo;t have a working Sensu deployment, you&amp;rsquo;ll want to checkout the [Sensu installation doc][5], so that you can get all of the various Sensu components installed. It&amp;rsquo;s worth noting that for some our later testing, we&amp;rsquo;ll be using a clustered deployment. For that, you&amp;rsquo;ll want to take a look at the [clustering doc][6].&lt;/p&gt;
+&lt;h2 id=&#34;gremlin-1&#34;&gt;&lt;strong&gt;Gremlin&lt;/strong&gt;
+&lt;/h2&gt;&lt;p&gt;Just like Sensu, we&amp;rsquo;ll need to install Gremlin&amp;rsquo;s agent so we can start &lt;del&gt;doing pseudo-nefarious stuff&lt;/del&gt; performing attacks on our test boxen. 😈 In this case, since I&amp;rsquo;m using Ubuntu 18.04 as my test box of choice, I&amp;rsquo;ll also follow [Gremlin&amp;rsquo;s installation guide][7] for Ubuntu as well (though it&amp;rsquo;s for Ubuntu 16.04, this should still work in our case).&lt;/p&gt;
+&lt;h1 id=&#34;next-steps&#34;&gt;Next Steps
+&lt;/h1&gt;&lt;p&gt;Once you&amp;rsquo;ve got both Sensu and Gremlin installed, let&amp;rsquo;s run a couple of tests to make sure things are working like we expect them to.&lt;/p&gt;
+&lt;h2 id=&#34;sensu-2&#34;&gt;Sensu
+&lt;/h2&gt;&lt;p&gt;One of the cool things about Sensu is that you can monitor anything and you can have alerts generated from any number of things, not just the [community plugins][8] or [assets][8] Sensu offers. We can create some ad-hoc alerts using the [agent API][9] just to see what an alert might look like in our dashboard. To do that, run the following on your test VM:&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;curl -X POST \
+-H &#39;Content-Type: application/json&#39; \
+-d &#39;{
+  &amp;quot;check&amp;quot;: {
+    &amp;quot;metadata&amp;quot;: {
+      &amp;quot;name&amp;quot;: &amp;quot;mysql-backup-job&amp;quot;
+    },
+    &amp;quot;status&amp;quot;: 0,
+    &amp;quot;output&amp;quot;: &amp;quot;mysql backup initiated&amp;quot;,
+    &amp;quot;ttl&amp;quot;: 25200
+  }
+}&#39; \
+http://127.0.0.1:3031/events
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;That command creates a mock event and sends it to the agent API. Now, this might be useful if I had some sort of code that monitored a mysql backup job and emitted this message. In our case, it&amp;rsquo;s just for us to make sure that we&amp;rsquo;ve set up and configured Sensu correctly. A successful test should leave you with an event that looks something like this:&lt;/p&gt;
+&lt;p&gt;&lt;!-- raw HTML omitted --&gt;&lt;!-- raw HTML omitted --&gt;&lt;!-- raw HTML omitted --&gt;&lt;/p&gt;
+&lt;p&gt;BOOM! 💥 Our test worked! Let&amp;rsquo;s just run a quick sample attack with Gremlin now.&lt;/p&gt;
+&lt;h2 id=&#34;gremlin-2&#34;&gt;Gremlin
+&lt;/h2&gt;&lt;p&gt;Just like we tested Sensu to make sure we&amp;rsquo;re able to receive events, we&amp;rsquo;re going to test our Gremlin agent. You can see me run the attack below:&lt;/p&gt;
+&lt;p&gt;&lt;!-- raw HTML omitted --&gt;Screen Recording 2019-06-14 at 03.25 PM.mov&lt;!-- raw HTML omitted --&gt;&lt;/p&gt;
+&lt;p&gt;There we have it! Both Sensu and Gremlin are working like we expect them to. In the next post, I&amp;rsquo;m going to dig a bit more into the &amp;ldquo;why&amp;rdquo; of using a chaos engineering tool like Gremlin to test monitoring tools like Sensu.&lt;/p&gt;
+&lt;p&gt;&lt;em&gt;&lt;/em&gt;
+[1]: &lt;a class=&#34;link&#34; href=&#34;https://media.giphy.com/media/BqPljBK6V9ZPG/giphy.gif&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;https://media.giphy.com/media/BqPljBK6V9ZPG/giphy.gif&lt;/a&gt;
+[2]: &lt;a class=&#34;link&#34; href=&#34;https://www.gremlin.com/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;https://www.gremlin.com/&lt;/a&gt;
+[3]: &lt;a class=&#34;link&#34; href=&#34;https://principlesofchaos.org/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;https://principlesofchaos.org/&lt;/a&gt;
+[4]: &lt;a class=&#34;link&#34; href=&#34;http://onemogin.com/monitoring/case-method-better-monitoring-for-humans.html&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;http://onemogin.com/monitoring/case-method-better-monitoring-for-humans.html&lt;/a&gt;
+[5]: &lt;a class=&#34;link&#34; href=&#34;https://docs.sensu.io/sensu-go/5.9/installation/install-sensu/#install-the-sensu-backend&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;https://docs.sensu.io/sensu-go/5.9/installation/install-sensu/#install-the-sensu-backend&lt;/a&gt;
+[6]: &lt;a class=&#34;link&#34; href=&#34;https://docs.sensu.io/sensu-go/5.9/guides/clustering/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;https://docs.sensu.io/sensu-go/5.9/guides/clustering/&lt;/a&gt;
+[7]: &lt;a class=&#34;link&#34; href=&#34;https://www.gremlin.com/community/tutorials/how-to-install-and-use-gremlin-on-ubuntu-16-04/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;https://www.gremlin.com/community/tutorials/how-to-install-and-use-gremlin-on-ubuntu-16-04/&lt;/a&gt;&lt;/p&gt;
+</description>
+        </item>
+        
+    </channel>
+</rss>

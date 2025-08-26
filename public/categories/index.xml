@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+    <channel>
+        <title>Categories on Staring Blankly at a Screen</title>
+        <link>http://localhost:1313/categories/</link>
+        <description>Recent content in Categories on Staring Blankly at a Screen</description>
+        <generator>Hugo -- gohugo.io</generator>
+        <language>en-us</language>
+        <copyright>© 2025 Aaron Sachs. All rights reserved.</copyright>
+        <lastBuildDate>Thu, 06 Jun 2019 10:31:40 +0000</lastBuildDate><atom:link href="http://localhost:1313/categories/index.xml" rel="self" type="application/rss+xml" /><item>
+        <title>Monitoring</title>
+        <link>http://localhost:1313/categories/monitoring/</link>
+        <pubDate>Thu, 06 Jun 2019 10:31:40 +0000</pubDate>
+        
+        <guid>http://localhost:1313/categories/monitoring/</guid>
+        <description></description>
+        </item>
+        <item>
+        <title>Sensu</title>
+        <link>http://localhost:1313/categories/sensu/</link>
+        <pubDate>Thu, 06 Jun 2019 10:31:40 +0000</pubDate>
+        
+        <guid>http://localhost:1313/categories/sensu/</guid>
+        <description></description>
+        </item>
+        <item>
+        <title>Osx</title>
+        <link>http://localhost:1313/categories/osx/</link>
+        <pubDate>Thu, 16 May 2019 19:49:32 -0500</pubDate>
+        
+        <guid>http://localhost:1313/categories/osx/</guid>
+        <description></description>
+        </item>
+        <item>
+        <title>Arm</title>
+        <link>http://localhost:1313/categories/arm/</link>
+        <pubDate>Thu, 09 May 2019 19:49:32 -0500</pubDate>
+        
+        <guid>http://localhost:1313/categories/arm/</guid>
+        <description></description>
+        </item>
+        <item>
+        <title>Tech</title>
+        <link>http://localhost:1313/categories/tech/</link>
+        <pubDate>Mon, 06 May 2019 11:32:56 -0500</pubDate>
+        
+        <guid>http://localhost:1313/categories/tech/</guid>
+        <description></description>
+        </item>
+        <item>
+        <title>Beer</title>
+        <link>http://localhost:1313/categories/beer/</link>
+        <pubDate>Tue, 17 Apr 2018 16:48:02 +0000</pubDate>
+        
+        <guid>http://localhost:1313/categories/beer/</guid>
+        <description></description>
+        </item>
+        <item>
+        <title>Homebrew</title>
+        <link>http://localhost:1313/categories/homebrew/</link>
+        <pubDate>Tue, 17 Apr 2018 16:48:02 +0000</pubDate>
+        
+        <guid>http://localhost:1313/categories/homebrew/</guid>
+        <description></description>
+        </item>
+        <item>
+        <title>Homebrewing</title>
+        <link>http://localhost:1313/categories/homebrewing/</link>
+        <pubDate>Tue, 17 Apr 2018 16:48:02 +0000</pubDate>
+        
+        <guid>http://localhost:1313/categories/homebrewing/</guid>
+        <description></description>
+        </item>
+        <item>
+        <title>Brewing</title>
+        <link>http://localhost:1313/categories/brewing/</link>
+        <pubDate>Thu, 15 Mar 2018 10:00:00 -0500</pubDate>
+        
+        <guid>http://localhost:1313/categories/brewing/</guid>
+        <description></description>
+        </item>
+        <item>
+        <title>Personal</title>
+        <link>http://localhost:1313/categories/personal/</link>
+        <pubDate>Thu, 15 Mar 2018 10:00:00 -0500</pubDate>
+        
+        <guid>http://localhost:1313/categories/personal/</guid>
+        <description></description>
+        </item>
+        <item>
+        <title>Kegerator</title>
+        <link>http://localhost:1313/categories/kegerator/</link>
+        <pubDate>Thu, 16 Nov 2017 20:16:08 +0000</pubDate>
+        
+        <guid>http://localhost:1313/categories/kegerator/</guid>
+        <description></description>
+        </item>
+        <item>
+        <title>Raspberry Pi</title>
+        <link>http://localhost:1313/categories/raspberry-pi/</link>
+        <pubDate>Thu, 16 Nov 2017 20:16:08 +0000</pubDate>
+        
+        <guid>http://localhost:1313/categories/raspberry-pi/</guid>
+        <description></description>
+        </item>
+        <item>
+        <title>Career</title>
+        <link>http://localhost:1313/categories/career/</link>
+        <pubDate>Tue, 22 Aug 2017 00:57:25 +0000</pubDate>
+        
+        <guid>http://localhost:1313/categories/career/</guid>
+        <description></description>
+        </item>
+        <item>
+        <title>How I Work</title>
+        <link>http://localhost:1313/categories/how-i-work/</link>
+        <pubDate>Tue, 22 Aug 2017 00:57:25 +0000</pubDate>
+        
+        <guid>http://localhost:1313/categories/how-i-work/</guid>
+        <description></description>
+        </item>
+        <item>
+        <title>Support-Driven</title>
+        <link>http://localhost:1313/categories/support-driven/</link>
+        <pubDate>Tue, 22 Aug 2017 00:42:54 +0000</pubDate>
+        
+        <guid>http://localhost:1313/categories/support-driven/</guid>
+        <description></description>
+        </item>
+        <item>
+        <title>Tools</title>
+        <link>http://localhost:1313/categories/tools/</link>
+        <pubDate>Tue, 22 Aug 2017 00:42:01 +0000</pubDate>
+        
+        <guid>http://localhost:1313/categories/tools/</guid>
+        <description></description>
+        </item>
+        <item>
+        <title>Linux</title>
+        <link>http://localhost:1313/categories/linux/</link>
+        <pubDate>Wed, 21 Dec 2016 01:58:00 +0000</pubDate>
+        
+        <guid>http://localhost:1313/categories/linux/</guid>
+        <description></description>
+        </item>
+        <item>
+        <title>Banjo</title>
+        <link>http://localhost:1313/categories/banjo/</link>
+        <pubDate>Fri, 18 Nov 2016 01:45:00 +0000</pubDate>
+        
+        <guid>http://localhost:1313/categories/banjo/</guid>
+        <description></description>
+        </item>
+        <item>
+        <title>Clawhammer</title>
+        <link>http://localhost:1313/categories/clawhammer/</link>
+        <pubDate>Fri, 18 Nov 2016 01:45:00 +0000</pubDate>
+        
+        <guid>http://localhost:1313/categories/clawhammer/</guid>
+        <description></description>
+        </item>
+        <item>
+        <title>Music</title>
+        <link>http://localhost:1313/categories/music/</link>
+        <pubDate>Fri, 18 Nov 2016 01:45:00 +0000</pubDate>
+        
+        <guid>http://localhost:1313/categories/music/</guid>
+        <description></description>
+        </item>
+        <item>
+        <title>Burnout</title>
+        <link>http://localhost:1313/categories/burnout/</link>
+        <pubDate>Tue, 26 Jul 2016 00:40:00 +0000</pubDate>
+        
+        <guid>http://localhost:1313/categories/burnout/</guid>
+        <description></description>
+        </item>
+        <item>
+        <title>Customer Success</title>
+        <link>http://localhost:1313/categories/customer-success/</link>
+        <pubDate>Fri, 08 Jul 2016 00:39:00 +0000</pubDate>
+        
+        <guid>http://localhost:1313/categories/customer-success/</guid>
+        <description></description>
+        </item>
+        
+    </channel>
+</rss>

@@ -1,0 +1,198 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+    <channel>
+        <title>Tech on Staring Blankly at a Screen</title>
+        <link>http://localhost:1313/categories/tech/</link>
+        <description>Recent content in Tech on Staring Blankly at a Screen</description>
+        <generator>Hugo -- gohugo.io</generator>
+        <language>en-us</language>
+        <copyright>© 2025 Aaron Sachs. All rights reserved.</copyright>
+        <lastBuildDate>Mon, 06 May 2019 11:32:56 -0500</lastBuildDate><atom:link href="http://localhost:1313/categories/tech/index.xml" rel="self" type="application/rss+xml" /><item>
+        <title>A minimal Sensu environment with Docker</title>
+        <link>http://localhost:1313/archive/minimal-sensu-docker/</link>
+        <pubDate>Mon, 06 May 2019 11:32:56 -0500</pubDate>
+        
+        <guid>http://localhost:1313/archive/minimal-sensu-docker/</guid>
+        <description>&lt;p&gt;This past week, I had the pleaseure of attending Dockercon. While I was there primarily working the &lt;a class=&#34;link&#34; href=&#34;https://sensu.io&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;Sensu&lt;/a&gt; booth, it occurred to me that Docker presents an ideal way to demo what Sensu does, and I can quickly get an environment up without having to go through the rigmarole that I previously did using &lt;a class=&#34;link&#34; href=&#34;https://vagrantup.com&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;Vagrant&lt;/a&gt;. Now, that&amp;rsquo;s not saying that I think one tool is better than the other, but for the purposes of quick demos, Docker is more useful to me.&lt;/p&gt;
+&lt;p&gt;So let&amp;rsquo;s go over the setup.&lt;/p&gt;
+&lt;h2 id=&#34;docker-details&#34;&gt;Docker details
+&lt;/h2&gt;&lt;p&gt;I&amp;rsquo;m primarily using &lt;a class=&#34;link&#34; href=&#34;https://docs.docker.com/docker-for-mac/install/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;Docker for Mac&lt;/a&gt; right now, since I&amp;rsquo;ve switched over from my Linux laptop. But now that I&amp;rsquo;ve covered that, let&amp;rsquo;s take a look at this &lt;a class=&#34;link&#34; href=&#34;https://github.com/asachs01/sensu-go-minimal&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;little repo&lt;/a&gt; I&amp;rsquo;m using.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt; 1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;11
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;12
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;13
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;14
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;15
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;16
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;17
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;18
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-fallback&#34; data-lang=&#34;fallback&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;.
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;├── README.md
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;├── assets
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;│   ├── hello-world-ruby.tar.gz
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;│   ├── helloworld-v0.1.tar.gz
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;│   ├── sensu-plugins-cpu-checks_4.0.0_alpine_linux_amd64.tar.gz
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;│   └── sensu-ruby-runtime_0.0.5_alpine_linux_amd64.tar.gz
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;├── config
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;│   ├── nginx
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;│   │   └── nginx.conf
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;│   └── sensu
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;│       ├── assets
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;│       │   ├── sensu-plugins-cpu-checks.yaml
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;│       │   └── sensu-ruby-runtime.yaml
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;│       └── checks
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;│           ├── check-cpu.yaml
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;│           └── check-disk-usage.yaml
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;└── docker-compose.yaml
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;And a look at the docker-compose file:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt; 1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;11
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;12
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;13
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;14
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;15
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;16
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;17
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;18
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;19
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;20
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;21
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;22
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;23
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;24
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;25
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;26
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;27
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;28
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;29
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;30
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;31
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;32
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;33
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-gdscript3&#34; data-lang=&#34;gdscript3&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;n&#34;&gt;version&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;s1&#34;&gt;&amp;#39;3&amp;#39;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;n&#34;&gt;services&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  &lt;span class=&#34;n&#34;&gt;sensu&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;-&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;backend&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;n&#34;&gt;image&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;s2&#34;&gt;&amp;#34;sensu/sensu:latest&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;n&#34;&gt;ports&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;      &lt;span class=&#34;o&#34;&gt;-&lt;/span&gt; &lt;span class=&#34;s2&#34;&gt;&amp;#34;3000:3000&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;      &lt;span class=&#34;o&#34;&gt;-&lt;/span&gt; &lt;span class=&#34;s2&#34;&gt;&amp;#34;2379:2379&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;      &lt;span class=&#34;o&#34;&gt;-&lt;/span&gt; &lt;span class=&#34;s2&#34;&gt;&amp;#34;2380:2380&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;      &lt;span class=&#34;o&#34;&gt;-&lt;/span&gt; &lt;span class=&#34;s2&#34;&gt;&amp;#34;8080:8080&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;      &lt;span class=&#34;o&#34;&gt;-&lt;/span&gt; &lt;span class=&#34;s2&#34;&gt;&amp;#34;8081:8081&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;n&#34;&gt;command&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;s2&#34;&gt;&amp;#34;sensu-backend start&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;n&#34;&gt;volumes&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;      &lt;span class=&#34;o&#34;&gt;-&lt;/span&gt; &lt;span class=&#34;s2&#34;&gt;&amp;#34;/tmp/sensu:/var/lib/sensu&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;n&#34;&gt;hostname&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;sensu&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;-&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;backend&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  &lt;span class=&#34;n&#34;&gt;sensu&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;-&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;agent&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;n&#34;&gt;image&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;s2&#34;&gt;&amp;#34;sensu/sensu:latest&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;n&#34;&gt;command&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;s2&#34;&gt;&amp;#34;sensu-agent start --backend-url ws://sensu-backend:8081 --subscriptions dev poller system linux docker --cache-dir /var/lib/sensu --namespace default --deregister true&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;n&#34;&gt;links&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;      &lt;span class=&#34;o&#34;&gt;-&lt;/span&gt; &lt;span class=&#34;s2&#34;&gt;&amp;#34;sensu-backend:backend&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;n&#34;&gt;depends_on&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;      &lt;span class=&#34;o&#34;&gt;-&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;sensu&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;-&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;backend&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;n&#34;&gt;hostname&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;sensu&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;-&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;agent&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  &lt;span class=&#34;n&#34;&gt;sensu&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;-&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;asset&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;-&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;server&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;n&#34;&gt;image&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;nginx&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;latest&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;n&#34;&gt;ports&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;o&#34;&gt;-&lt;/span&gt; &lt;span class=&#34;mi&#34;&gt;8000&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;mi&#34;&gt;80&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;n&#34;&gt;volumes&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;o&#34;&gt;-&lt;/span&gt; &lt;span class=&#34;s2&#34;&gt;&amp;#34;./config/nginx/nginx.conf:/etc/nginx/nginx.conf&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;o&#34;&gt;-&lt;/span&gt; &lt;span class=&#34;s2&#34;&gt;&amp;#34;./assets:/usr/share/nginx/html/assets&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;n&#34;&gt;depends_on&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;o&#34;&gt;-&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;sensu&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;-&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;backend&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;n&#34;&gt;links&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;      &lt;span class=&#34;o&#34;&gt;-&lt;/span&gt; &lt;span class=&#34;s2&#34;&gt;&amp;#34;sensu-backend:backend&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;What we end up with here is a backend, an agent, and a local asset server (SUPER useful if you&amp;rsquo;re on 💩 wifi/internet). This means that I can quickly spin up an agent and a backend, and then drop any &lt;a class=&#34;link&#34; href=&#34;https://docs.sensu.io/sensu-go/latest/reference/assets/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;asset&lt;/a&gt; that I need to use in the assets directory and have the agent download it quickly.&lt;/p&gt;
+&lt;p&gt;This makes demos super quick to spin up, and I can scale a bunch of agents if I want to show a large number of agent containers connecting to the backend.&lt;/p&gt;
+&lt;p&gt;Cheers!&lt;/p&gt;
+</description>
+        </item>
+        <item>
+        <title>Why I started using a Kanban tool for home tasks</title>
+        <link>http://localhost:1313/archive/my-personal-kanban/</link>
+        <pubDate>Sun, 10 Feb 2019 20:25:03 -0500</pubDate>
+        
+        <guid>http://localhost:1313/archive/my-personal-kanban/</guid>
+        <description>&lt;p&gt;I&amp;rsquo;ve tried quite a few to-do apps. Google Tasks, Todoist, Wunderlist, Any.do, &lt;!-- raw HTML omitted --&gt;. I&amp;rsquo;ve even tried using things like a planner, or a Bullet Journal. No app, no physical piece of paper seems to do the trick when it comes to keeping track of things I need to do.&lt;/p&gt;
+&lt;p&gt;That is, until I started using a tool that could emulate a Kanban-style workflow. Let&amp;rsquo;s start with &amp;ldquo;What the heck is a Kanban board?&amp;rdquo;&lt;/p&gt;
+&lt;h2 id=&#34;what-is-kanban&#34;&gt;What is Kanban
+&lt;/h2&gt;&lt;p&gt;Kanban boards are basically to-do lists on steroids. They find their origins in the world of &lt;a class=&#34;link&#34; href=&#34;https://www.leanproduction.com/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;Lean Manufacturing&lt;/a&gt;. A general flow looks something like this:&lt;/p&gt;
+&lt;p&gt;To-do &amp;ndash;&amp;gt; Doing &amp;ndash;&amp;gt; Done&lt;/p&gt;
+&lt;p&gt;Where you&amp;rsquo;d have 3 columns with items under the column that represents that item&amp;rsquo;s current status. Keep in mind a Kanban board can be customized to whatever you require, so these columns aren&amp;rsquo;t static. &lt;a class=&#34;link&#34; href=&#34;https://www.atlassian.com/agile/kanban/boards&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;There is a ton more that goes into a Kanban board&lt;/a&gt;, but for a personal one, I&amp;rsquo;ve found that keeping it simple helps me best.&lt;/p&gt;
+&lt;h2 id=&#34;why-would-i-want-to-use-it&#34;&gt;Why would I want to use it?
+&lt;/h2&gt;&lt;p&gt;So why use a Kanban board over a traditional to-do list, or app? For me, it&amp;rsquo;s easy: I can see the progress of what I&amp;rsquo;m doing. At a glance, I can get some insight into what things are in my personal backlog and in what phase they&amp;rsquo;re in. It also happens that putting something on the board makes it stick for me.&lt;/p&gt;
+&lt;p&gt;Using boards has stuck so well that I&amp;rsquo;ve started creating domain specific boards. I have one for home improvement projects, one for general errands and such, one for shopping lists, and a personal one for tasks that aren&amp;rsquo;t a home improvement project or an errand/household task.&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;http://localhost:1313/img/haus-projects.png&#34;
+	
+	
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;house projects&#34;
+	
+	
+&gt;&lt;/p&gt;
+&lt;h2 id=&#34;what-tools-can-i-use-for-my-own-personal-kanban&#34;&gt;What tools can I use for my own personal Kanban?
+&lt;/h2&gt;&lt;p&gt;There are quite a number of tools you can use to do a personal Kanban board. Let&amp;rsquo;s look at a few:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;https://trello.com/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;Trello&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;https://asana.com&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;Asana&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;https://notion.so&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;Notion&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;https://waffle.io&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;Waffle&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;https://waffle.io&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;Personal Kanban&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;http://personalkanban.com/pk/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;Kanban Tool&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;https://www.pipefy.com/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;Pipefy&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;I personally like using Notion for my boards. As a one-stop-shop type of software, it allows me to link to lists and documents that I&amp;rsquo;ve created inside of the app so I don&amp;rsquo;t have to ever worry about going back and forth between tabs or apps.&lt;/p&gt;
+&lt;p&gt;I&amp;rsquo;ve also used Trello and Asana in the past, both at home and work. While they both work well as personal Kanban tools, I still tend to prefer Notion.&lt;/p&gt;
+&lt;p&gt;If you&amp;rsquo;re more of the type that wants to use a Github-centric approach, Waffle is the tool for you.&lt;/p&gt;
+&lt;p&gt;I&amp;rsquo;ve not yet used Personal Kanban, Kanban Tool, or Pipefy, so I can&amp;rsquo;t speak to those tools. However, what I&amp;rsquo;d recommend is giving each of these a shot to see if they&amp;rsquo;re right for you, or if they stick. If they do, awesome! If they don&amp;rsquo;t stick immediately, no worries. The more you use the tools, the more things will settle in and make sense as you develop your workflow.&lt;/p&gt;
+</description>
+        </item>
+        
+    </channel>
+</rss>

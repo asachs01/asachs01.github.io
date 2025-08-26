@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="en-us" dir="ltr">
+    <head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script><meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="It&rsquo;s week four of the Support Driven Writing Challenge, and sadly, I&rsquo;m a bit behind what with the US holiday and the customary food coma. That said, let&rsquo;s get cracking.\nThe Ubiquitous Ticket Queue I&rsquo;ll start off by saying that the most common way of supporting our customers at DigitalOcean (from a Customer Success Team standpoint), is via support ticket through our home-grown system. That&rsquo;s where most of our work comes from, be it customer-initiated tickets, or automated tickets. A majority of the time, tickets work decently. But there are some pitfalls, especially when working for a self-managed platform like DigitalOcean. Namely, that the ticket approach can seem impersonal\n">
+<title>The Support Stack At Digital Ocean</title>
+
+<link rel='canonical' href='http://localhost:1313/archive/support-stack-at-digitalocean/'>
+
+<link rel="stylesheet" href="/scss/style.min.946cca6c6259ef94ac55abfae7c7bf3291ea3ed5eea17ef77500b257217c6710.css"><meta property='og:title' content="The Support Stack At Digital Ocean">
+<meta property='og:description' content="It&rsquo;s week four of the Support Driven Writing Challenge, and sadly, I&rsquo;m a bit behind what with the US holiday and the customary food coma. That said, let&rsquo;s get cracking.\nThe Ubiquitous Ticket Queue I&rsquo;ll start off by saying that the most common way of supporting our customers at DigitalOcean (from a Customer Success Team standpoint), is via support ticket through our home-grown system. That&rsquo;s where most of our work comes from, be it customer-initiated tickets, or automated tickets. A majority of the time, tickets work decently. But there are some pitfalls, especially when working for a self-managed platform like DigitalOcean. Namely, that the ticket approach can seem impersonal\n">
+<meta property='og:url' content='http://localhost:1313/archive/support-stack-at-digitalocean/'>
+<meta property='og:site_name' content='Staring Blankly at a Screen'>
+<meta property='og:type' content='article'><meta property='article:section' content='Archive' /><meta property='article:tag' content='support-driven' /><meta property='article:published_time' content='2016-11-18T01:45:00&#43;00:00'/><meta property='article:modified_time' content='2016-11-18T01:45:00&#43;00:00'/>
+<meta name="twitter:title" content="The Support Stack At Digital Ocean">
+<meta name="twitter:description" content="It&rsquo;s week four of the Support Driven Writing Challenge, and sadly, I&rsquo;m a bit behind what with the US holiday and the customary food coma. That said, let&rsquo;s get cracking.\nThe Ubiquitous Ticket Queue I&rsquo;ll start off by saying that the most common way of supporting our customers at DigitalOcean (from a Customer Success Team standpoint), is via support ticket through our home-grown system. That&rsquo;s where most of our work comes from, be it customer-initiated tickets, or automated tickets. A majority of the time, tickets work decently. But there are some pitfalls, especially when working for a self-managed platform like DigitalOcean. Namely, that the ticket approach can seem impersonal\n">
+    </head>
+    <body class="
+    article-page
+    ">
+    <script>
+        (function() {
+            const colorSchemeKey = 'StackColorScheme';
+            if(!localStorage.getItem(colorSchemeKey)){
+                localStorage.setItem(colorSchemeKey, "auto");
+            }
+        })();
+    </script><script>
+    (function() {
+        const colorSchemeKey = 'StackColorScheme';
+        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+
+        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
+            
+
+            document.documentElement.dataset.scheme = 'dark';
+        } else {
+            document.documentElement.dataset.scheme = 'light';
+        }
+    })();
+</script>
+<div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky ">
+    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="Toggle Menu">
+        <span class="hamburger-box">
+            <span class="hamburger-inner"></span>
+        </span>
+    </button>
+
+    <header>
+        
+            
+            <figure class="site-avatar">
+                <a href="/">
+                
+                    
+                    
+                    
+                        
+                        <img src="/img/avatar_hu_f509edb42ecc0ebd.png" width="300"
+                            height="300" class="site-logo" loading="lazy" alt="Avatar">
+                    
+                
+                </a>
+                
+                    <span class="emoji">🎸</span>
+                
+            </figure>
+            
+        
+        
+        <div class="site-meta">
+            <h1 class="site-name"><a href="/">Staring Blankly at a Screen</a></h1>
+            <h2 class="site-description">Tech, beer, and the occasional banjo tune</h2>
+        </div>
+    </header><ol class="menu-social">
+            
+                <li>
+                    <a 
+                        href='https://github.com/asachs01'
+                        target="_blank"
+                        title="GitHub"
+                        rel="me"
+                    >
+                        
+                        
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-github" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M9 19c-4.3 1.4 -4.3 -2.5 -6 -3m12 5v-3.5c0 -1 .1 -1.4 -.5 -2c2.8 -.3 5.5 -1.4 5.5 -6a4.6 4.6 0 0 0 -1.3 -3.2a4.2 4.2 0 0 0 -.1 -3.2s-1.1 -.3 -3.5 1.3a12.3 12.3 0 0 0 -6.2 0c-2.4 -1.6 -3.5 -1.3 -3.5 -1.3a4.2 4.2 0 0 0 -.1 3.2a4.6 4.6 0 0 0 -1.3 3.2c0 4.6 2.7 5.7 5.5 6c-.6 .6 -.6 1.2 -.5 2v3.5" />
+</svg>
+
+
+
+                        
+                    </a>
+                </li>
+            
+                <li>
+                    <a 
+                        href='https://twitter.com/asachs01'
+                        target="_blank"
+                        title="Twitter"
+                        rel="me"
+                    >
+                        
+                        
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-twitter" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M22 4.01c-1 .49 -1.98 .689 -3 .99c-1.121 -1.265 -2.783 -1.335 -4.38 -.737s-2.643 2.06 -2.62 3.737v1c-3.245 .083 -6.135 -1.395 -8 -4c0 0 -4.182 7.433 4 11c-1.872 1.247 -3.739 2.088 -6 2c3.308 1.803 6.913 2.423 10.034 1.517c3.58 -1.04 6.522 -3.723 7.651 -7.742a13.84 13.84 0 0 0 .497 -3.753c-.002 -.249 1.51 -2.772 1.818 -4.013z" />
+</svg>
+
+
+
+                        
+                    </a>
+                </li>
+            
+        </ol><ol class="menu" id="main-menu">
+        
+        
+        
+        <li >
+            <a href='/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <polyline points="5 12 3 12 12 3 21 12 19 12" />
+  <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7" />
+  <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6" />
+</svg>
+
+
+
+                
+                <span>Home</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/about/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-user" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="7" r="4" />
+  <path d="M6 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2" />
+</svg>
+
+
+
+                
+                <span>About</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/talks/' >
+                
+                
+                
+                <span>Talks</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/archives/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <rect x="3" y="4" width="18" height="4" rx="2" />
+  <path d="M5 8v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-10" />
+  <line x1="10" y1="12" x2="14" y2="12" />
+</svg>
+
+
+
+                
+                <span>Archives</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/archives/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <rect x="3" y="4" width="18" height="4" rx="2" />
+  <path d="M5 8v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-10" />
+  <line x1="10" y1="12" x2="14" y2="12" />
+</svg>
+
+
+
+                
+                <span>Archives</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/search/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="10" cy="10" r="7" />
+  <line x1="21" y1="21" x2="15" y2="15" />
+</svg>
+
+
+
+                
+                <span>Search</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/search/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="10" cy="10" r="7" />
+  <line x1="21" y1="21" x2="15" y2="15" />
+</svg>
+
+
+
+                
+                <span>Search</span>
+            </a>
+        </li>
+        
+        <li class="menu-bottom-section">
+            <ol class="menu">
+
+                
+                    <li id="dark-mode-toggle">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="8" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="16" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <span>Dark Mode</span>
+                    </li>
+                
+            </ol>
+        </li>
+    </ol>
+</aside>
+
+    
+
+            <main class="main full-width">
+    <article class="main-article">
+    <header class="article-header">
+
+    <div class="article-details">
+    
+    <header class="article-category">
+        
+            <a href="/categories/support-driven/" >
+                Support-Driven
+            </a>
+        
+    </header>
+    
+
+    <div class="article-title-wrapper">
+        <h2 class="article-title">
+            <a href="/archive/support-stack-at-digitalocean/">The Support Stack At Digital Ocean</a>
+        </h2>
+    
+        
+    </div>
+
+    
+    
+    
+    
+    <footer class="article-time">
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11.795 21h-6.795a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v4" />
+  <circle cx="18" cy="18" r="4" />
+  <path d="M15 3v4" />
+  <path d="M7 3v4" />
+  <path d="M3 11h16" />
+  <path d="M18 16.496v1.504l1 1" />
+</svg>
+                <time class="article-time--published">Nov 18, 2016</time>
+            </div>
+        
+
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <polyline points="12 7 12 12 15 15" />
+</svg>
+
+
+
+                <time class="article-time--reading">
+                    4 minute read
+                </time>
+            </div>
+        
+    </footer>
+    
+
+    
+</div>
+
+</header>
+
+    <section class="article-content">
+    
+    
+    <p>It&rsquo;s week four of the <a class="link" href="https://supportdriven.com/2016/10/21/stretch-your-typing-fingers-support-driven-6-week-writing-challenge/"  target="_blank" rel="noopener"
+    >Support Driven Writing Challenge</a>, and sadly, I&rsquo;m a bit behind what with the US holiday and the customary food coma. That said, let&rsquo;s get cracking.</p>
+<h4 id="the-ubiquitous-ticket-queue">The Ubiquitous Ticket Queue
+</h4><p>I&rsquo;ll start off by saying that the most common way of supporting our customers at DigitalOcean (from a Customer Success Team standpoint), is via support ticket through our home-grown system. That&rsquo;s where most of our work comes from, be it customer-initiated tickets, or automated tickets. A majority of the time, tickets work decently. But there are some pitfalls, especially when working for a self-managed platform like DigitalOcean. Namely, that the ticket approach can seem impersonal</p>
+<h4 id="email-support">Email Support
+</h4><p>We also use email to support customers working directly with our Customer Success team. This is done via Helpscout, and works fairly well. Emails, while they don&rsquo;t have an SLA attached to them, typically get responded to quite quickly. Emails also tend to not deal so much with in-depth technical issues, and when they do, we usually push that sort of thing to a ticket, so that everything is documented and auditable.</p>
+<h4 id="the-not-so-common-phone-call">The Not-So-Common Phone Call
+</h4><p>At my previous two positions, phone calls were the bread an butter of what I did, especially at Rackspace. I typically was on the phone with a customer walking them through and issue, and troubleshooting an issue on their server while they watched. It was a bit nerve-wracking at times. However, since DigitalOcean doesn&rsquo;t have a support line, the phone support that we typically do tends to be on the more consultative side. For example, my team works with quite a lot of startups who come through our <a class="link" href="http://do.co/hatch"  target="_blank" rel="noopener"
+    >&ldquo;Hatch&rdquo;</a> program. Many of the calls that we do are introductory, and I like to think of them as a first date. You know, the &ldquo;Hi, who are you? What do you do? Here&rsquo;s what I do&rdquo; sorts of calls. On the rare occasion, we&rsquo;ll hop on the phone with a customer and troubleshoot over the phone.</p>
+<h4 id="a-view-of-the-other-side-of-the-house">A View of the Other Side of the House
+</h4><p>Just to give an idea of what our front lines teams do, they typically operate off of tickets, but also include social support via Twitter or Facebook. Our support team definitely sees a higher volume of tickets than our Success team, so our ticketing system shines when they&rsquo;re able to address quite a few tickets in a relatively short amount of time.</p>
+<h4 id="some-thoughts">Some Thoughts
+</h4><p>I wasn&rsquo;t around for the choosing of any of the components of our support stack, and it&rsquo;s been interesting to read up from other members of the Support Driven community who have had that opportunity to build theirs out. That said, I&rsquo;ve got no opinions really on the platform that&rsquo;s being used to provide support (a la Zendesk, Kayako, Intercom, etc.).</p>
+<p>I will say that I have a bit of a love/hate relationship with ticketing systems. For all the benefits they provide, I find ticketing systems to be the least personal out of any support tool. That may be the communication researcher in me speaking, but I think the loss of verbal/nonverbal queues can exacerbate situations in which those sorts of things are necessary. I can tell a customer in a reply that I empathize with them, and that yeah, it&rsquo;s terrible that X happened, but they don&rsquo;t get to see that. Instead, they&rsquo;re forced to infer my tone/meaning in my reply. And no matter how much I try to instill empathy into a response, there will always be a case where that falls short.</p>
+<p>Phone support, if done well, can eliminate some of that&ndash;namely, the lack of verbal queues. This all goes back to training, though. If a support agent isn&rsquo;t empathetic, and doesn&rsquo;t take the time to put themselves in their customers&rsquo; shoes, all the phone support in the world won&rsquo;t do any good (I&rsquo;m looking at you, Comcast &amp; Time Warner). So I think (and perhaps I&rsquo;ll do a post on this in the future) that while a support stack is important, and should be chosen carefully, it&rsquo;s really a collection of tools to accomplish one purpose: supporting a customer. If the tools don&rsquo;t do it well, then they&rsquo;re not worth choosing. Likewise, it&rsquo;s important to have people on your team who know how to use those tools effectively. If you choose a tool that doesn&rsquo;t allow for being able to pick up on verbal/nonverbal queues, the person behind that tool has to know that weakness, and compensate for it.</p>
+<p>Well, I&rsquo;ve rambled on long enough, and I&rsquo;ve got to get cracking on the next post! Stay tuned for a Day in the Life Of a 3rd shift Customer Success Engineer at DigitalOcean.</p>
+
+</section>
+
+
+    <footer class="article-footer">
+    
+    <section class="article-tags">
+        
+            <a href="/tags/support-driven/">Support-Driven</a>
+        
+    </section>
+
+
+    </footer>
+
+
+    
+</article>
+
+    
+
+    
+
+<aside class="related-content--wrapper">
+    <h2 class="section-title">Related content</h2>
+    <div class="related-content">
+        <div class="flex article-list--tile">
+            
+                
+<article class="">
+    <a href="/archive/thinking-spaces-a-support-driven-challenge-post/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">Thinking Spaces (A Support Driven Challenge Post)</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="">
+    <a href="/archive/how-i-work/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">How I Work</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="">
+    <a href="/archive/my-workspace/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">My Workspace</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="">
+    <a href="/archive/it-came-from-the-night-shift/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">It Came From the Night Shift</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="">
+    <a href="/archive/my-story/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">My Story</h2>
+        </div>
+    </a>
+</article>
+
+            
+        </div>
+    </div>
+</aside>
+
+     
+    
+        
+    
+
+    <footer class="site-footer">
+    <section class="copyright">
+        &copy; 
+        
+            2019 - 
+        
+        2025 © 2025 Aaron Sachs. All rights reserved.
+    </section>
+    
+    <section class="powerby">
+        Built with <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> <br />
+        Theme <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="3.30.0">Stack</a></b> designed by <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a>
+    </section>
+</footer>
+
+
+    
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    
+    <div class="pswp__bg"></div>
+
+    
+    <div class="pswp__scroll-wrap">
+
+        
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                
+                
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                        <div class="pswp__preloader__cut">
+                            <div class="pswp__preloader__donut"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js"integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo="crossorigin="anonymous"
+                defer
+                >
+            </script><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js"integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU="crossorigin="anonymous"
+                defer
+                >
+            </script><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css"crossorigin="anonymous"
+            ><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css"crossorigin="anonymous"
+            >
+
+            </main>
+        </div>
+        <script 
+                src="https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js"integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z&#43;KMkF24hUW8WePSA9HM="crossorigin="anonymous"
+                
+                >
+            </script><script type="text/javascript" src="/ts/main.7e2744cab1d920655de661919fdfc920dbd054f5fb511380ecae20d388479363.js" defer></script>
+<script>
+    (function () {
+        const customFont = document.createElement('link');
+        customFont.href = "https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap";
+
+        customFont.type = "text/css";
+        customFont.rel = "stylesheet";
+
+        document.head.appendChild(customFont);
+    }());
+</script>
+
+    </body>
+</html>
