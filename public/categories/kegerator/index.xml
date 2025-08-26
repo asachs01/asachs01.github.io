@@ -1,282 +1,199 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?>
-<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
-    <channel>
-        <title>Kegerator on Staring Blankly at a Screen</title>
-        <link>http://localhost:1313/categories/kegerator/</link>
-        <description>Recent content in Kegerator on Staring Blankly at a Screen</description>
-        <generator>Hugo -- gohugo.io</generator>
-        <language>en-us</language>
-        <copyright>© 2025 Aaron Sachs. All rights reserved.</copyright>
-        <lastBuildDate>Thu, 16 Nov 2017 20:16:08 +0000</lastBuildDate><atom:link href="http://localhost:1313/categories/kegerator/index.xml" rel="self" type="application/rss+xml" /><item>
-        <title>Monitoring Raspberry Pi&#39;s with Sensu</title>
-        <link>http://localhost:1313/archive/monitoring-raspberry-pis-with-sensu/</link>
-        <pubDate>Thu, 16 Nov 2017 20:16:08 +0000</pubDate>
-        
-        <guid>http://localhost:1313/archive/monitoring-raspberry-pis-with-sensu/</guid>
-        <description>&lt;p&gt;Back in August, I took a Customer Success role at &lt;a class=&#34;link&#34; href=&#34;https://sensuapp.org&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
-    &gt;Sensu&lt;/a&gt;. I&amp;rsquo;d been familiar with Sensu through my various bits of tinkering and dabbling with monitoring in the past, and was happy to take the role and work with the Sensu team officially.&lt;/p&gt;
-&lt;p&gt;Now that I&amp;rsquo;ve been working with Sensu for a few months (and am officially on paternity leave for the next several weeks), I decided it was time to revisit the idea of using Sensu to monitor my Kegpi&amp;rsquo;s various sensors. I&amp;rsquo;d hit some blocks previously, but came back to it with some fresh eyes. Lo and behold, I&amp;rsquo;ve got it working! Let&amp;rsquo;s walk through how I&amp;rsquo;ve got it running.&lt;/p&gt;
-&lt;h3 id=&#34;the-setup&#34;&gt;The Setup
-&lt;/h3&gt;&lt;p&gt;Here are the prerequisites for getting Sensu to work on your Raspberry Pi:&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;Ruby &amp;gt; 2.0&lt;/li&gt;
-&lt;li&gt;Rubygems
-&lt;code&gt;sudo apt-get install ruby ruby-dev&lt;/code&gt; (this should install rubygems by default)&lt;/li&gt;
-&lt;li&gt;Sensu gem
-&lt;code&gt;sudo gem install sensu&lt;/code&gt;&lt;/li&gt;
-&lt;li&gt;A working Sensu server (you can snag one quick by downloading Vagrant, cloning my &lt;a class=&#34;link&#34; href=&#34;https://github.com/asachs01/sensu-up-and-running&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
-    &gt;&amp;ldquo;Sensu Up and Running&amp;rdquo; repo&lt;/a&gt;, and doing a &lt;code&gt;vagrant up&lt;/code&gt;)&lt;/li&gt;
-&lt;/ul&gt;
-&lt;h3 id=&#34;configuration&#34;&gt;Configuration
-&lt;/h3&gt;&lt;p&gt;Before you get started, ensure you&amp;rsquo;ve added the &lt;code&gt;sensu&lt;/code&gt; user:&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;&lt;code&gt;useradd sensu&lt;/code&gt;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;h4 id=&#34;sensu&#34;&gt;Sensu
-&lt;/h4&gt;&lt;p&gt;By default, the Sensu gem installs three services: &lt;code&gt;sensu-client&lt;/code&gt;, &lt;code&gt;sensu-server&lt;/code&gt;, and &lt;code&gt;sensu-api&lt;/code&gt;. These form the core components of any Sensu installation, but we&amp;rsquo;re ultimately about getting a client up and running on the Raspi. Before we go too much futher into configuring Sensu, I recommend that if you&amp;rsquo;re not familiar with Sensu as a monitoring framework, you should take a moment and watch some of &lt;a class=&#34;link&#34; href=&#34;https://www.youtube.com/playlist?list=PLqLtpBjHqwC-4o7HLtK3MM2V_GdtSh-Dw&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
-    &gt;Sensu&amp;rsquo;s free training videos&lt;/a&gt;.&lt;/p&gt;
-&lt;p&gt;Presuming you&amp;rsquo;ve already installed the gem, the commands to manage the Sensu client are located in &lt;code&gt;/usr/local/bin&lt;/code&gt;. The configuration files, however, are located in &lt;code&gt;/etc/sensu/conf.d&lt;/code&gt;. You&amp;rsquo;ll likely have to create that directory:&lt;/p&gt;
-&lt;p&gt;&lt;code&gt;sudo mkdir -p /etc/sensu/conf.d&lt;/code&gt;&lt;/p&gt;
-&lt;p&gt;From there, we&amp;rsquo;ll add three different configuration files, as per the &lt;a class=&#34;link&#34; href=&#34;https://sensuapp.org/docs&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
-    &gt;Sensu Documentation&lt;/a&gt;:&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;&lt;code&gt;client.json&lt;/code&gt;&lt;/li&gt;
-&lt;li&gt;&lt;code&gt;rabbitmq.json&lt;/code&gt;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;Here&amp;rsquo;s what they&amp;rsquo;ll look like:&lt;/p&gt;
-&lt;p&gt;client.json:&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
-&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;3
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;4
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;5
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;6
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;7
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;8
-&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
-&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-fallback&#34; data-lang=&#34;fallback&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;{
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt; &amp;#34;client&amp;#34;: {
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;   &amp;#34;environment&amp;#34;: &amp;#34;development&amp;#34;,
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;   &amp;#34;subscriptions&amp;#34;: [
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;     &amp;#34;dev&amp;#34;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;   ]
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt; }
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;}
-&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
-&lt;/div&gt;
-&lt;/div&gt;&lt;p&gt;rabbitmq.json&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
-&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt; 1
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;11
-&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
-&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-fallback&#34; data-lang=&#34;fallback&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;{                    
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  &amp;#34;rabbitmq&amp;#34;: {      
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &amp;#34;host&amp;#34;: &amp;#34;127.0.0.1&amp;#34;,                   
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &amp;#34;port&amp;#34;: 5672,    
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &amp;#34;vhost&amp;#34;: &amp;#34;/sensu&amp;#34;,                     
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &amp;#34;user&amp;#34;: &amp;#34;sensu&amp;#34;, 
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &amp;#34;password&amp;#34;: &amp;#34;secret&amp;#34;,                  
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &amp;#34;heartbeat&amp;#34;: 30, 
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &amp;#34;prefetch&amp;#34;: 50   
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  }                  
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;} 
-&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
-&lt;/div&gt;
-&lt;/div&gt;&lt;p&gt;Finish off by ensuring the permissions for all the files in &lt;code&gt;/etc/sensu/&lt;/code&gt; are owned by sensu:&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;&lt;code&gt;chown sensu. /etc/sensu/&lt;/code&gt;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;&lt;strong&gt;NOTE&lt;/strong&gt;: The credentials listed above should be changed. They&amp;rsquo;re merely examples pulled straight from the Sensu documentation and should NOT be used as is on any system you care about. You&amp;rsquo;ll also need to chage the IP addresses for Rabbit to the IP of the system(s) you have those running on. If you&amp;rsquo;re using the Sensu Up and Running Vagrant box, the IP addresses will be the same.&lt;/p&gt;
-&lt;h4 id=&#34;systemd&#34;&gt;Systemd
-&lt;/h4&gt;&lt;p&gt;If you&amp;rsquo;re used to a system using systemd for service management, you&amp;rsquo;ll be familiar with the service files located in &lt;code&gt;/etc/systemd/system&lt;/code&gt;. Sensu includes service files for each of the components, but for them to work on a Raspberry Pi, they need to be slightly modified. You&amp;rsquo;ll need to create the service file like so:&lt;/p&gt;
-&lt;p&gt;&lt;code&gt;sudo vim /etc/systemd/system/sensu-client.service&lt;/code&gt;&lt;/p&gt;
-&lt;p&gt;With the following content:&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
-&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt; 1
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;11
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;12
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;13
-&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
-&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-fallback&#34; data-lang=&#34;fallback&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;[Unit]               
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;Description=sensu client                   
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;[Service]            
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;User=sensu           
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;Group=sensu          
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;ExecStart=/usr/local/bin/sensu-client                                    
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;KillMode=process     
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;Restart=on-failure   
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;RestartSec=1min      
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;[Install]            
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;WantedBy=multi-user.target
-&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
-&lt;/div&gt;
-&lt;/div&gt;&lt;p&gt;From there, start the service:
-&lt;code&gt;sudo systemctl start sensu-client&lt;/code&gt;&lt;/p&gt;
-&lt;p&gt;And set it to start at boot:
-&lt;code&gt;sudo systemctl enable sensu-client&lt;/code&gt;&lt;/p&gt;
-&lt;p&gt;Which, if you&amp;rsquo;re using the Sensu Up and Running repo I mentioned earlier, should get you something that looks like this:&lt;/p&gt;
-&lt;p&gt;&lt;img src=&#34;http://localhost:1313/img/kegpi-sensu.png&#34;
-	
-	
-	
-	loading=&#34;lazy&#34;
-	
-		alt=&#34;kegpi-sensu&#34;
-	
-	
-&gt;&lt;/p&gt;
-&lt;h3 id=&#34;next-steps&#34;&gt;Next Steps
-&lt;/h3&gt;&lt;p&gt;So what do you do after getting Sensu working on your Raspi? Well, it&amp;rsquo;s up to you! In my case, I&amp;rsquo;ll use it to monitor the temperature, whether or not the door is open, and remaining liquid in the kegs for my kegerator.&lt;/p&gt;
-&lt;p&gt;In your case, you may want to monitor some system-level activity, like load, available RAM, or something of the like. You could also use it to say, monitor a web app you&amp;rsquo;re running on the Raspi, or, since Sensu&amp;rsquo;s plugins can be written in any programming language, use it to monitor any number of sensors you can attach to the Pi. Again, if you haven&amp;rsquo;t already, take a look over &lt;a class=&#34;link&#34; href=&#34;https://www.youtube.com/playlist?list=PLqLtpBjHqwC-4o7HLtK3MM2V_GdtSh-Dw&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
-    &gt;Sensu&amp;rsquo;s training videos&lt;/a&gt; to get a better idea of how Sensu works and what you can do with it.&lt;/p&gt;
-</description>
-        </item>
-        <item>
-        <title>Moving to Kegging my Homebrew</title>
-        <link>http://localhost:1313/archive/moving-to-kegging/</link>
-        <pubDate>Tue, 22 Aug 2017 17:49:16 +0000</pubDate>
-        
-        <guid>http://localhost:1313/archive/moving-to-kegging/</guid>
-        <description>&lt;p&gt;I&amp;rsquo;ve posted previously about &lt;a class=&#34;link&#34; href=&#34;http://aaron.sachs.blog/how-homebrewing-saved-me-from-burnout/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
-    &gt;homebrewing&lt;/a&gt; and have been brewing for almost three years now. Back in April, I took to destroying a perfectly good mini fridge to turn it into a kegerator.&lt;/p&gt;
-&lt;p&gt;&lt;img src=&#34;http://localhost:1313/img/IMG_20170403_105320.jpg&#34;
-	
-	
-	
-	loading=&#34;lazy&#34;
-	
-		alt=&#34;IMG_20170403_105320&#34;
-	
-	
-&gt;&lt;/p&gt;
-&lt;p&gt;As any homebrewer can tell you, bottling is a pain in the ass. The delabling (if you&amp;rsquo;re reusing bottles), the santization, and the bottle carbonization makes for a rather long and laborious process. Because I&amp;rsquo;d finally had it with bottling, I decided that kegging would be a wiser choice since:&lt;/p&gt;
-&lt;ol&gt;
-&lt;li&gt;Less time would be spent on bottling&lt;/li&gt;
-&lt;li&gt;Carbonization would be better controlled&lt;/li&gt;
-&lt;li&gt;For most ales, production time would be cut by a week&lt;/li&gt;
-&lt;/ol&gt;
-&lt;p&gt;Thankfully, my assumptions have proven to be true. So let&amp;rsquo;s walk through what it took to make the kegerator.&lt;/p&gt;
-&lt;h3 id=&#34;the-build&#34;&gt;The Build
-&lt;/h3&gt;&lt;p&gt;I started off with the following hardware:&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;https://www.amazon.com/Whirlpool-Stainless-Compact-Refrigerator-Fridge/dp/B00XQLQXMY&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
-    &gt;Whirlpool 4.3 cu ft mini fridge&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;http://www.beveragefactory.com/draftbeer/towers/doublefaucet/D4743DT___6843.shtml&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
-    &gt;Chrome plated dual faucet tower&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;https://www.midwestsupplies.com/draft-brewer-flex-keg-system&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
-    &gt;Draft Brewer Flex Keg System&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;http://www.austinhomebrew.com/Aluminum-CO2-Tank--5-lb_p_4693.html&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
-    &gt;Aluminum CO2 Tank - 5 lb&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;http://www.beveragefactory.com/draftbeer/driptray/cutout/kegco-surface-mount-drip-tray-seco1610.html&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
-    &gt;Surface Mount Drip Tray&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;I won&amp;rsquo;t go through the whole process of assembling, since the post over at &lt;a class=&#34;link&#34; href=&#34;https://missionarybrewer.wordpress.com/how-to-build-your-own-kegerator/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
-    &gt;missionarybrewer&lt;/a&gt; (which my build was largely based on) covers the steps more than sufficiently. I will mention a few gotchas for the particular fridge I used:&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;There are coolant lines running over in the upper rear left corner. DON&amp;rsquo;T drill back there&lt;/li&gt;
-&lt;li&gt;The 4.3 cu ft size is just a hair too small for both kegs to fit comfortably. I ended up using a multitool to carve out the front of the door, as well as the molding for holding the shelves so that the kegs would fit.&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;Now, some pics of the kegerator:&lt;/p&gt;
-&lt;p&gt;&lt;img src=&#34;http://localhost:1313/img/IMG_20170403_162917.jpg&#34;
-	
-	
-	
-	loading=&#34;lazy&#34;
-	
-		alt=&#34;IMG_20170403_162917&#34;
-	
-	
-&gt;&lt;/p&gt;
-&lt;p&gt;&lt;img src=&#34;http://localhost:1313/img/IMG_20170403_193658.jpg&#34;
-	
-	
-	
-	loading=&#34;lazy&#34;
-	
-		alt=&#34;IMG_20170403_193658&#34;
-	
-	
-&gt;&lt;/p&gt;
-&lt;p&gt;&lt;img src=&#34;http://localhost:1313/img/IMG_20170403_193702.jpg&#34;
-	
-	
-	
-	loading=&#34;lazy&#34;
-	
-		alt=&#34;IMG_20170403_193702&#34;
-	
-	
-&gt;&lt;/p&gt;
-&lt;p&gt;&lt;img src=&#34;http://localhost:1313/img/IMG_20170403_193658-1.jpg&#34;
-	
-	
-	
-	loading=&#34;lazy&#34;
-	
-		alt=&#34;IMG_20170403_193658-1&#34;
-	
-	
-&gt;&lt;/p&gt;
-&lt;p&gt;&lt;img src=&#34;http://localhost:1313/img/IMG_20170403_193706.jpg&#34;
-	
-	
-	
-	loading=&#34;lazy&#34;
-	
-		alt=&#34;IMG_20170403_193706&#34;
-	
-	
-&gt;&lt;/p&gt;
-&lt;p&gt;&lt;img src=&#34;http://localhost:1313/img/IMG_20170403_193711.jpg&#34;
-	
-	
-	
-	loading=&#34;lazy&#34;
-	
-		alt=&#34;IMG_20170403_193711&#34;
-	
-	
-&gt;&lt;/p&gt;
-&lt;p&gt;&lt;img src=&#34;http://localhost:1313/img/IMG_20170403_231824.jpg&#34;
-	
-	
-	
-	loading=&#34;lazy&#34;
-	
-		alt=&#34;IMG_20170403_231824&#34;
-	
-	
-&gt;&lt;/p&gt;
-&lt;p&gt;If you&amp;rsquo;ve got any questions, feel free to reach out and let me know!&lt;/p&gt;
-</description>
-        </item>
-        
-    </channel>
-</rss>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Kegerator on Staring Blankly at a Screen</title><link>https://aaron.sachs.blog/categories/kegerator/</link><description>Recent content in Kegerator on Staring Blankly at a Screen</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><copyright>© 2025 Aaron Sachs. All rights reserved.</copyright><lastBuildDate>Thu, 16 Nov 2017 20:16:08 +0000</lastBuildDate><atom:link href="https://aaron.sachs.blog/categories/kegerator/index.xml" rel="self" type="application/rss+xml"/><item><title>Monitoring Raspberry Pi's with Sensu</title><link>https://aaron.sachs.blog/archive/monitoring-raspberry-pis-with-sensu/</link><pubDate>Thu, 16 Nov 2017 20:16:08 +0000</pubDate><guid>https://aaron.sachs.blog/archive/monitoring-raspberry-pis-with-sensu/</guid><description>&lt;p>Back in August, I took a Customer Success role at &lt;a class="link" href="https://sensuapp.org" target="_blank" rel="noopener"
+>Sensu&lt;/a>. I&amp;rsquo;d been familiar with Sensu through my various bits of tinkering and dabbling with monitoring in the past, and was happy to take the role and work with the Sensu team officially.&lt;/p>
+&lt;p>Now that I&amp;rsquo;ve been working with Sensu for a few months (and am officially on paternity leave for the next several weeks), I decided it was time to revisit the idea of using Sensu to monitor my Kegpi&amp;rsquo;s various sensors. I&amp;rsquo;d hit some blocks previously, but came back to it with some fresh eyes. Lo and behold, I&amp;rsquo;ve got it working! Let&amp;rsquo;s walk through how I&amp;rsquo;ve got it running.&lt;/p>
+&lt;h3 id="the-setup">The Setup
+&lt;/h3>&lt;p>Here are the prerequisites for getting Sensu to work on your Raspberry Pi:&lt;/p>
+&lt;ul>
+&lt;li>Ruby &amp;gt; 2.0&lt;/li>
+&lt;li>Rubygems
+&lt;code>sudo apt-get install ruby ruby-dev&lt;/code> (this should install rubygems by default)&lt;/li>
+&lt;li>Sensu gem
+&lt;code>sudo gem install sensu&lt;/code>&lt;/li>
+&lt;li>A working Sensu server (you can snag one quick by downloading Vagrant, cloning my &lt;a class="link" href="https://github.com/asachs01/sensu-up-and-running" target="_blank" rel="noopener"
+>&amp;ldquo;Sensu Up and Running&amp;rdquo; repo&lt;/a>, and doing a &lt;code>vagrant up&lt;/code>)&lt;/li>
+&lt;/ul>
+&lt;h3 id="configuration">Configuration
+&lt;/h3>&lt;p>Before you get started, ensure you&amp;rsquo;ve added the &lt;code>sensu&lt;/code> user:&lt;/p>
+&lt;ul>
+&lt;li>&lt;code>useradd sensu&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;h4 id="sensu">Sensu
+&lt;/h4>&lt;p>By default, the Sensu gem installs three services: &lt;code>sensu-client&lt;/code>, &lt;code>sensu-server&lt;/code>, and &lt;code>sensu-api&lt;/code>. These form the core components of any Sensu installation, but we&amp;rsquo;re ultimately about getting a client up and running on the Raspi. Before we go too much futher into configuring Sensu, I recommend that if you&amp;rsquo;re not familiar with Sensu as a monitoring framework, you should take a moment and watch some of &lt;a class="link" href="https://www.youtube.com/playlist?list=PLqLtpBjHqwC-4o7HLtK3MM2V_GdtSh-Dw" target="_blank" rel="noopener"
+>Sensu&amp;rsquo;s free training videos&lt;/a>.&lt;/p>
+&lt;p>Presuming you&amp;rsquo;ve already installed the gem, the commands to manage the Sensu client are located in &lt;code>/usr/local/bin&lt;/code>. The configuration files, however, are located in &lt;code>/etc/sensu/conf.d&lt;/code>. You&amp;rsquo;ll likely have to create that directory:&lt;/p>
+&lt;p>&lt;code>sudo mkdir -p /etc/sensu/conf.d&lt;/code>&lt;/p>
+&lt;p>From there, we&amp;rsquo;ll add three different configuration files, as per the &lt;a class="link" href="https://sensuapp.org/docs" target="_blank" rel="noopener"
+>Sensu Documentation&lt;/a>:&lt;/p>
+&lt;ul>
+&lt;li>&lt;code>client.json&lt;/code>&lt;/li>
+&lt;li>&lt;code>rabbitmq.json&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;p>Here&amp;rsquo;s what they&amp;rsquo;ll look like:&lt;/p>
+&lt;p>client.json:&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;span class="lnt">7
+&lt;/span>&lt;span class="lnt">8
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-fallback" data-lang="fallback">&lt;span class="line">&lt;span class="cl">{
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &amp;#34;client&amp;#34;: {
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &amp;#34;environment&amp;#34;: &amp;#34;development&amp;#34;,
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &amp;#34;subscriptions&amp;#34;: [
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &amp;#34;dev&amp;#34;
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> ]
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> }
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">}
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>rabbitmq.json&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-fallback" data-lang="fallback">&lt;span class="line">&lt;span class="cl">{
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &amp;#34;rabbitmq&amp;#34;: {
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &amp;#34;host&amp;#34;: &amp;#34;127.0.0.1&amp;#34;,
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &amp;#34;port&amp;#34;: 5672,
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &amp;#34;vhost&amp;#34;: &amp;#34;/sensu&amp;#34;,
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &amp;#34;user&amp;#34;: &amp;#34;sensu&amp;#34;,
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &amp;#34;password&amp;#34;: &amp;#34;secret&amp;#34;,
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &amp;#34;heartbeat&amp;#34;: 30,
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &amp;#34;prefetch&amp;#34;: 50
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> }
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">}
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>Finish off by ensuring the permissions for all the files in &lt;code>/etc/sensu/&lt;/code> are owned by sensu:&lt;/p>
+&lt;ul>
+&lt;li>&lt;code>chown sensu. /etc/sensu/&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;p>&lt;strong>NOTE&lt;/strong>: The credentials listed above should be changed. They&amp;rsquo;re merely examples pulled straight from the Sensu documentation and should NOT be used as is on any system you care about. You&amp;rsquo;ll also need to chage the IP addresses for Rabbit to the IP of the system(s) you have those running on. If you&amp;rsquo;re using the Sensu Up and Running Vagrant box, the IP addresses will be the same.&lt;/p>
+&lt;h4 id="systemd">Systemd
+&lt;/h4>&lt;p>If you&amp;rsquo;re used to a system using systemd for service management, you&amp;rsquo;ll be familiar with the service files located in &lt;code>/etc/systemd/system&lt;/code>. Sensu includes service files for each of the components, but for them to work on a Raspberry Pi, they need to be slightly modified. You&amp;rsquo;ll need to create the service file like so:&lt;/p>
+&lt;p>&lt;code>sudo vim /etc/systemd/system/sensu-client.service&lt;/code>&lt;/p>
+&lt;p>With the following content:&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-fallback" data-lang="fallback">&lt;span class="line">&lt;span class="cl">[Unit]
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Description=sensu client
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">[Service]
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">User=sensu
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Group=sensu
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">ExecStart=/usr/local/bin/sensu-client
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">KillMode=process
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Restart=on-failure
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">RestartSec=1min
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">[Install]
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">WantedBy=multi-user.target
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>From there, start the service:
+&lt;code>sudo systemctl start sensu-client&lt;/code>&lt;/p>
+&lt;p>And set it to start at boot:
+&lt;code>sudo systemctl enable sensu-client&lt;/code>&lt;/p>
+&lt;p>Which, if you&amp;rsquo;re using the Sensu Up and Running repo I mentioned earlier, should get you something that looks like this:&lt;/p>
+&lt;p>&lt;img src="https://aaron.sachs.blog/img/kegpi-sensu.png"
+loading="lazy"
+alt="kegpi-sensu"
+>&lt;/p>
+&lt;h3 id="next-steps">Next Steps
+&lt;/h3>&lt;p>So what do you do after getting Sensu working on your Raspi? Well, it&amp;rsquo;s up to you! In my case, I&amp;rsquo;ll use it to monitor the temperature, whether or not the door is open, and remaining liquid in the kegs for my kegerator.&lt;/p>
+&lt;p>In your case, you may want to monitor some system-level activity, like load, available RAM, or something of the like. You could also use it to say, monitor a web app you&amp;rsquo;re running on the Raspi, or, since Sensu&amp;rsquo;s plugins can be written in any programming language, use it to monitor any number of sensors you can attach to the Pi. Again, if you haven&amp;rsquo;t already, take a look over &lt;a class="link" href="https://www.youtube.com/playlist?list=PLqLtpBjHqwC-4o7HLtK3MM2V_GdtSh-Dw" target="_blank" rel="noopener"
+>Sensu&amp;rsquo;s training videos&lt;/a> to get a better idea of how Sensu works and what you can do with it.&lt;/p></description></item><item><title>Moving to Kegging my Homebrew</title><link>https://aaron.sachs.blog/archive/moving-to-kegging/</link><pubDate>Tue, 22 Aug 2017 17:49:16 +0000</pubDate><guid>https://aaron.sachs.blog/archive/moving-to-kegging/</guid><description>&lt;p>I&amp;rsquo;ve posted previously about &lt;a class="link" href="http://aaron.sachs.blog/how-homebrewing-saved-me-from-burnout/" target="_blank" rel="noopener"
+>homebrewing&lt;/a> and have been brewing for almost three years now. Back in April, I took to destroying a perfectly good mini fridge to turn it into a kegerator.&lt;/p>
+&lt;p>&lt;img src="https://aaron.sachs.blog/img/IMG_20170403_105320.jpg"
+loading="lazy"
+alt="IMG_20170403_105320"
+>&lt;/p>
+&lt;p>As any homebrewer can tell you, bottling is a pain in the ass. The delabling (if you&amp;rsquo;re reusing bottles), the santization, and the bottle carbonization makes for a rather long and laborious process. Because I&amp;rsquo;d finally had it with bottling, I decided that kegging would be a wiser choice since:&lt;/p>
+&lt;ol>
+&lt;li>Less time would be spent on bottling&lt;/li>
+&lt;li>Carbonization would be better controlled&lt;/li>
+&lt;li>For most ales, production time would be cut by a week&lt;/li>
+&lt;/ol>
+&lt;p>Thankfully, my assumptions have proven to be true. So let&amp;rsquo;s walk through what it took to make the kegerator.&lt;/p>
+&lt;h3 id="the-build">The Build
+&lt;/h3>&lt;p>I started off with the following hardware:&lt;/p>
+&lt;ul>
+&lt;li>&lt;a class="link" href="https://www.amazon.com/Whirlpool-Stainless-Compact-Refrigerator-Fridge/dp/B00XQLQXMY" target="_blank" rel="noopener"
+>Whirlpool 4.3 cu ft mini fridge&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="http://www.beveragefactory.com/draftbeer/towers/doublefaucet/D4743DT___6843.shtml" target="_blank" rel="noopener"
+>Chrome plated dual faucet tower&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="https://www.midwestsupplies.com/draft-brewer-flex-keg-system" target="_blank" rel="noopener"
+>Draft Brewer Flex Keg System&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="http://www.austinhomebrew.com/Aluminum-CO2-Tank--5-lb_p_4693.html" target="_blank" rel="noopener"
+>Aluminum CO2 Tank - 5 lb&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="http://www.beveragefactory.com/draftbeer/driptray/cutout/kegco-surface-mount-drip-tray-seco1610.html" target="_blank" rel="noopener"
+>Surface Mount Drip Tray&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;p>I won&amp;rsquo;t go through the whole process of assembling, since the post over at &lt;a class="link" href="https://missionarybrewer.wordpress.com/how-to-build-your-own-kegerator/" target="_blank" rel="noopener"
+>missionarybrewer&lt;/a> (which my build was largely based on) covers the steps more than sufficiently. I will mention a few gotchas for the particular fridge I used:&lt;/p>
+&lt;ul>
+&lt;li>There are coolant lines running over in the upper rear left corner. DON&amp;rsquo;T drill back there&lt;/li>
+&lt;li>The 4.3 cu ft size is just a hair too small for both kegs to fit comfortably. I ended up using a multitool to carve out the front of the door, as well as the molding for holding the shelves so that the kegs would fit.&lt;/li>
+&lt;/ul>
+&lt;p>Now, some pics of the kegerator:&lt;/p>
+&lt;p>&lt;img src="https://aaron.sachs.blog/img/IMG_20170403_162917.jpg"
+loading="lazy"
+alt="IMG_20170403_162917"
+>&lt;/p>
+&lt;p>&lt;img src="https://aaron.sachs.blog/img/IMG_20170403_193658.jpg"
+loading="lazy"
+alt="IMG_20170403_193658"
+>&lt;/p>
+&lt;p>&lt;img src="https://aaron.sachs.blog/img/IMG_20170403_193702.jpg"
+loading="lazy"
+alt="IMG_20170403_193702"
+>&lt;/p>
+&lt;p>&lt;img src="https://aaron.sachs.blog/img/IMG_20170403_193658-1.jpg"
+loading="lazy"
+alt="IMG_20170403_193658-1"
+>&lt;/p>
+&lt;p>&lt;img src="https://aaron.sachs.blog/img/IMG_20170403_193706.jpg"
+loading="lazy"
+alt="IMG_20170403_193706"
+>&lt;/p>
+&lt;p>&lt;img src="https://aaron.sachs.blog/img/IMG_20170403_193711.jpg"
+loading="lazy"
+alt="IMG_20170403_193711"
+>&lt;/p>
+&lt;p>&lt;img src="https://aaron.sachs.blog/img/IMG_20170403_231824.jpg"
+loading="lazy"
+alt="IMG_20170403_231824"
+>&lt;/p>
+&lt;p>If you&amp;rsquo;ve got any questions, feel free to reach out and let me know!&lt;/p></description></item></channel></rss>

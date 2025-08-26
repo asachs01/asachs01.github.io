@@ -1,1044 +1,467 @@
-<!DOCTYPE html>
-<html lang="en-us" dir="ltr">
-    <head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script><meta charset='utf-8'>
-<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="It&rsquo;s been a long time coming, but I&rsquo;ve finally got the KegPi mostly working and being monitored with Sensu! This post is going to go over the whole kit and caboodle and is going to build on the posts of creating the kegerator and getting Sensu to run on a Raspberry Pi. The deep and dark part of this post will cover:\nThe code to measure the temp/contact sensors (Sensu Plugin) Writing Sensu checks that will incorporate that code Exporting the data from the temp sensor to Graphite and InfluxDB for seeing temperature trends Writing the Plugins If you haven&rsquo;t had a chance to read the previous post on using Sensu to monitor Raspberry Pis, I&rsquo;ll give you a short blurb about Sensu. It&rsquo;s an open-source monitoring framework that allows you to monitor everything from fleets of servers and networking equipment to applications, and even yes, Raspberry Pis. It also has a highly decoupled architecture and relies on plugins to extend its functionality.\n">
-<title>Monitoring My Kegerator With Sensu</title>
-
-<link rel='canonical' href='http://localhost:1313/archive/monitoring-my-kegerator-with-sensu/'>
-
-<link rel="stylesheet" href="/scss/style.min.946cca6c6259ef94ac55abfae7c7bf3291ea3ed5eea17ef77500b257217c6710.css"><meta property='og:title' content="Monitoring My Kegerator With Sensu">
-<meta property='og:description' content="It&rsquo;s been a long time coming, but I&rsquo;ve finally got the KegPi mostly working and being monitored with Sensu! This post is going to go over the whole kit and caboodle and is going to build on the posts of creating the kegerator and getting Sensu to run on a Raspberry Pi. The deep and dark part of this post will cover:\nThe code to measure the temp/contact sensors (Sensu Plugin) Writing Sensu checks that will incorporate that code Exporting the data from the temp sensor to Graphite and InfluxDB for seeing temperature trends Writing the Plugins If you haven&rsquo;t had a chance to read the previous post on using Sensu to monitor Raspberry Pis, I&rsquo;ll give you a short blurb about Sensu. It&rsquo;s an open-source monitoring framework that allows you to monitor everything from fleets of servers and networking equipment to applications, and even yes, Raspberry Pis. It also has a highly decoupled architecture and relies on plugins to extend its functionality.\n">
-<meta property='og:url' content='http://localhost:1313/archive/monitoring-my-kegerator-with-sensu/'>
-<meta property='og:site_name' content='Staring Blankly at a Screen'>
-<meta property='og:type' content='article'><meta property='article:section' content='Archive' /><meta property='article:published_time' content='2018-04-28T04:58:16&#43;00:00'/><meta property='article:modified_time' content='2018-04-28T04:58:16&#43;00:00'/>
-<meta name="twitter:title" content="Monitoring My Kegerator With Sensu">
-<meta name="twitter:description" content="It&rsquo;s been a long time coming, but I&rsquo;ve finally got the KegPi mostly working and being monitored with Sensu! This post is going to go over the whole kit and caboodle and is going to build on the posts of creating the kegerator and getting Sensu to run on a Raspberry Pi. The deep and dark part of this post will cover:\nThe code to measure the temp/contact sensors (Sensu Plugin) Writing Sensu checks that will incorporate that code Exporting the data from the temp sensor to Graphite and InfluxDB for seeing temperature trends Writing the Plugins If you haven&rsquo;t had a chance to read the previous post on using Sensu to monitor Raspberry Pis, I&rsquo;ll give you a short blurb about Sensu. It&rsquo;s an open-source monitoring framework that allows you to monitor everything from fleets of servers and networking equipment to applications, and even yes, Raspberry Pis. It also has a highly decoupled architecture and relies on plugins to extend its functionality.\n">
-    </head>
-    <body class="
-    article-page
-    ">
-    <script>
-        (function() {
-            const colorSchemeKey = 'StackColorScheme';
-            if(!localStorage.getItem(colorSchemeKey)){
-                localStorage.setItem(colorSchemeKey, "auto");
-            }
-        })();
-    </script><script>
-    (function() {
-        const colorSchemeKey = 'StackColorScheme';
-        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
-        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
-
-        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
-            
-
-            document.documentElement.dataset.scheme = 'dark';
-        } else {
-            document.documentElement.dataset.scheme = 'light';
-        }
-    })();
-</script>
-<div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky ">
-    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="Toggle Menu">
-        <span class="hamburger-box">
-            <span class="hamburger-inner"></span>
-        </span>
-    </button>
-
-    <header>
-        
-            
-            <figure class="site-avatar">
-                <a href="/">
-                
-                    
-                    
-                    
-                        
-                        <img src="/img/avatar_hu_f509edb42ecc0ebd.png" width="300"
-                            height="300" class="site-logo" loading="lazy" alt="Avatar">
-                    
-                
-                </a>
-                
-                    <span class="emoji">🎸</span>
-                
-            </figure>
-            
-        
-        
-        <div class="site-meta">
-            <h1 class="site-name"><a href="/">Staring Blankly at a Screen</a></h1>
-            <h2 class="site-description">Tech, beer, and the occasional banjo tune</h2>
-        </div>
-    </header><ol class="menu-social">
-            
-                <li>
-                    <a 
-                        href='https://github.com/asachs01'
-                        target="_blank"
-                        title="GitHub"
-                        rel="me"
-                    >
-                        
-                        
-                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-github" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
-  <path d="M9 19c-4.3 1.4 -4.3 -2.5 -6 -3m12 5v-3.5c0 -1 .1 -1.4 -.5 -2c2.8 -.3 5.5 -1.4 5.5 -6a4.6 4.6 0 0 0 -1.3 -3.2a4.2 4.2 0 0 0 -.1 -3.2s-1.1 -.3 -3.5 1.3a12.3 12.3 0 0 0 -6.2 0c-2.4 -1.6 -3.5 -1.3 -3.5 -1.3a4.2 4.2 0 0 0 -.1 3.2a4.6 4.6 0 0 0 -1.3 3.2c0 4.6 2.7 5.7 5.5 6c-.6 .6 -.6 1.2 -.5 2v3.5" />
-</svg>
-
-
-
-                        
-                    </a>
-                </li>
-            
-                <li>
-                    <a 
-                        href='https://twitter.com/asachs01'
-                        target="_blank"
-                        title="Twitter"
-                        rel="me"
-                    >
-                        
-                        
-                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-twitter" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
-  <path d="M22 4.01c-1 .49 -1.98 .689 -3 .99c-1.121 -1.265 -2.783 -1.335 -4.38 -.737s-2.643 2.06 -2.62 3.737v1c-3.245 .083 -6.135 -1.395 -8 -4c0 0 -4.182 7.433 4 11c-1.872 1.247 -3.739 2.088 -6 2c3.308 1.803 6.913 2.423 10.034 1.517c3.58 -1.04 6.522 -3.723 7.651 -7.742a13.84 13.84 0 0 0 .497 -3.753c-.002 -.249 1.51 -2.772 1.818 -4.013z" />
-</svg>
-
-
-
-                        
-                    </a>
-                </li>
-            
-        </ol><ol class="menu" id="main-menu">
-        
-        
-        
-        <li >
-            <a href='/' >
-                
-                
-                
-                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-  <path stroke="none" d="M0 0h24v24H0z"/>
-  <polyline points="5 12 3 12 12 3 21 12 19 12" />
-  <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7" />
-  <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6" />
-</svg>
-
-
-
-                
-                <span>Home</span>
-            </a>
-        </li>
-        
-        
-        <li >
-            <a href='/about/' >
-                
-                
-                
-                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-user" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-  <path stroke="none" d="M0 0h24v24H0z"/>
-  <circle cx="12" cy="7" r="4" />
-  <path d="M6 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2" />
-</svg>
-
-
-
-                
-                <span>About</span>
-            </a>
-        </li>
-        
-        
-        <li >
-            <a href='/talks/' >
-                
-                
-                
-                <span>Talks</span>
-            </a>
-        </li>
-        
-        
-        <li >
-            <a href='/archives/' >
-                
-                
-                
-                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-  <path stroke="none" d="M0 0h24v24H0z"/>
-  <rect x="3" y="4" width="18" height="4" rx="2" />
-  <path d="M5 8v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-10" />
-  <line x1="10" y1="12" x2="14" y2="12" />
-</svg>
-
-
-
-                
-                <span>Archives</span>
-            </a>
-        </li>
-        
-        
-        <li >
-            <a href='/archives/' >
-                
-                
-                
-                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-  <path stroke="none" d="M0 0h24v24H0z"/>
-  <rect x="3" y="4" width="18" height="4" rx="2" />
-  <path d="M5 8v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-10" />
-  <line x1="10" y1="12" x2="14" y2="12" />
-</svg>
-
-
-
-                
-                <span>Archives</span>
-            </a>
-        </li>
-        
-        
-        <li >
-            <a href='/search/' >
-                
-                
-                
-                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-  <path stroke="none" d="M0 0h24v24H0z"/>
-  <circle cx="10" cy="10" r="7" />
-  <line x1="21" y1="21" x2="15" y2="15" />
-</svg>
-
-
-
-                
-                <span>Search</span>
-            </a>
-        </li>
-        
-        
-        <li >
-            <a href='/search/' >
-                
-                
-                
-                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-  <path stroke="none" d="M0 0h24v24H0z"/>
-  <circle cx="10" cy="10" r="7" />
-  <line x1="21" y1="21" x2="15" y2="15" />
-</svg>
-
-
-
-                
-                <span>Search</span>
-            </a>
-        </li>
-        
-        <li class="menu-bottom-section">
-            <ol class="menu">
-
-                
-                    <li id="dark-mode-toggle">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-  <path stroke="none" d="M0 0h24v24H0z"/>
-  <circle cx="8" cy="12" r="2" />
-  <rect x="2" y="6" width="20" height="12" rx="6" />
-</svg>
-
-
-
-                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-  <path stroke="none" d="M0 0h24v24H0z"/>
-  <circle cx="16" cy="12" r="2" />
-  <rect x="2" y="6" width="20" height="12" rx="6" />
-</svg>
-
-
-
-                        <span>Dark Mode</span>
-                    </li>
-                
-            </ol>
-        </li>
-    </ol>
-</aside>
-
-    
-
-            <main class="main full-width">
-    <article class="main-article">
-    <header class="article-header">
-
-    <div class="article-details">
-    
-
-    <div class="article-title-wrapper">
-        <h2 class="article-title">
-            <a href="/archive/monitoring-my-kegerator-with-sensu/">Monitoring My Kegerator With Sensu</a>
-        </h2>
-    
-        
-    </div>
-
-    
-    
-    
-    
-    <footer class="article-time">
-        
-            <div>
-                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-  <path stroke="none" d="M0 0h24v24H0z"/>
-  <path d="M11.795 21h-6.795a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v4" />
-  <circle cx="18" cy="18" r="4" />
-  <path d="M15 3v4" />
-  <path d="M7 3v4" />
-  <path d="M3 11h16" />
-  <path d="M18 16.496v1.504l1 1" />
-</svg>
-                <time class="article-time--published">Apr 28, 2018</time>
-            </div>
-        
-
-        
-            <div>
-                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-  <path stroke="none" d="M0 0h24v24H0z"/>
-  <circle cx="12" cy="12" r="9" />
-  <polyline points="12 7 12 12 15 15" />
-</svg>
-
-
-
-                <time class="article-time--reading">
-                    9 minute read
-                </time>
-            </div>
-        
-    </footer>
-    
-
-    
-</div>
-
-</header>
-
-    <section class="article-content">
-    
-    
-    <p>It&rsquo;s been a long time coming, but I&rsquo;ve finally got the <a class="link" href="https://github.com/asachs01/kegpi"  target="_blank" rel="noopener"
-    >KegPi</a> <em>mostly</em> working and being monitored with <a class="link" href="https://sensu.io"  target="_blank" rel="noopener"
-    >Sensu</a>! This post is going to go over the whole kit and caboodle and is going to build on the posts of <a class="link" href="moving-to-kegging" >creating  the kegerator</a> and <a class="link" href="monitoring-raspberry-pis-with-sensu" >getting Sensu to run on a Raspberry Pi</a>. The deep and dark part of this post will cover:</p>
-<ul>
-<li>The code to measure the temp/contact sensors (Sensu Plugin)</li>
-<li>Writing Sensu checks that will incorporate that code</li>
-<li>Exporting the data from the temp sensor to <a class="link" href="https://graphiteapp.org/"  target="_blank" rel="noopener"
-    >Graphite</a> and <a class="link" href="https://www.influxdata.com/"  target="_blank" rel="noopener"
-    >InfluxDB</a> for seeing temperature trends</li>
-</ul>
-<h1 id="writing-the-plugins">Writing the Plugins
-</h1><p>If you haven&rsquo;t had a chance to read the previous post on using Sensu to monitor Raspberry Pis, I&rsquo;ll give you a short blurb about Sensu. It&rsquo;s an open-source monitoring framework that allows you to monitor everything from fleets of servers and networking equipment to applications, and even yes, Raspberry Pis. It also has a highly decoupled architecture and relies on <a class="link" href="https://github.com/sensu-plugins"  target="_blank" rel="noopener"
-    >plugins</a> to extend its functionality.</p>
-<p>Currently there aren&rsquo;t any plugins inside of the Sensu ecosystem that exist for monitoring components that would be hooked up to a Raspberry Pi. So, I decided to write a few!</p>
-<p><em>WARNING: I don&rsquo;t write a whole lot of Ruby professionally, and it&rsquo;s likely pretty UGLY code, but what the hell. It works, so let&rsquo;s just go with it! Also, your mileage may vary if you decide to put something like this together and use my code.</em></p>
-<p>To get started writing a plugin, Sensu provides some skeletons for writing code in various languages:</p>
-<ul>
-<li><a class="link" href="https://github.com/sensu-plugins/sensu-plugin"  target="_blank" rel="noopener"
-    >Ruby</a></li>
-<li><a class="link" href="https://github.com/sensu-plugins/sensu-plugin-python"  target="_blank" rel="noopener"
-    >Python</a></li>
-<li><a class="link" href="https://github.com/sensu-plugins/sensu-plugins-windows/tree/master/bin/powershell"  target="_blank" rel="noopener"
-    >Powershell* (not Sensu-provided, but does give a good idea of plugins written in Powershell)</a></li>
-</ul>
-<p>Before I&rsquo;d started working at Sensu, the KegPi project was something that I tried to do from the ground up. I realized that the monitoring portion wasn&rsquo;t something that I wanted to write from scratch and tools (like Sensu) already existed, hence why I wrote the plugin for it.</p>
-<p>One quick note&ndash;by design, this plugin and the checks are designed to be fairly generic. What that means practically is that even though I&rsquo;m using this primarily for a Raspberry Pi hooked up to a kegerator, you can use these checks in any sort of context. Have a Raspi that&rsquo;s monitoring the temp of a chicken coop? You can use this plugin. Want to <a class="link" href="http://blog.initialstate.com/pi-for-kids-door-sensor/"  target="_blank" rel="noopener"
-    >build security system for your kid&rsquo;s school locker</a> and use Sensu to handle the alerts? You can use this plugin to do it!</p>
-<p>So let&rsquo;s take a look at a couple of the checks that are part of the plugin.</p>
-<h2 id="status-checks">Status Checks
-</h2><h3 id="contact-sensor-check">Contact Sensor Check
-</h3><p>The contact sensor check is, again, designed to be generic and able to be used in a variety of circumstances. Here&rsquo;s the code:</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
-</span><span class="lnt"> 2
-</span><span class="lnt"> 3
-</span><span class="lnt"> 4
-</span><span class="lnt"> 5
-</span><span class="lnt"> 6
-</span><span class="lnt"> 7
-</span><span class="lnt"> 8
-</span><span class="lnt"> 9
-</span><span class="lnt">10
-</span><span class="lnt">11
-</span><span class="lnt">12
-</span><span class="lnt">13
-</span><span class="lnt">14
-</span><span class="lnt">15
-</span><span class="lnt">16
-</span><span class="lnt">17
-</span><span class="lnt">18
-</span><span class="lnt">19
-</span><span class="lnt">20
-</span><span class="lnt">21
-</span><span class="lnt">22
-</span><span class="lnt">23
-</span><span class="lnt">24
-</span><span class="lnt">25
-</span><span class="lnt">26
-</span><span class="lnt">27
-</span><span class="lnt">28
-</span><span class="lnt">29
-</span><span class="lnt">30
-</span><span class="lnt">31
-</span><span class="lnt">32
-</span><span class="lnt">33
-</span><span class="lnt">34
-</span></code></pre></td>
-<td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">require &#39;sensu-plugin/check/cli&#39;
-</span></span><span class="line"><span class="cl">require &#39;rpi_gpio&#39;
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"># Starting check class
-</span></span><span class="line"><span class="cl">class CheckContactSensor &lt; Sensu::Plugin::Check::CLI
-</span></span><span class="line"><span class="cl">  option  :pinnum,
-</span></span><span class="line"><span class="cl">          short: &#39;-p PINNUM&#39;,
-</span></span><span class="line"><span class="cl">          long: &#39;--pin-num PINNUM&#39;,
-</span></span><span class="line"><span class="cl">          description: &#39;Sets the pin number the contact sensor is attached to&#39;,
-</span></span><span class="line"><span class="cl">          proc: proc(&amp;:to_i),
-</span></span><span class="line"><span class="cl">          required: true
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">  option  :boardnum,
-</span></span><span class="line"><span class="cl">          short: &#39;-b BOARDNUM&#39;,
-</span></span><span class="line"><span class="cl">          long: &#39;--board-num BOARDNUM&#39;,
-</span></span><span class="line"><span class="cl">          description: &#39;Sets the board numbering type to either :bcm or :board&#39;,
-</span></span><span class="line"><span class="cl">          default: :bcm
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">  def initialize
-</span></span><span class="line"><span class="cl">    super
-</span></span><span class="line"><span class="cl">    RPi::GPIO.set_numbering config[:boardnum]
-</span></span><span class="line"><span class="cl">    RPi::GPIO.setup config[:pinnum], as: &#39;input&#39;, pull: &#39;up&#39;
-</span></span><span class="line"><span class="cl">  end
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">  def run
-</span></span><span class="line"><span class="cl">    if RPi::GPIO.high? config[:pinnum]
-</span></span><span class="line"><span class="cl">      puts &#39;Contact sensor is open!&#39;
-</span></span><span class="line"><span class="cl">      exit(2)
-</span></span><span class="line"><span class="cl">    else
-</span></span><span class="line"><span class="cl">      puts &#39;Contact sensor is closed.&#39;
-</span></span><span class="line"><span class="cl">      exit(0)
-</span></span><span class="line"><span class="cl">    end
-</span></span><span class="line"><span class="cl">  end
-</span></span><span class="line"><span class="cl">end
-</span></span></code></pre></td></tr></table>
-</div>
-</div><p>We&rsquo;ve got an option to set our pin and our board numbering options (those coming from <a class="link" href="https://github.com/ClockVapor/rpi_gpio"  target="_blank" rel="noopener"
-    >Clockvapor&rsquo;s ruby port of rpi.gpio</a>). So when we write our check (see below), we can add these options to the check.</p>
-<h3 id="temp-sensor-check">Temp Sensor Check
-</h3><p>Working with the temp in Python examples was a bit of a challenge and much of that code I was able to translate into Ruby for the purpose of this particular check. Let&rsquo;s take a look:</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
-</span><span class="lnt"> 2
-</span><span class="lnt"> 3
-</span><span class="lnt"> 4
-</span><span class="lnt"> 5
-</span><span class="lnt"> 6
-</span><span class="lnt"> 7
-</span><span class="lnt"> 8
-</span><span class="lnt"> 9
-</span><span class="lnt">10
-</span><span class="lnt">11
-</span><span class="lnt">12
-</span><span class="lnt">13
-</span><span class="lnt">14
-</span><span class="lnt">15
-</span><span class="lnt">16
-</span><span class="lnt">17
-</span><span class="lnt">18
-</span><span class="lnt">19
-</span><span class="lnt">20
-</span><span class="lnt">21
-</span><span class="lnt">22
-</span><span class="lnt">23
-</span><span class="lnt">24
-</span><span class="lnt">25
-</span><span class="lnt">26
-</span><span class="lnt">27
-</span><span class="lnt">28
-</span><span class="lnt">29
-</span><span class="lnt">30
-</span><span class="lnt">31
-</span><span class="lnt">32
-</span><span class="lnt">33
-</span><span class="lnt">34
-</span><span class="lnt">35
-</span><span class="lnt">36
-</span><span class="lnt">37
-</span><span class="lnt">38
-</span><span class="lnt">39
-</span><span class="lnt">40
-</span><span class="lnt">41
-</span><span class="lnt">42
-</span><span class="lnt">43
-</span><span class="lnt">44
-</span><span class="lnt">45
-</span><span class="lnt">46
-</span><span class="lnt">47
-</span><span class="lnt">48
-</span><span class="lnt">49
-</span><span class="lnt">50
-</span><span class="lnt">51
-</span><span class="lnt">52
-</span><span class="lnt">53
-</span><span class="lnt">54
-</span><span class="lnt">55
-</span><span class="lnt">56
-</span><span class="lnt">57
-</span><span class="lnt">58
-</span><span class="lnt">59
-</span><span class="lnt">60
-</span><span class="lnt">61
-</span><span class="lnt">62
-</span><span class="lnt">63
-</span><span class="lnt">64
-</span><span class="lnt">65
-</span><span class="lnt">66
-</span><span class="lnt">67
-</span><span class="lnt">68
-</span><span class="lnt">69
-</span><span class="lnt">70
-</span><span class="lnt">71
-</span><span class="lnt">72
-</span><span class="lnt">73
-</span><span class="lnt">74
-</span><span class="lnt">75
-</span><span class="lnt">76
-</span><span class="lnt">77
-</span><span class="lnt">78
-</span><span class="lnt">79
-</span><span class="lnt">80
-</span><span class="lnt">81
-</span><span class="lnt">82
-</span><span class="lnt">83
-</span><span class="lnt">84
-</span><span class="lnt">85
-</span></code></pre></td>
-<td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-gdscript3" data-lang="gdscript3"><span class="line"><span class="cl"><span class="n">require</span> <span class="s1">&#39;sensu-plugin/check/cli&#39;</span>
-</span></span><span class="line"><span class="cl"><span class="n">require</span> <span class="s1">&#39;rpi_gpio&#39;</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="c1"># Starting check class</span>
-</span></span><span class="line"><span class="cl"><span class="k">class</span> <span class="n">CheckTempSensor</span> <span class="o">&lt;</span> <span class="n">Sensu</span><span class="p">::</span><span class="n">Plugin</span><span class="p">::</span><span class="n">Check</span><span class="p">::</span><span class="n">CLI</span>
-</span></span><span class="line"><span class="cl">  <span class="n">option</span>  <span class="p">:</span><span class="n">fahrenheit</span><span class="p">,</span>
-</span></span><span class="line"><span class="cl">          <span class="n">short</span><span class="p">:</span> <span class="s1">&#39;-F&#39;</span><span class="p">,</span>
-</span></span><span class="line"><span class="cl">          <span class="n">long</span><span class="p">:</span> <span class="s1">&#39;--fahrenheit&#39;</span><span class="p">,</span>
-</span></span><span class="line"><span class="cl">          <span class="n">description</span><span class="p">:</span> <span class="s1">&#39;Return temperature in Fahrenheit&#39;</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">  <span class="n">option</span>  <span class="p">:</span><span class="n">celsius</span><span class="p">,</span>
-</span></span><span class="line"><span class="cl">          <span class="n">short</span><span class="p">:</span> <span class="s1">&#39;-C&#39;</span><span class="p">,</span>
-</span></span><span class="line"><span class="cl">          <span class="n">long</span><span class="p">:</span> <span class="s1">&#39;--celsius&#39;</span><span class="p">,</span>
-</span></span><span class="line"><span class="cl">          <span class="n">description</span><span class="p">:</span> <span class="s1">&#39;Return temperature in Celsius&#39;</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">  <span class="n">option</span>  <span class="p">:</span><span class="n">tcrit</span><span class="p">,</span>
-</span></span><span class="line"><span class="cl">          <span class="n">short</span><span class="p">:</span> <span class="s1">&#39;-c TEMP&#39;</span><span class="p">,</span>
-</span></span><span class="line"><span class="cl">          <span class="n">long</span><span class="p">:</span> <span class="s1">&#39;--critical&#39;</span><span class="p">,</span>
-</span></span><span class="line"><span class="cl">          <span class="n">proc</span><span class="p">:</span> <span class="n">proc</span><span class="p">(</span><span class="o">&amp;</span><span class="p">:</span><span class="n">to_i</span><span class="p">),</span>
-</span></span><span class="line"><span class="cl">          <span class="n">description</span><span class="p">:</span> <span class="s1">&#39;Critical if TEMP greater than set value&#39;</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">  <span class="n">option</span>  <span class="p">:</span><span class="n">twarn</span><span class="p">,</span>
-</span></span><span class="line"><span class="cl">          <span class="n">short</span><span class="p">:</span> <span class="s1">&#39;-w TEMP&#39;</span><span class="p">,</span>
-</span></span><span class="line"><span class="cl">          <span class="n">long</span><span class="p">:</span> <span class="s1">&#39;--warn&#39;</span><span class="p">,</span>
-</span></span><span class="line"><span class="cl">          <span class="n">proc</span><span class="p">:</span> <span class="n">proc</span><span class="p">(</span><span class="o">&amp;</span><span class="p">:</span><span class="n">to_i</span><span class="p">),</span>
-</span></span><span class="line"><span class="cl">          <span class="n">description</span><span class="p">:</span> <span class="s1">&#39;Warning if TEMP greater than set value&#39;</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">  <span class="c1"># Set up variables</span>
-</span></span><span class="line"><span class="cl">  <span class="k">def</span> <span class="nf">initialize</span>
-</span></span><span class="line"><span class="cl">    <span class="n">super</span>
-</span></span><span class="line"><span class="cl">    <span class="n">system</span><span class="p">(</span><span class="s1">&#39;modprobe w1-gpio&#39;</span><span class="p">)</span>
-</span></span><span class="line"><span class="cl">    <span class="n">system</span><span class="p">(</span><span class="s1">&#39;modprobe w1-therm&#39;</span><span class="p">)</span>
-</span></span><span class="line"><span class="cl">    <span class="err">@</span><span class="n">basedir</span> <span class="o">=</span> <span class="s1">&#39;/sys/bus/w1/devices/&#39;</span><span class="o">.</span><span class="n">freeze</span>
-</span></span><span class="line"><span class="cl">    <span class="err">@</span><span class="n">device_folder</span> <span class="o">=</span> <span class="n">Dir</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="err">@</span><span class="n">basedir</span> <span class="o">+</span> <span class="s1">&#39;28*&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
-</span></span><span class="line"><span class="cl">    <span class="err">@</span><span class="n">device_file</span> <span class="o">=</span> <span class="err">@</span><span class="n">device_folder</span> <span class="o">+</span> <span class="s1">&#39;/w1_slave&#39;</span>
-</span></span><span class="line"><span class="cl">  <span class="n">end</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">  <span class="k">def</span> <span class="nf">read_temp</span>
-</span></span><span class="line"><span class="cl">    <span class="n">lines</span> <span class="o">=</span> <span class="ne">File</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="err">@</span><span class="n">device_file</span><span class="p">)</span>
-</span></span><span class="line"><span class="cl">    <span class="k">while</span> <span class="n">lines</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="o">-</span><span class="mf">4.</span><span class="o">.-</span><span class="mi">2</span><span class="p">]</span> <span class="o">!=</span> <span class="s1">&#39;YES&#39;</span>
-</span></span><span class="line"><span class="cl">      <span class="n">sleep</span> <span class="mf">0.2</span>
-</span></span><span class="line"><span class="cl">      <span class="n">lines</span> <span class="o">=</span> <span class="ne">File</span><span class="o">.</span><span class="n">readlines</span><span class="p">(</span><span class="err">@</span><span class="n">device_file</span><span class="p">)</span>
-</span></span><span class="line"><span class="cl">    <span class="n">end</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">    <span class="n">equals_pos</span> <span class="o">=</span> <span class="n">lines</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="s1">&#39;t=&#39;</span><span class="p">)</span>
-</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="k">if</span> <span class="n">equals_pos</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">    <span class="n">lines</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="n">equals_pos</span> <span class="o">+</span> <span class="mf">2.</span><span class="o">.-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">chomp</span><span class="o">.</span><span class="n">to_f</span> <span class="o">/</span> <span class="mf">1000.0</span>
-</span></span><span class="line"><span class="cl">  <span class="n">end</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">  <span class="k">def</span> <span class="nf">temp_to_fahrenheit</span>
-</span></span><span class="line"><span class="cl">    <span class="n">read_temp</span> <span class="o">*</span> <span class="mf">9.0</span> <span class="o">/</span> <span class="mf">5.0</span> <span class="o">+</span> <span class="mf">32.0</span>
-</span></span><span class="line"><span class="cl">  <span class="n">end</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">  <span class="k">def</span> <span class="nf">temp_status</span>
-</span></span><span class="line"><span class="cl">    <span class="n">critmsg</span> <span class="o">=</span> <span class="s1">&#39;Temp is critical&#39;</span>
-</span></span><span class="line"><span class="cl">    <span class="n">warnmsg</span> <span class="o">=</span> <span class="s1">&#39;Temp is abnormal&#39;</span>
-</span></span><span class="line"><span class="cl">    <span class="n">okmsg</span> <span class="o">=</span> <span class="s1">&#39;Temp is OK&#39;</span>
-</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="n">config</span><span class="p">[:</span><span class="n">celsius</span><span class="p">]</span> <span class="o">&amp;&amp;</span> <span class="n">read_temp</span> <span class="o">&gt;</span> <span class="n">config</span><span class="p">[:</span><span class="n">tcrit</span><span class="p">]</span>
-</span></span><span class="line"><span class="cl">      <span class="n">puts</span> <span class="n">critmsg</span>
-</span></span><span class="line"><span class="cl">      <span class="n">exit</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
-</span></span><span class="line"><span class="cl">    <span class="n">elsif</span> <span class="n">config</span><span class="p">[:</span><span class="n">celsius</span><span class="p">]</span> <span class="o">&amp;&amp;</span> <span class="n">read_temp</span><span class="o">.</span><span class="n">between</span><span class="err">?</span><span class="p">(</span><span class="n">config</span><span class="p">[:</span><span class="n">tcrit</span><span class="p">],</span> <span class="n">config</span><span class="p">[:</span><span class="n">twarn</span><span class="p">])</span>
-</span></span><span class="line"><span class="cl">      <span class="n">puts</span> <span class="n">warnmsg</span>
-</span></span><span class="line"><span class="cl">      <span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
-</span></span><span class="line"><span class="cl">    <span class="n">elsif</span> <span class="n">config</span><span class="p">[:</span><span class="n">fahrenheit</span><span class="p">]</span> <span class="o">&amp;&amp;</span> <span class="n">temp_to_fahrenheit</span> <span class="o">&gt;</span> <span class="n">config</span><span class="p">[:</span><span class="n">tcrit</span><span class="p">]</span>
-</span></span><span class="line"><span class="cl">      <span class="n">puts</span> <span class="n">critmsg</span>
-</span></span><span class="line"><span class="cl">      <span class="n">exit</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
-</span></span><span class="line"><span class="cl">    <span class="n">elsif</span> <span class="n">config</span><span class="p">[:</span><span class="n">fahrenheit</span><span class="p">]</span> <span class="o">&amp;&amp;</span> <span class="n">temp_to_fahrenheit</span><span class="o">.</span><span class="n">between</span><span class="err">?</span><span class="p">(</span><span class="n">config</span><span class="p">[:</span><span class="n">tcrit</span><span class="p">],</span> <span class="n">config</span><span class="p">[:</span><span class="n">twarn</span><span class="p">])</span>
-</span></span><span class="line"><span class="cl">      <span class="n">puts</span> <span class="n">warnmsg</span>
-</span></span><span class="line"><span class="cl">      <span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
-</span></span><span class="line"><span class="cl">    <span class="k">else</span>
-</span></span><span class="line"><span class="cl">      <span class="n">puts</span> <span class="n">okmsg</span>
-</span></span><span class="line"><span class="cl">      <span class="n">exit</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
-</span></span><span class="line"><span class="cl">    <span class="n">end</span>
-</span></span><span class="line"><span class="cl">  <span class="n">end</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">  <span class="k">def</span> <span class="nf">run</span>
-</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="n">config</span><span class="p">[:</span><span class="n">fahrenheit</span><span class="p">]</span>
-</span></span><span class="line"><span class="cl">      <span class="n">puts</span> <span class="s1">&#39;Current Temp: &#39;</span> <span class="o">+</span> <span class="n">temp_to_fahrenheit</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">to_s</span> <span class="o">+</span> <span class="s1">&#39; Fahrenheit&#39;</span>
-</span></span><span class="line"><span class="cl">    <span class="k">else</span>
-</span></span><span class="line"><span class="cl">      <span class="n">puts</span> <span class="s1">&#39;Current Temp: &#39;</span> <span class="o">+</span> <span class="n">read_temp</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">to_s</span> <span class="o">+</span> <span class="s1">&#39; Celsius&#39;</span>
-</span></span><span class="line"><span class="cl">    <span class="n">end</span>
-</span></span><span class="line"><span class="cl">    <span class="n">temp_status</span>
-</span></span><span class="line"><span class="cl">  <span class="n">end</span>
-</span></span><span class="line"><span class="cl"><span class="n">end</span>
-</span></span></code></pre></td></tr></table>
-</div>
-</div><p>Yikes! Yeah, that&rsquo;s a lot, but it boils down to a few key options you can include in a check:</p>
-<ul>
-<li>Celsius</li>
-<li>Fahrenheit</li>
-<li>Warning temp</li>
-<li>Critical temp</li>
-</ul>
-<p>Again, this check can be super-generic, and it&rsquo;s got the option for Celsius, so what&rsquo;s not to love?</p>
-<p>Alright, so one last check to take a look at as an example&hellip;metrics!</p>
-<h3 id="temp-sensor-metric-check">Temp Sensor Metric Check
-</h3><p>So this particular check is SUPER useful if you want to see your temp trends over time. It looks like this:</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
-</span><span class="lnt"> 2
-</span><span class="lnt"> 3
-</span><span class="lnt"> 4
-</span><span class="lnt"> 5
-</span><span class="lnt"> 6
-</span><span class="lnt"> 7
-</span><span class="lnt"> 8
-</span><span class="lnt"> 9
-</span><span class="lnt">10
-</span><span class="lnt">11
-</span><span class="lnt">12
-</span><span class="lnt">13
-</span><span class="lnt">14
-</span><span class="lnt">15
-</span><span class="lnt">16
-</span><span class="lnt">17
-</span><span class="lnt">18
-</span><span class="lnt">19
-</span><span class="lnt">20
-</span><span class="lnt">21
-</span><span class="lnt">22
-</span><span class="lnt">23
-</span><span class="lnt">24
-</span><span class="lnt">25
-</span><span class="lnt">26
-</span><span class="lnt">27
-</span><span class="lnt">28
-</span><span class="lnt">29
-</span><span class="lnt">30
-</span><span class="lnt">31
-</span><span class="lnt">32
-</span><span class="lnt">33
-</span><span class="lnt">34
-</span><span class="lnt">35
-</span><span class="lnt">36
-</span><span class="lnt">37
-</span></code></pre></td>
-<td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-gdscript3" data-lang="gdscript3"><span class="line"><span class="cl">  <span class="c1"># Set up variables</span>
-</span></span><span class="line"><span class="cl">  <span class="k">def</span> <span class="nf">initialize</span>
-</span></span><span class="line"><span class="cl">    <span class="n">super</span>
-</span></span><span class="line"><span class="cl">    <span class="n">system</span><span class="p">(</span><span class="s1">&#39;modprobe w1-gpio&#39;</span><span class="p">)</span>
-</span></span><span class="line"><span class="cl">    <span class="n">system</span><span class="p">(</span><span class="s1">&#39;modprobe w1-therm&#39;</span><span class="p">)</span>
-</span></span><span class="line"><span class="cl">    <span class="err">@</span><span class="n">basedir</span> <span class="o">=</span> <span class="s1">&#39;/sys/bus/w1/devices/&#39;</span><span class="o">.</span><span class="n">freeze</span>
-</span></span><span class="line"><span class="cl">    <span class="err">@</span><span class="n">device_folder</span> <span class="o">=</span> <span class="n">Dir</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="err">@</span><span class="n">basedir</span> <span class="o">+</span> <span class="s1">&#39;28*&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
-</span></span><span class="line"><span class="cl">    <span class="err">@</span><span class="n">device_file</span> <span class="o">=</span> <span class="err">@</span><span class="n">device_folder</span> <span class="o">+</span> <span class="s1">&#39;/w1_slave&#39;</span>
-</span></span><span class="line"><span class="cl">  <span class="n">end</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">  <span class="k">def</span> <span class="nf">read_temp</span>
-</span></span><span class="line"><span class="cl">    <span class="n">lines</span> <span class="o">=</span> <span class="ne">File</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="err">@</span><span class="n">device_file</span><span class="p">)</span>
-</span></span><span class="line"><span class="cl">    <span class="k">while</span> <span class="n">lines</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="o">-</span><span class="mf">4.</span><span class="o">.-</span><span class="mi">2</span><span class="p">]</span> <span class="o">!=</span> <span class="s1">&#39;YES&#39;</span>
-</span></span><span class="line"><span class="cl">      <span class="n">sleep</span> <span class="mf">0.2</span>
-</span></span><span class="line"><span class="cl">      <span class="n">lines</span> <span class="o">=</span> <span class="ne">File</span><span class="o">.</span><span class="n">readlines</span><span class="p">(</span><span class="err">@</span><span class="n">device_file</span><span class="p">)</span>
-</span></span><span class="line"><span class="cl">    <span class="n">end</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">    <span class="n">equals_pos</span> <span class="o">=</span> <span class="n">lines</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="s1">&#39;t=&#39;</span><span class="p">)</span>
-</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="k">if</span> <span class="n">equals_pos</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">    <span class="n">lines</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="n">equals_pos</span> <span class="o">+</span> <span class="mf">2.</span><span class="o">.-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">chomp</span><span class="o">.</span><span class="n">to_f</span> <span class="o">/</span> <span class="mf">1000.0</span>
-</span></span><span class="line"><span class="cl">  <span class="n">end</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">  <span class="k">def</span> <span class="nf">temp_to_fahrenheit</span>
-</span></span><span class="line"><span class="cl">    <span class="n">read_temp</span> <span class="o">*</span> <span class="mf">9.0</span> <span class="o">/</span> <span class="mf">5.0</span> <span class="o">+</span> <span class="mf">32.0</span>
-</span></span><span class="line"><span class="cl">  <span class="n">end</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">  <span class="k">def</span> <span class="nf">run</span>
-</span></span><span class="line"><span class="cl">    <span class="n">timestamp</span> <span class="o">=</span> <span class="n">Time</span><span class="o">.</span><span class="n">now</span><span class="o">.</span><span class="n">to_i</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="n">config</span><span class="p">[:</span><span class="n">celsius</span><span class="p">]</span>
-</span></span><span class="line"><span class="cl">      <span class="n">ok</span> <span class="n">output</span> <span class="s2">&#34;#{config[:scheme]}&#34;</span><span class="p">,</span> <span class="n">read_temp</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
-</span></span><span class="line"><span class="cl">    <span class="k">else</span>
-</span></span><span class="line"><span class="cl">      <span class="n">ok</span> <span class="n">output</span> <span class="s2">&#34;#{config[:scheme]}&#34;</span><span class="p">,</span> <span class="n">temp_to_fahrenheit</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
-</span></span><span class="line"><span class="cl">    <span class="n">end</span>
-</span></span><span class="line"><span class="cl">  <span class="n">end</span>
-</span></span><span class="line"><span class="cl"><span class="n">end</span>
-</span></span></code></pre></td></tr></table>
-</div>
-</div><p>When we write a metric check in Sensu, this won&rsquo;t be a &ldquo;status&rdquo; type check (think &ldquo;up&rdquo; or &ldquo;down&rdquo;, or &ldquo;OH CRAP THIS THRESHHOLD&rsquo;S BEEN HIT&rdquo;), but more of a &ldquo;here&rsquo;s the data&rdquo; type check. Cool, so now that that&rsquo;s all out of the way, let&rsquo;s talk about the cool part, writing our checks.</p>
-<h1 id="writing-the-checks">Writing the Checks
-</h1><p>Sensu&rsquo;s check definitions are all written in JSON (trust me, I know the pains of trailing or missing commas). So when we write a check for the KegPi, we&rsquo;ll have to write this all in JSON and it&rsquo;s SUPER CRAZY IMPORTANT that you have the check scripts living on your Pi. To do that, just do the following:</p>
-<p><code>git clone https://github.com/asachs01/sensu-plugins-rpi-sensors.git</code></p>
-<p>Cool, done? Awesome.</p>
-<p>So let&rsquo;s take a look at three checks that correspond to the scripts I shared:</p>
-<p><em><strong>check-temp-sensor</strong></em></p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
-</span><span class="lnt"> 2
-</span><span class="lnt"> 3
-</span><span class="lnt"> 4
-</span><span class="lnt"> 5
-</span><span class="lnt"> 6
-</span><span class="lnt"> 7
-</span><span class="lnt"> 8
-</span><span class="lnt"> 9
-</span><span class="lnt">10
-</span><span class="lnt">11
-</span><span class="lnt">12
-</span></code></pre></td>
-<td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">{
-</span></span><span class="line"><span class="cl">	&#34;checks&#34;: {
-</span></span><span class="line"><span class="cl">		&#34;check-temp-sensor&#34;: {
-</span></span><span class="line"><span class="cl">			&#34;command&#34;: &#34;/home/pi/Documents/sensu-plugins-rpi-sensors/bin/check-temp-sensor.rb -F -w 45 -c 60&#34;,
-</span></span><span class="line"><span class="cl">			&#34;interval&#34;: 15,
-</span></span><span class="line"><span class="cl">			&#34;subscribers&#34;: [&#34;kegpi&#34;],
-</span></span><span class="line"><span class="cl">			&#34;handlers&#34;: [&#34;email&#34;, &#34;slack&#34;],
-</span></span><span class="line"><span class="cl">			&#34;occurrences&#34;: 3,
-</span></span><span class="line"><span class="cl">			&#34;refresh&#34;: 600
-</span></span><span class="line"><span class="cl">		}
-</span></span><span class="line"><span class="cl">	}
-</span></span><span class="line"><span class="cl">}
-</span></span></code></pre></td></tr></table>
-</div>
-</div><p><em><strong>check-contact-sensor</strong></em></p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
-</span><span class="lnt"> 2
-</span><span class="lnt"> 3
-</span><span class="lnt"> 4
-</span><span class="lnt"> 5
-</span><span class="lnt"> 6
-</span><span class="lnt"> 7
-</span><span class="lnt"> 8
-</span><span class="lnt"> 9
-</span><span class="lnt">10
-</span><span class="lnt">11
-</span><span class="lnt">12
-</span><span class="lnt">13
-</span></code></pre></td>
-<td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">{
-</span></span><span class="line"><span class="cl">	&#34;checks&#34;: {
-</span></span><span class="line"><span class="cl">		&#34;check-contact-sensor&#34;: {
-</span></span><span class="line"><span class="cl">			&#34;command&#34;: &#34;sudo /home/pi/Documents/scratchpad_kegpi/bin/check-contact-sensor.rb -p 22&#34;,
-</span></span><span class="line"><span class="cl">			&#34;interval&#34;: 10,
-</span></span><span class="line"><span class="cl">			&#34;occurrences&#34;: 8,
-</span></span><span class="line"><span class="cl">			&#34;refresh&#34;: 120,
-</span></span><span class="line"><span class="cl">			&#34;subscribers&#34;: [&#34;kegpi&#34;],
-</span></span><span class="line"><span class="cl">			&#34;contacts&#34;: [&#34;aaron&#34;],
-</span></span><span class="line"><span class="cl">			&#34;handlers&#34;: [&#34;slack&#34;]
-</span></span><span class="line"><span class="cl">		}
-</span></span><span class="line"><span class="cl">	}
-</span></span><span class="line"><span class="cl">}
-</span></span></code></pre></td></tr></table>
-</div>
-</div><p><em><strong>metrics-temp-sensor</strong></em></p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
-</span><span class="lnt"> 2
-</span><span class="lnt"> 3
-</span><span class="lnt"> 4
-</span><span class="lnt"> 5
-</span><span class="lnt"> 6
-</span><span class="lnt"> 7
-</span><span class="lnt"> 8
-</span><span class="lnt"> 9
-</span><span class="lnt">10
-</span><span class="lnt">11
-</span><span class="lnt">12
-</span></code></pre></td>
-<td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">{
-</span></span><span class="line"><span class="cl">	&#34;checks&#34;: {
-</span></span><span class="line"><span class="cl">		&#34;metrics-temp-sensor&#34;: {
-</span></span><span class="line"><span class="cl">			&#34;command&#34;: &#34;/home/pi/Documents/sensu-plugins-rpi-sensors/bin/metrics-temp-sensor.rb -F&#34;,
-</span></span><span class="line"><span class="cl">			&#34;type&#34;: &#34;metric&#34;,
-</span></span><span class="line"><span class="cl">			&#34;interval&#34;: 15,
-</span></span><span class="line"><span class="cl">			&#34;metrics-temp&#34;: &#34;&lt;URL TO GRAPHITE GRAPH&gt;&#34;,
-</span></span><span class="line"><span class="cl">			&#34;subscribers&#34;: [&#34;kegpi&#34;],
-</span></span><span class="line"><span class="cl">			&#34;handlers&#34;: [&#34;graphite&#34;]
-</span></span><span class="line"><span class="cl">		}
-</span></span><span class="line"><span class="cl">	}
-</span></span><span class="line"><span class="cl">}
-</span></span></code></pre></td></tr></table>
-</div>
-</div><p>Those are what the checks look like on a practical level. You&rsquo;ll notice the <code>contact</code> attribute is present in these checks. That&rsquo;s because I&rsquo;m running a Sensu Enterprise deployment and taking advantage of contact routing&hellip;even though I&rsquo;m the only one monitoring the kegerator. <!-- raw HTML omitted --></p>
-<p>So there you have it&ndash;some working checks that are at this point in time, checking the contact and temperature sensors attached ot the Pi.</p>
-<h1 id="sending-the-data-to-other-sources">Sending the Data to Other Sources
-</h1><p>Before I wrap this up, let&rsquo;s do a quick discussion about how you can send the data to other sources and get some cool graphs out of the deal. Personally, I have the data being sent to two sources: an InfluxDB instance and a Graphite instance. The reason for exporting to two data sources simply comes down to the fact that I can perform a quick bit of magic in my check and embed my Graphite graph into my check for a quick visualization of the temperature. Also, I much prefer the graphs I can get out of Influx, but alas, those aren&rsquo;t embeddable.</p>
-<p>So how does the data make it to the Graphite and InfluxDB instances? Enter our handlers. You&rsquo;ll notice in the checks defined above, I have my influxdb and graphite handlers specified. Just like everything else in Sensu, this is done via JSON configuration files:</p>
-<p>Our Graphite configuration;
-<em><strong>/etc/sensu/conf.d/graphite.json</strong></em></p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
-</span><span class="lnt"> 2
-</span><span class="lnt"> 3
-</span><span class="lnt"> 4
-</span><span class="lnt"> 5
-</span><span class="lnt"> 6
-</span><span class="lnt"> 7
-</span><span class="lnt"> 8
-</span><span class="lnt"> 9
-</span><span class="lnt">10
-</span><span class="lnt">11
-</span><span class="lnt">12
-</span><span class="lnt">13
-</span></code></pre></td>
-<td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">{
-</span></span><span class="line"><span class="cl">  &#34;handlers&#34;: {
-</span></span><span class="line"><span class="cl">    &#34;graphite&#34;: {
-</span></span><span class="line"><span class="cl">      &#34;type&#34;: &#34;tcp&#34;,
-</span></span><span class="line"><span class="cl">      &#34;mutator&#34;: &#34;only_check_output&#34;,
-</span></span><span class="line"><span class="cl">      &#34;timeout&#34;: 30,
-</span></span><span class="line"><span class="cl">      &#34;socket&#34;: {
-</span></span><span class="line"><span class="cl">        &#34;host&#34;: &#34;graphite.company.tld&#34;,
-</span></span><span class="line"><span class="cl">        &#34;port&#34;: 2003
-</span></span><span class="line"><span class="cl">      }
-</span></span><span class="line"><span class="cl">    }
-</span></span><span class="line"><span class="cl">  }
-</span></span><span class="line"><span class="cl">}
-</span></span></code></pre></td></tr></table>
-</div>
-</div><p>Our InfluxDB configuration (both the Influx configuration and requisite handler):</p>
-<p><em><strong>/etc/sensu/conf.d/influxdb.json</strong></em></p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre tabindex="0" class="chroma"><code><span class="lnt">1
-</span><span class="lnt">2
-</span><span class="lnt">3
-</span><span class="lnt">4
-</span><span class="lnt">5
-</span><span class="lnt">6
-</span><span class="lnt">7
-</span><span class="lnt">8
-</span><span class="lnt">9
-</span></code></pre></td>
-<td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">{
-</span></span><span class="line"><span class="cl">  &#34;influxdb&#34;: {
-</span></span><span class="line"><span class="cl">      &#34;host&#34;: &#34;192.168.1.5&#34;,
-</span></span><span class="line"><span class="cl">      &#34;port&#34;: &#34;8086&#34;,
-</span></span><span class="line"><span class="cl">      &#34;database&#34;: &#34;sensu&#34;,
-</span></span><span class="line"><span class="cl">      &#34;username&#34;: &#34;user&#34;,
-</span></span><span class="line"><span class="cl">      &#34;password&#34;: &#34;password&#34;
-</span></span><span class="line"><span class="cl">  }
-</span></span><span class="line"><span class="cl">}
-</span></span></code></pre></td></tr></table>
-</div>
-</div><p><em><strong>/etc/sensu/conf.d/influx-tcp.json</strong></em></p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre tabindex="0" class="chroma"><code><span class="lnt">1
-</span><span class="lnt">2
-</span><span class="lnt">3
-</span><span class="lnt">4
-</span><span class="lnt">5
-</span><span class="lnt">6
-</span><span class="lnt">7
-</span><span class="lnt">8
-</span></code></pre></td>
-<td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">{
-</span></span><span class="line"><span class="cl">  &#34;handlers&#34;: {
-</span></span><span class="line"><span class="cl">     &#34;influx-tcp&#34;: {
-</span></span><span class="line"><span class="cl">       &#34;type&#34;: &#34;pipe&#34;,
-</span></span><span class="line"><span class="cl">       &#34;command&#34;: &#34;/opt/sensu/embedded/bin/metrics-influxdb.rb&#34;
-</span></span><span class="line"><span class="cl">     }
-</span></span><span class="line"><span class="cl">   }
-</span></span><span class="line"><span class="cl">}
-</span></span></code></pre></td></tr></table>
-</div>
-</div><p>With those files added, we&rsquo;re able to then send the check data from the KegPi to Graphite and InfluxDB respectively.</p>
-<h1 id="wrapping-up">Wrapping Up
-</h1><p>Whew! This post has been a bit of a long one, and I thank you for sticking through the read until this point. If you have any questions about any aspect of this, don&rsquo;t hesitate to leave a comment down below.</p>
-<p>Thanks for reading!</p>
-
-</section>
-
-
-    <footer class="article-footer">
-    
-
-    </footer>
-
-
-    
-</article>
-
-    
-
-    
-
-     
-    
-        
-    
-
-    <footer class="site-footer">
-    <section class="copyright">
-        &copy; 
-        
-            2019 - 
-        
-        2025 © 2025 Aaron Sachs. All rights reserved.
-    </section>
-    
-    <section class="powerby">
-        Built with <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> <br />
-        Theme <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="3.30.0">Stack</a></b> designed by <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a>
-    </section>
-</footer>
-
-
-    
-<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
-
-    
-    <div class="pswp__bg"></div>
-
-    
-    <div class="pswp__scroll-wrap">
-
-        
-        <div class="pswp__container">
-            <div class="pswp__item"></div>
-            <div class="pswp__item"></div>
-            <div class="pswp__item"></div>
-        </div>
-
-        
-        <div class="pswp__ui pswp__ui--hidden">
-
-            <div class="pswp__top-bar">
-
-                
-
-                <div class="pswp__counter"></div>
-
-                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
-
-                <button class="pswp__button pswp__button--share" title="Share"></button>
-
-                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
-
-                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
-
-                
-                
-                <div class="pswp__preloader">
-                    <div class="pswp__preloader__icn">
-                        <div class="pswp__preloader__cut">
-                            <div class="pswp__preloader__donut"></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
-                <div class="pswp__share-tooltip"></div>
-            </div>
-
-            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
-            </button>
-
-            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
-            </button>
-
-            <div class="pswp__caption">
-                <div class="pswp__caption__center"></div>
-            </div>
-
-        </div>
-
-    </div>
-
-</div><script 
-                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js"integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo="crossorigin="anonymous"
-                defer
-                >
-            </script><script 
-                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js"integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU="crossorigin="anonymous"
-                defer
-                >
-            </script><link 
-                rel="stylesheet" 
-                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css"crossorigin="anonymous"
-            ><link 
-                rel="stylesheet" 
-                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css"crossorigin="anonymous"
-            >
-
-            </main>
-        </div>
-        <script 
-                src="https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js"integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z&#43;KMkF24hUW8WePSA9HM="crossorigin="anonymous"
-                
-                >
-            </script><script type="text/javascript" src="/ts/main.7e2744cab1d920655de661919fdfc920dbd054f5fb511380ecae20d388479363.js" defer></script>
-<script>
-    (function () {
-        const customFont = document.createElement('link');
-        customFont.href = "https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap";
-
-        customFont.type = "text/css";
-        customFont.rel = "stylesheet";
-
-        document.head.appendChild(customFont);
-    }());
-</script>
-
-    </body>
-</html>
+<!doctype html><html lang=en-us dir=ltr><head><meta charset=utf-8><meta name=viewport content='width=device-width,initial-scale=1'><meta name=description content="It&rsquo;s been a long time coming, but I&rsquo;ve finally got the KegPi mostly working and being monitored with Sensu! This post is going to go over the whole kit and caboodle and is going to build on the posts of creating the kegerator and getting Sensu to run on a Raspberry Pi. The deep and dark part of this post will cover:\nThe code to measure the temp/contact sensors (Sensu Plugin) Writing Sensu checks that will incorporate that code Exporting the data from the temp sensor to Graphite and InfluxDB for seeing temperature trends Writing the Plugins If you haven&rsquo;t had a chance to read the previous post on using Sensu to monitor Raspberry Pis, I&rsquo;ll give you a short blurb about Sensu. It&rsquo;s an open-source monitoring framework that allows you to monitor everything from fleets of servers and networking equipment to applications, and even yes, Raspberry Pis. It also has a highly decoupled architecture and relies on plugins to extend its functionality.\n"><title>Monitoring My Kegerator With Sensu</title><link rel=canonical href=https://aaron.sachs.blog/archive/monitoring-my-kegerator-with-sensu/><link rel=stylesheet href=/scss/style.min.946cca6c6259ef94ac55abfae7c7bf3291ea3ed5eea17ef77500b257217c6710.css><meta property='og:title' content="Monitoring My Kegerator With Sensu"><meta property='og:description' content="It&rsquo;s been a long time coming, but I&rsquo;ve finally got the KegPi mostly working and being monitored with Sensu! This post is going to go over the whole kit and caboodle and is going to build on the posts of creating the kegerator and getting Sensu to run on a Raspberry Pi. The deep and dark part of this post will cover:\nThe code to measure the temp/contact sensors (Sensu Plugin) Writing Sensu checks that will incorporate that code Exporting the data from the temp sensor to Graphite and InfluxDB for seeing temperature trends Writing the Plugins If you haven&rsquo;t had a chance to read the previous post on using Sensu to monitor Raspberry Pis, I&rsquo;ll give you a short blurb about Sensu. It&rsquo;s an open-source monitoring framework that allows you to monitor everything from fleets of servers and networking equipment to applications, and even yes, Raspberry Pis. It also has a highly decoupled architecture and relies on plugins to extend its functionality.\n"><meta property='og:url' content='https://aaron.sachs.blog/archive/monitoring-my-kegerator-with-sensu/'><meta property='og:site_name' content='Staring Blankly at a Screen'><meta property='og:type' content='article'><meta property='article:section' content='Archive'><meta property='article:published_time' content='2018-04-28T04:58:16+00:00'><meta property='article:modified_time' content='2018-04-28T04:58:16+00:00'><meta name=twitter:title content="Monitoring My Kegerator With Sensu"><meta name=twitter:description content="It&rsquo;s been a long time coming, but I&rsquo;ve finally got the KegPi mostly working and being monitored with Sensu! This post is going to go over the whole kit and caboodle and is going to build on the posts of creating the kegerator and getting Sensu to run on a Raspberry Pi. The deep and dark part of this post will cover:\nThe code to measure the temp/contact sensors (Sensu Plugin) Writing Sensu checks that will incorporate that code Exporting the data from the temp sensor to Graphite and InfluxDB for seeing temperature trends Writing the Plugins If you haven&rsquo;t had a chance to read the previous post on using Sensu to monitor Raspberry Pis, I&rsquo;ll give you a short blurb about Sensu. It&rsquo;s an open-source monitoring framework that allows you to monitor everything from fleets of servers and networking equipment to applications, and even yes, Raspberry Pis. It also has a highly decoupled architecture and relies on plugins to extend its functionality.\n"></head><body class=article-page><script>(function(){const e="StackColorScheme";localStorage.getItem(e)||localStorage.setItem(e,"auto")})()</script><script>(function(){const t="StackColorScheme",e=localStorage.getItem(t),n=window.matchMedia("(prefers-color-scheme: dark)").matches===!0;e=="dark"||e==="auto"&&n?document.documentElement.dataset.scheme="dark":document.documentElement.dataset.scheme="light"})()</script><div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky"><button class="hamburger hamburger--spin" type=button id=toggle-menu aria-label="Toggle Menu">
+<span class=hamburger-box><span class=hamburger-inner></span></span></button><header><figure class=site-avatar><a href=/><img src=/img/avatar_hu_f509edb42ecc0ebd.png width=300 height=300 class=site-logo loading=lazy alt=Avatar>
+</a><span class=emoji>🎸</span></figure><div class=site-meta><h1 class=site-name><a href=/>Staring Blankly at a Screen</a></h1><h2 class=site-description>Tech, beer, and the occasional banjo tune</h2></div></header><ol class=menu-social><li><a href=https://github.com/asachs01 target=_blank title=GitHub rel=me><svg class="icon icon-tabler icon-tabler-brand-github" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M9 19c-4.3 1.4-4.3-2.5-6-3m12 5v-3.5c0-1 .1-1.4-.5-2 2.8-.3 5.5-1.4 5.5-6a4.6 4.6.0 00-1.3-3.2 4.2 4.2.0 00-.1-3.2s-1.1-.3-3.5 1.3a12.3 12.3.0 00-6.2.0C6.5 2.8 5.4 3.1 5.4 3.1a4.2 4.2.0 00-.1 3.2A4.6 4.6.0 004 9.5c0 4.6 2.7 5.7 5.5 6-.6.6-.6 1.2-.5 2V21"/></svg></a></li><li><a href=https://twitter.com/asachs01 target=_blank title=Twitter rel=me><svg class="icon icon-tabler icon-tabler-brand-twitter" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M22 4.01c-1 .49-1.98.689-3 .99-1.121-1.265-2.783-1.335-4.38-.737S11.977 6.323 12 8v1c-3.245.083-6.135-1.395-8-4 0 0-4.182 7.433 4 11-1.872 1.247-3.739 2.088-6 2 3.308 1.803 6.913 2.423 10.034 1.517 3.58-1.04 6.522-3.723 7.651-7.742a13.84 13.84.0 00.497-3.753C20.18 7.773 21.692 5.25 22 4.009z"/></svg></a></li></ol><ol class=menu id=main-menu><li><a href=/><svg class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><polyline points="5 12 3 12 12 3 21 12 19 12"/><path d="M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7"/><path d="M9 21v-6a2 2 0 012-2h2a2 2 0 012 2v6"/></svg>
+<span>Home</span></a></li><li><a href=/about/><svg class="icon icon-tabler icon-tabler-user" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="12" cy="7" r="4"/><path d="M6 21v-2a4 4 0 014-4h4a4 4 0 014 4v2"/></svg>
+<span>About</span></a></li><li><a href=/talks/><span>Talks</span></a></li><li><a href=/archives/><svg class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><rect x="3" y="4" width="18" height="4" rx="2"/><path d="M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8"/><line x1="10" y1="12" x2="14" y2="12"/></svg>
+<span>Archives</span></a></li><li><a href=/archives/><svg class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><rect x="3" y="4" width="18" height="4" rx="2"/><path d="M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8"/><line x1="10" y1="12" x2="14" y2="12"/></svg>
+<span>Archives</span></a></li><li><a href=/search/><svg class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="10" cy="10" r="7"/><line x1="21" y1="21" x2="15" y2="15"/></svg>
+<span>Search</span></a></li><li><a href=/search/><svg class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="10" cy="10" r="7"/><line x1="21" y1="21" x2="15" y2="15"/></svg>
+<span>Search</span></a></li><li class=menu-bottom-section><ol class=menu><li id=dark-mode-toggle><svg class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="8" cy="12" r="2"/><rect x="2" y="6" width="20" height="12" rx="6"/></svg>
+<svg class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="16" cy="12" r="2"/><rect x="2" y="6" width="20" height="12" rx="6"/></svg>
+<span>Dark Mode</span></li></ol></li></ol></aside><main class="main full-width"><article class=main-article><header class=article-header><div class=article-details><div class=article-title-wrapper><h2 class=article-title><a href=/archive/monitoring-my-kegerator-with-sensu/>Monitoring My Kegerator With Sensu</a></h2></div><footer class=article-time><div><svg class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><path d="M11.795 21H5a2 2 0 01-2-2V7a2 2 0 012-2h12a2 2 0 012 2v4"/><circle cx="18" cy="18" r="4"/><path d="M15 3v4"/><path d="M7 3v4"/><path d="M3 11h16"/><path d="M18 16.496V18l1 1"/></svg>
+<time class=article-time--published>Apr 28, 2018</time></div><div><svg class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 15"/></svg>
+<time class=article-time--reading>9 minute read</time></div></footer></div></header><section class=article-content><p>It&rsquo;s been a long time coming, but I&rsquo;ve finally got the <a class=link href=https://github.com/asachs01/kegpi target=_blank rel=noopener>KegPi</a> <em>mostly</em> working and being monitored with <a class=link href=https://sensu.io target=_blank rel=noopener>Sensu</a>! This post is going to go over the whole kit and caboodle and is going to build on the posts of <a class=link href=moving-to-kegging>creating the kegerator</a> and <a class=link href=monitoring-raspberry-pis-with-sensu>getting Sensu to run on a Raspberry Pi</a>. The deep and dark part of this post will cover:</p><ul><li>The code to measure the temp/contact sensors (Sensu Plugin)</li><li>Writing Sensu checks that will incorporate that code</li><li>Exporting the data from the temp sensor to <a class=link href=https://graphiteapp.org/ target=_blank rel=noopener>Graphite</a> and <a class=link href=https://www.influxdata.com/ target=_blank rel=noopener>InfluxDB</a> for seeing temperature trends</li></ul><h1 id=writing-the-plugins>Writing the Plugins</h1><p>If you haven&rsquo;t had a chance to read the previous post on using Sensu to monitor Raspberry Pis, I&rsquo;ll give you a short blurb about Sensu. It&rsquo;s an open-source monitoring framework that allows you to monitor everything from fleets of servers and networking equipment to applications, and even yes, Raspberry Pis. It also has a highly decoupled architecture and relies on <a class=link href=https://github.com/sensu-plugins target=_blank rel=noopener>plugins</a> to extend its functionality.</p><p>Currently there aren&rsquo;t any plugins inside of the Sensu ecosystem that exist for monitoring components that would be hooked up to a Raspberry Pi. So, I decided to write a few!</p><p><em>WARNING: I don&rsquo;t write a whole lot of Ruby professionally, and it&rsquo;s likely pretty UGLY code, but what the hell. It works, so let&rsquo;s just go with it! Also, your mileage may vary if you decide to put something like this together and use my code.</em></p><p>To get started writing a plugin, Sensu provides some skeletons for writing code in various languages:</p><ul><li><a class=link href=https://github.com/sensu-plugins/sensu-plugin target=_blank rel=noopener>Ruby</a></li><li><a class=link href=https://github.com/sensu-plugins/sensu-plugin-python target=_blank rel=noopener>Python</a></li><li><a class=link href=https://github.com/sensu-plugins/sensu-plugins-windows/tree/master/bin/powershell target=_blank rel=noopener>Powershell* (not Sensu-provided, but does give a good idea of plugins written in Powershell)</a></li></ul><p>Before I&rsquo;d started working at Sensu, the KegPi project was something that I tried to do from the ground up. I realized that the monitoring portion wasn&rsquo;t something that I wanted to write from scratch and tools (like Sensu) already existed, hence why I wrote the plugin for it.</p><p>One quick note&ndash;by design, this plugin and the checks are designed to be fairly generic. What that means practically is that even though I&rsquo;m using this primarily for a Raspberry Pi hooked up to a kegerator, you can use these checks in any sort of context. Have a Raspi that&rsquo;s monitoring the temp of a chicken coop? You can use this plugin. Want to <a class=link href=http://blog.initialstate.com/pi-for-kids-door-sensor/ target=_blank rel=noopener>build security system for your kid&rsquo;s school locker</a> and use Sensu to handle the alerts? You can use this plugin to do it!</p><p>So let&rsquo;s take a look at a couple of the checks that are part of the plugin.</p><h2 id=status-checks>Status Checks</h2><h3 id=contact-sensor-check>Contact Sensor Check</h3><p>The contact sensor check is, again, designed to be generic and able to be used in a variety of circumstances. Here&rsquo;s the code:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span><span class=lnt>32
+</span><span class=lnt>33
+</span><span class=lnt>34
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>require &#39;sensu-plugin/check/cli&#39;
+</span></span><span class=line><span class=cl>require &#39;rpi_gpio&#39;
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl># Starting check class
+</span></span><span class=line><span class=cl>class CheckContactSensor &lt; Sensu::Plugin::Check::CLI
+</span></span><span class=line><span class=cl>  option  :pinnum,
+</span></span><span class=line><span class=cl>          short: &#39;-p PINNUM&#39;,
+</span></span><span class=line><span class=cl>          long: &#39;--pin-num PINNUM&#39;,
+</span></span><span class=line><span class=cl>          description: &#39;Sets the pin number the contact sensor is attached to&#39;,
+</span></span><span class=line><span class=cl>          proc: proc(&amp;:to_i),
+</span></span><span class=line><span class=cl>          required: true
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>  option  :boardnum,
+</span></span><span class=line><span class=cl>          short: &#39;-b BOARDNUM&#39;,
+</span></span><span class=line><span class=cl>          long: &#39;--board-num BOARDNUM&#39;,
+</span></span><span class=line><span class=cl>          description: &#39;Sets the board numbering type to either :bcm or :board&#39;,
+</span></span><span class=line><span class=cl>          default: :bcm
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>  def initialize
+</span></span><span class=line><span class=cl>    super
+</span></span><span class=line><span class=cl>    RPi::GPIO.set_numbering config[:boardnum]
+</span></span><span class=line><span class=cl>    RPi::GPIO.setup config[:pinnum], as: &#39;input&#39;, pull: &#39;up&#39;
+</span></span><span class=line><span class=cl>  end
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>  def run
+</span></span><span class=line><span class=cl>    if RPi::GPIO.high? config[:pinnum]
+</span></span><span class=line><span class=cl>      puts &#39;Contact sensor is open!&#39;
+</span></span><span class=line><span class=cl>      exit(2)
+</span></span><span class=line><span class=cl>    else
+</span></span><span class=line><span class=cl>      puts &#39;Contact sensor is closed.&#39;
+</span></span><span class=line><span class=cl>      exit(0)
+</span></span><span class=line><span class=cl>    end
+</span></span><span class=line><span class=cl>  end
+</span></span><span class=line><span class=cl>end
+</span></span></code></pre></td></tr></table></div></div><p>We&rsquo;ve got an option to set our pin and our board numbering options (those coming from <a class=link href=https://github.com/ClockVapor/rpi_gpio target=_blank rel=noopener>Clockvapor&rsquo;s ruby port of rpi.gpio</a>). So when we write our check (see below), we can add these options to the check.</p><h3 id=temp-sensor-check>Temp Sensor Check</h3><p>Working with the temp in Python examples was a bit of a challenge and much of that code I was able to translate into Ruby for the purpose of this particular check. Let&rsquo;s take a look:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span><span class=lnt>32
+</span><span class=lnt>33
+</span><span class=lnt>34
+</span><span class=lnt>35
+</span><span class=lnt>36
+</span><span class=lnt>37
+</span><span class=lnt>38
+</span><span class=lnt>39
+</span><span class=lnt>40
+</span><span class=lnt>41
+</span><span class=lnt>42
+</span><span class=lnt>43
+</span><span class=lnt>44
+</span><span class=lnt>45
+</span><span class=lnt>46
+</span><span class=lnt>47
+</span><span class=lnt>48
+</span><span class=lnt>49
+</span><span class=lnt>50
+</span><span class=lnt>51
+</span><span class=lnt>52
+</span><span class=lnt>53
+</span><span class=lnt>54
+</span><span class=lnt>55
+</span><span class=lnt>56
+</span><span class=lnt>57
+</span><span class=lnt>58
+</span><span class=lnt>59
+</span><span class=lnt>60
+</span><span class=lnt>61
+</span><span class=lnt>62
+</span><span class=lnt>63
+</span><span class=lnt>64
+</span><span class=lnt>65
+</span><span class=lnt>66
+</span><span class=lnt>67
+</span><span class=lnt>68
+</span><span class=lnt>69
+</span><span class=lnt>70
+</span><span class=lnt>71
+</span><span class=lnt>72
+</span><span class=lnt>73
+</span><span class=lnt>74
+</span><span class=lnt>75
+</span><span class=lnt>76
+</span><span class=lnt>77
+</span><span class=lnt>78
+</span><span class=lnt>79
+</span><span class=lnt>80
+</span><span class=lnt>81
+</span><span class=lnt>82
+</span><span class=lnt>83
+</span><span class=lnt>84
+</span><span class=lnt>85
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-gdscript3 data-lang=gdscript3><span class=line><span class=cl><span class=n>require</span> <span class=s1>&#39;sensu-plugin/check/cli&#39;</span>
+</span></span><span class=line><span class=cl><span class=n>require</span> <span class=s1>&#39;rpi_gpio&#39;</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># Starting check class</span>
+</span></span><span class=line><span class=cl><span class=k>class</span> <span class=n>CheckTempSensor</span> <span class=o>&lt;</span> <span class=n>Sensu</span><span class=p>::</span><span class=n>Plugin</span><span class=p>::</span><span class=n>Check</span><span class=p>::</span><span class=n>CLI</span>
+</span></span><span class=line><span class=cl>  <span class=n>option</span>  <span class=p>:</span><span class=n>fahrenheit</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>          <span class=n>short</span><span class=p>:</span> <span class=s1>&#39;-F&#39;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>          <span class=n>long</span><span class=p>:</span> <span class=s1>&#39;--fahrenheit&#39;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>          <span class=n>description</span><span class=p>:</span> <span class=s1>&#39;Return temperature in Fahrenheit&#39;</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>  <span class=n>option</span>  <span class=p>:</span><span class=n>celsius</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>          <span class=n>short</span><span class=p>:</span> <span class=s1>&#39;-C&#39;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>          <span class=n>long</span><span class=p>:</span> <span class=s1>&#39;--celsius&#39;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>          <span class=n>description</span><span class=p>:</span> <span class=s1>&#39;Return temperature in Celsius&#39;</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>  <span class=n>option</span>  <span class=p>:</span><span class=n>tcrit</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>          <span class=n>short</span><span class=p>:</span> <span class=s1>&#39;-c TEMP&#39;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>          <span class=n>long</span><span class=p>:</span> <span class=s1>&#39;--critical&#39;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>          <span class=n>proc</span><span class=p>:</span> <span class=n>proc</span><span class=p>(</span><span class=o>&amp;</span><span class=p>:</span><span class=n>to_i</span><span class=p>),</span>
+</span></span><span class=line><span class=cl>          <span class=n>description</span><span class=p>:</span> <span class=s1>&#39;Critical if TEMP greater than set value&#39;</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>  <span class=n>option</span>  <span class=p>:</span><span class=n>twarn</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>          <span class=n>short</span><span class=p>:</span> <span class=s1>&#39;-w TEMP&#39;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>          <span class=n>long</span><span class=p>:</span> <span class=s1>&#39;--warn&#39;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>          <span class=n>proc</span><span class=p>:</span> <span class=n>proc</span><span class=p>(</span><span class=o>&amp;</span><span class=p>:</span><span class=n>to_i</span><span class=p>),</span>
+</span></span><span class=line><span class=cl>          <span class=n>description</span><span class=p>:</span> <span class=s1>&#39;Warning if TEMP greater than set value&#39;</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>  <span class=c1># Set up variables</span>
+</span></span><span class=line><span class=cl>  <span class=k>def</span> <span class=nf>initialize</span>
+</span></span><span class=line><span class=cl>    <span class=n>super</span>
+</span></span><span class=line><span class=cl>    <span class=n>system</span><span class=p>(</span><span class=s1>&#39;modprobe w1-gpio&#39;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=n>system</span><span class=p>(</span><span class=s1>&#39;modprobe w1-therm&#39;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=err>@</span><span class=n>basedir</span> <span class=o>=</span> <span class=s1>&#39;/sys/bus/w1/devices/&#39;</span><span class=o>.</span><span class=n>freeze</span>
+</span></span><span class=line><span class=cl>    <span class=err>@</span><span class=n>device_folder</span> <span class=o>=</span> <span class=n>Dir</span><span class=o>.</span><span class=n>glob</span><span class=p>(</span><span class=err>@</span><span class=n>basedir</span> <span class=o>+</span> <span class=s1>&#39;28*&#39;</span><span class=p>)[</span><span class=mi>0</span><span class=p>]</span>
+</span></span><span class=line><span class=cl>    <span class=err>@</span><span class=n>device_file</span> <span class=o>=</span> <span class=err>@</span><span class=n>device_folder</span> <span class=o>+</span> <span class=s1>&#39;/w1_slave&#39;</span>
+</span></span><span class=line><span class=cl>  <span class=n>end</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>  <span class=k>def</span> <span class=nf>read_temp</span>
+</span></span><span class=line><span class=cl>    <span class=n>lines</span> <span class=o>=</span> <span class=ne>File</span><span class=o>.</span><span class=n>read</span><span class=p>(</span><span class=err>@</span><span class=n>device_file</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=k>while</span> <span class=n>lines</span><span class=p>[</span><span class=mi>0</span><span class=p>][</span><span class=o>-</span><span class=mf>4.</span><span class=o>.-</span><span class=mi>2</span><span class=p>]</span> <span class=o>!=</span> <span class=s1>&#39;YES&#39;</span>
+</span></span><span class=line><span class=cl>      <span class=n>sleep</span> <span class=mf>0.2</span>
+</span></span><span class=line><span class=cl>      <span class=n>lines</span> <span class=o>=</span> <span class=ne>File</span><span class=o>.</span><span class=n>readlines</span><span class=p>(</span><span class=err>@</span><span class=n>device_file</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=n>end</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=n>equals_pos</span> <span class=o>=</span> <span class=n>lines</span><span class=p>[</span><span class=mi>1</span><span class=p>]</span><span class=o>.</span><span class=n>index</span><span class=p>(</span><span class=s1>&#39;t=&#39;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=k>return</span> <span class=k>if</span> <span class=n>equals_pos</span> <span class=o>==</span> <span class=o>-</span><span class=mi>1</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=n>lines</span><span class=p>[</span><span class=mi>1</span><span class=p>][</span><span class=n>equals_pos</span> <span class=o>+</span> <span class=mf>2.</span><span class=o>.-</span><span class=mi>1</span><span class=p>]</span><span class=o>.</span><span class=n>chomp</span><span class=o>.</span><span class=n>to_f</span> <span class=o>/</span> <span class=mf>1000.0</span>
+</span></span><span class=line><span class=cl>  <span class=n>end</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>  <span class=k>def</span> <span class=nf>temp_to_fahrenheit</span>
+</span></span><span class=line><span class=cl>    <span class=n>read_temp</span> <span class=o>*</span> <span class=mf>9.0</span> <span class=o>/</span> <span class=mf>5.0</span> <span class=o>+</span> <span class=mf>32.0</span>
+</span></span><span class=line><span class=cl>  <span class=n>end</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>  <span class=k>def</span> <span class=nf>temp_status</span>
+</span></span><span class=line><span class=cl>    <span class=n>critmsg</span> <span class=o>=</span> <span class=s1>&#39;Temp is critical&#39;</span>
+</span></span><span class=line><span class=cl>    <span class=n>warnmsg</span> <span class=o>=</span> <span class=s1>&#39;Temp is abnormal&#39;</span>
+</span></span><span class=line><span class=cl>    <span class=n>okmsg</span> <span class=o>=</span> <span class=s1>&#39;Temp is OK&#39;</span>
+</span></span><span class=line><span class=cl>    <span class=k>if</span> <span class=n>config</span><span class=p>[:</span><span class=n>celsius</span><span class=p>]</span> <span class=o>&amp;&amp;</span> <span class=n>read_temp</span> <span class=o>&gt;</span> <span class=n>config</span><span class=p>[:</span><span class=n>tcrit</span><span class=p>]</span>
+</span></span><span class=line><span class=cl>      <span class=n>puts</span> <span class=n>critmsg</span>
+</span></span><span class=line><span class=cl>      <span class=n>exit</span><span class=p>(</span><span class=mi>2</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=n>elsif</span> <span class=n>config</span><span class=p>[:</span><span class=n>celsius</span><span class=p>]</span> <span class=o>&amp;&amp;</span> <span class=n>read_temp</span><span class=o>.</span><span class=n>between</span><span class=err>?</span><span class=p>(</span><span class=n>config</span><span class=p>[:</span><span class=n>tcrit</span><span class=p>],</span> <span class=n>config</span><span class=p>[:</span><span class=n>twarn</span><span class=p>])</span>
+</span></span><span class=line><span class=cl>      <span class=n>puts</span> <span class=n>warnmsg</span>
+</span></span><span class=line><span class=cl>      <span class=n>exit</span><span class=p>(</span><span class=mi>1</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=n>elsif</span> <span class=n>config</span><span class=p>[:</span><span class=n>fahrenheit</span><span class=p>]</span> <span class=o>&amp;&amp;</span> <span class=n>temp_to_fahrenheit</span> <span class=o>&gt;</span> <span class=n>config</span><span class=p>[:</span><span class=n>tcrit</span><span class=p>]</span>
+</span></span><span class=line><span class=cl>      <span class=n>puts</span> <span class=n>critmsg</span>
+</span></span><span class=line><span class=cl>      <span class=n>exit</span><span class=p>(</span><span class=mi>2</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=n>elsif</span> <span class=n>config</span><span class=p>[:</span><span class=n>fahrenheit</span><span class=p>]</span> <span class=o>&amp;&amp;</span> <span class=n>temp_to_fahrenheit</span><span class=o>.</span><span class=n>between</span><span class=err>?</span><span class=p>(</span><span class=n>config</span><span class=p>[:</span><span class=n>tcrit</span><span class=p>],</span> <span class=n>config</span><span class=p>[:</span><span class=n>twarn</span><span class=p>])</span>
+</span></span><span class=line><span class=cl>      <span class=n>puts</span> <span class=n>warnmsg</span>
+</span></span><span class=line><span class=cl>      <span class=n>exit</span><span class=p>(</span><span class=mi>1</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=k>else</span>
+</span></span><span class=line><span class=cl>      <span class=n>puts</span> <span class=n>okmsg</span>
+</span></span><span class=line><span class=cl>      <span class=n>exit</span><span class=p>(</span><span class=mi>0</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=n>end</span>
+</span></span><span class=line><span class=cl>  <span class=n>end</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>  <span class=k>def</span> <span class=nf>run</span>
+</span></span><span class=line><span class=cl>    <span class=k>if</span> <span class=n>config</span><span class=p>[:</span><span class=n>fahrenheit</span><span class=p>]</span>
+</span></span><span class=line><span class=cl>      <span class=n>puts</span> <span class=s1>&#39;Current Temp: &#39;</span> <span class=o>+</span> <span class=n>temp_to_fahrenheit</span><span class=o>.</span><span class=n>round</span><span class=p>(</span><span class=mi>2</span><span class=p>)</span><span class=o>.</span><span class=n>to_s</span> <span class=o>+</span> <span class=s1>&#39; Fahrenheit&#39;</span>
+</span></span><span class=line><span class=cl>    <span class=k>else</span>
+</span></span><span class=line><span class=cl>      <span class=n>puts</span> <span class=s1>&#39;Current Temp: &#39;</span> <span class=o>+</span> <span class=n>read_temp</span><span class=o>.</span><span class=n>round</span><span class=p>(</span><span class=mi>2</span><span class=p>)</span><span class=o>.</span><span class=n>to_s</span> <span class=o>+</span> <span class=s1>&#39; Celsius&#39;</span>
+</span></span><span class=line><span class=cl>    <span class=n>end</span>
+</span></span><span class=line><span class=cl>    <span class=n>temp_status</span>
+</span></span><span class=line><span class=cl>  <span class=n>end</span>
+</span></span><span class=line><span class=cl><span class=n>end</span>
+</span></span></code></pre></td></tr></table></div></div><p>Yikes! Yeah, that&rsquo;s a lot, but it boils down to a few key options you can include in a check:</p><ul><li>Celsius</li><li>Fahrenheit</li><li>Warning temp</li><li>Critical temp</li></ul><p>Again, this check can be super-generic, and it&rsquo;s got the option for Celsius, so what&rsquo;s not to love?</p><p>Alright, so one last check to take a look at as an example&mldr;metrics!</p><h3 id=temp-sensor-metric-check>Temp Sensor Metric Check</h3><p>So this particular check is SUPER useful if you want to see your temp trends over time. It looks like this:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span><span class=lnt>32
+</span><span class=lnt>33
+</span><span class=lnt>34
+</span><span class=lnt>35
+</span><span class=lnt>36
+</span><span class=lnt>37
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-gdscript3 data-lang=gdscript3><span class=line><span class=cl>  <span class=c1># Set up variables</span>
+</span></span><span class=line><span class=cl>  <span class=k>def</span> <span class=nf>initialize</span>
+</span></span><span class=line><span class=cl>    <span class=n>super</span>
+</span></span><span class=line><span class=cl>    <span class=n>system</span><span class=p>(</span><span class=s1>&#39;modprobe w1-gpio&#39;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=n>system</span><span class=p>(</span><span class=s1>&#39;modprobe w1-therm&#39;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=err>@</span><span class=n>basedir</span> <span class=o>=</span> <span class=s1>&#39;/sys/bus/w1/devices/&#39;</span><span class=o>.</span><span class=n>freeze</span>
+</span></span><span class=line><span class=cl>    <span class=err>@</span><span class=n>device_folder</span> <span class=o>=</span> <span class=n>Dir</span><span class=o>.</span><span class=n>glob</span><span class=p>(</span><span class=err>@</span><span class=n>basedir</span> <span class=o>+</span> <span class=s1>&#39;28*&#39;</span><span class=p>)[</span><span class=mi>0</span><span class=p>]</span>
+</span></span><span class=line><span class=cl>    <span class=err>@</span><span class=n>device_file</span> <span class=o>=</span> <span class=err>@</span><span class=n>device_folder</span> <span class=o>+</span> <span class=s1>&#39;/w1_slave&#39;</span>
+</span></span><span class=line><span class=cl>  <span class=n>end</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>  <span class=k>def</span> <span class=nf>read_temp</span>
+</span></span><span class=line><span class=cl>    <span class=n>lines</span> <span class=o>=</span> <span class=ne>File</span><span class=o>.</span><span class=n>read</span><span class=p>(</span><span class=err>@</span><span class=n>device_file</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=k>while</span> <span class=n>lines</span><span class=p>[</span><span class=mi>0</span><span class=p>][</span><span class=o>-</span><span class=mf>4.</span><span class=o>.-</span><span class=mi>2</span><span class=p>]</span> <span class=o>!=</span> <span class=s1>&#39;YES&#39;</span>
+</span></span><span class=line><span class=cl>      <span class=n>sleep</span> <span class=mf>0.2</span>
+</span></span><span class=line><span class=cl>      <span class=n>lines</span> <span class=o>=</span> <span class=ne>File</span><span class=o>.</span><span class=n>readlines</span><span class=p>(</span><span class=err>@</span><span class=n>device_file</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=n>end</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=n>equals_pos</span> <span class=o>=</span> <span class=n>lines</span><span class=p>[</span><span class=mi>1</span><span class=p>]</span><span class=o>.</span><span class=n>index</span><span class=p>(</span><span class=s1>&#39;t=&#39;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=k>return</span> <span class=k>if</span> <span class=n>equals_pos</span> <span class=o>==</span> <span class=o>-</span><span class=mi>1</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=n>lines</span><span class=p>[</span><span class=mi>1</span><span class=p>][</span><span class=n>equals_pos</span> <span class=o>+</span> <span class=mf>2.</span><span class=o>.-</span><span class=mi>1</span><span class=p>]</span><span class=o>.</span><span class=n>chomp</span><span class=o>.</span><span class=n>to_f</span> <span class=o>/</span> <span class=mf>1000.0</span>
+</span></span><span class=line><span class=cl>  <span class=n>end</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>  <span class=k>def</span> <span class=nf>temp_to_fahrenheit</span>
+</span></span><span class=line><span class=cl>    <span class=n>read_temp</span> <span class=o>*</span> <span class=mf>9.0</span> <span class=o>/</span> <span class=mf>5.0</span> <span class=o>+</span> <span class=mf>32.0</span>
+</span></span><span class=line><span class=cl>  <span class=n>end</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>  <span class=k>def</span> <span class=nf>run</span>
+</span></span><span class=line><span class=cl>    <span class=n>timestamp</span> <span class=o>=</span> <span class=n>Time</span><span class=o>.</span><span class=n>now</span><span class=o>.</span><span class=n>to_i</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=k>if</span> <span class=n>config</span><span class=p>[:</span><span class=n>celsius</span><span class=p>]</span>
+</span></span><span class=line><span class=cl>      <span class=n>ok</span> <span class=n>output</span> <span class=s2>&#34;#{config[:scheme]}&#34;</span><span class=p>,</span> <span class=n>read_temp</span><span class=o>.</span><span class=n>round</span><span class=p>(</span><span class=mi>2</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=k>else</span>
+</span></span><span class=line><span class=cl>      <span class=n>ok</span> <span class=n>output</span> <span class=s2>&#34;#{config[:scheme]}&#34;</span><span class=p>,</span> <span class=n>temp_to_fahrenheit</span><span class=o>.</span><span class=n>round</span><span class=p>(</span><span class=mi>2</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=n>end</span>
+</span></span><span class=line><span class=cl>  <span class=n>end</span>
+</span></span><span class=line><span class=cl><span class=n>end</span>
+</span></span></code></pre></td></tr></table></div></div><p>When we write a metric check in Sensu, this won&rsquo;t be a &ldquo;status&rdquo; type check (think &ldquo;up&rdquo; or &ldquo;down&rdquo;, or &ldquo;OH CRAP THIS THRESHHOLD&rsquo;S BEEN HIT&rdquo;), but more of a &ldquo;here&rsquo;s the data&rdquo; type check. Cool, so now that that&rsquo;s all out of the way, let&rsquo;s talk about the cool part, writing our checks.</p><h1 id=writing-the-checks>Writing the Checks</h1><p>Sensu&rsquo;s check definitions are all written in JSON (trust me, I know the pains of trailing or missing commas). So when we write a check for the KegPi, we&rsquo;ll have to write this all in JSON and it&rsquo;s SUPER CRAZY IMPORTANT that you have the check scripts living on your Pi. To do that, just do the following:</p><p><code>git clone https://github.com/asachs01/sensu-plugins-rpi-sensors.git</code></p><p>Cool, done? Awesome.</p><p>So let&rsquo;s take a look at three checks that correspond to the scripts I shared:</p><p><em><strong>check-temp-sensor</strong></em></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>{
+</span></span><span class=line><span class=cl>	&#34;checks&#34;: {
+</span></span><span class=line><span class=cl>		&#34;check-temp-sensor&#34;: {
+</span></span><span class=line><span class=cl>			&#34;command&#34;: &#34;/home/pi/Documents/sensu-plugins-rpi-sensors/bin/check-temp-sensor.rb -F -w 45 -c 60&#34;,
+</span></span><span class=line><span class=cl>			&#34;interval&#34;: 15,
+</span></span><span class=line><span class=cl>			&#34;subscribers&#34;: [&#34;kegpi&#34;],
+</span></span><span class=line><span class=cl>			&#34;handlers&#34;: [&#34;email&#34;, &#34;slack&#34;],
+</span></span><span class=line><span class=cl>			&#34;occurrences&#34;: 3,
+</span></span><span class=line><span class=cl>			&#34;refresh&#34;: 600
+</span></span><span class=line><span class=cl>		}
+</span></span><span class=line><span class=cl>	}
+</span></span><span class=line><span class=cl>}
+</span></span></code></pre></td></tr></table></div></div><p><em><strong>check-contact-sensor</strong></em></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>{
+</span></span><span class=line><span class=cl>	&#34;checks&#34;: {
+</span></span><span class=line><span class=cl>		&#34;check-contact-sensor&#34;: {
+</span></span><span class=line><span class=cl>			&#34;command&#34;: &#34;sudo /home/pi/Documents/scratchpad_kegpi/bin/check-contact-sensor.rb -p 22&#34;,
+</span></span><span class=line><span class=cl>			&#34;interval&#34;: 10,
+</span></span><span class=line><span class=cl>			&#34;occurrences&#34;: 8,
+</span></span><span class=line><span class=cl>			&#34;refresh&#34;: 120,
+</span></span><span class=line><span class=cl>			&#34;subscribers&#34;: [&#34;kegpi&#34;],
+</span></span><span class=line><span class=cl>			&#34;contacts&#34;: [&#34;aaron&#34;],
+</span></span><span class=line><span class=cl>			&#34;handlers&#34;: [&#34;slack&#34;]
+</span></span><span class=line><span class=cl>		}
+</span></span><span class=line><span class=cl>	}
+</span></span><span class=line><span class=cl>}
+</span></span></code></pre></td></tr></table></div></div><p><em><strong>metrics-temp-sensor</strong></em></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>{
+</span></span><span class=line><span class=cl>	&#34;checks&#34;: {
+</span></span><span class=line><span class=cl>		&#34;metrics-temp-sensor&#34;: {
+</span></span><span class=line><span class=cl>			&#34;command&#34;: &#34;/home/pi/Documents/sensu-plugins-rpi-sensors/bin/metrics-temp-sensor.rb -F&#34;,
+</span></span><span class=line><span class=cl>			&#34;type&#34;: &#34;metric&#34;,
+</span></span><span class=line><span class=cl>			&#34;interval&#34;: 15,
+</span></span><span class=line><span class=cl>			&#34;metrics-temp&#34;: &#34;&lt;URL TO GRAPHITE GRAPH&gt;&#34;,
+</span></span><span class=line><span class=cl>			&#34;subscribers&#34;: [&#34;kegpi&#34;],
+</span></span><span class=line><span class=cl>			&#34;handlers&#34;: [&#34;graphite&#34;]
+</span></span><span class=line><span class=cl>		}
+</span></span><span class=line><span class=cl>	}
+</span></span><span class=line><span class=cl>}
+</span></span></code></pre></td></tr></table></div></div><p>Those are what the checks look like on a practical level. You&rsquo;ll notice the <code>contact</code> attribute is present in these checks. That&rsquo;s because I&rsquo;m running a Sensu Enterprise deployment and taking advantage of contact routing&mldr;even though I&rsquo;m the only one monitoring the kegerator.</p><p>So there you have it&ndash;some working checks that are at this point in time, checking the contact and temperature sensors attached ot the Pi.</p><h1 id=sending-the-data-to-other-sources>Sending the Data to Other Sources</h1><p>Before I wrap this up, let&rsquo;s do a quick discussion about how you can send the data to other sources and get some cool graphs out of the deal. Personally, I have the data being sent to two sources: an InfluxDB instance and a Graphite instance. The reason for exporting to two data sources simply comes down to the fact that I can perform a quick bit of magic in my check and embed my Graphite graph into my check for a quick visualization of the temperature. Also, I much prefer the graphs I can get out of Influx, but alas, those aren&rsquo;t embeddable.</p><p>So how does the data make it to the Graphite and InfluxDB instances? Enter our handlers. You&rsquo;ll notice in the checks defined above, I have my influxdb and graphite handlers specified. Just like everything else in Sensu, this is done via JSON configuration files:</p><p>Our Graphite configuration;
+<em><strong>/etc/sensu/conf.d/graphite.json</strong></em></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>{
+</span></span><span class=line><span class=cl>  &#34;handlers&#34;: {
+</span></span><span class=line><span class=cl>    &#34;graphite&#34;: {
+</span></span><span class=line><span class=cl>      &#34;type&#34;: &#34;tcp&#34;,
+</span></span><span class=line><span class=cl>      &#34;mutator&#34;: &#34;only_check_output&#34;,
+</span></span><span class=line><span class=cl>      &#34;timeout&#34;: 30,
+</span></span><span class=line><span class=cl>      &#34;socket&#34;: {
+</span></span><span class=line><span class=cl>        &#34;host&#34;: &#34;graphite.company.tld&#34;,
+</span></span><span class=line><span class=cl>        &#34;port&#34;: 2003
+</span></span><span class=line><span class=cl>      }
+</span></span><span class=line><span class=cl>    }
+</span></span><span class=line><span class=cl>  }
+</span></span><span class=line><span class=cl>}
+</span></span></code></pre></td></tr></table></div></div><p>Our InfluxDB configuration (both the Influx configuration and requisite handler):</p><p><em><strong>/etc/sensu/conf.d/influxdb.json</strong></em></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span><span class=lnt>8
+</span><span class=lnt>9
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>{
+</span></span><span class=line><span class=cl>  &#34;influxdb&#34;: {
+</span></span><span class=line><span class=cl>      &#34;host&#34;: &#34;192.168.1.5&#34;,
+</span></span><span class=line><span class=cl>      &#34;port&#34;: &#34;8086&#34;,
+</span></span><span class=line><span class=cl>      &#34;database&#34;: &#34;sensu&#34;,
+</span></span><span class=line><span class=cl>      &#34;username&#34;: &#34;user&#34;,
+</span></span><span class=line><span class=cl>      &#34;password&#34;: &#34;password&#34;
+</span></span><span class=line><span class=cl>  }
+</span></span><span class=line><span class=cl>}
+</span></span></code></pre></td></tr></table></div></div><p><em><strong>/etc/sensu/conf.d/influx-tcp.json</strong></em></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span><span class=lnt>8
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>{
+</span></span><span class=line><span class=cl>  &#34;handlers&#34;: {
+</span></span><span class=line><span class=cl>     &#34;influx-tcp&#34;: {
+</span></span><span class=line><span class=cl>       &#34;type&#34;: &#34;pipe&#34;,
+</span></span><span class=line><span class=cl>       &#34;command&#34;: &#34;/opt/sensu/embedded/bin/metrics-influxdb.rb&#34;
+</span></span><span class=line><span class=cl>     }
+</span></span><span class=line><span class=cl>   }
+</span></span><span class=line><span class=cl>}
+</span></span></code></pre></td></tr></table></div></div><p>With those files added, we&rsquo;re able to then send the check data from the KegPi to Graphite and InfluxDB respectively.</p><h1 id=wrapping-up>Wrapping Up</h1><p>Whew! This post has been a bit of a long one, and I thank you for sticking through the read until this point. If you have any questions about any aspect of this, don&rsquo;t hesitate to leave a comment down below.</p><p>Thanks for reading!</p></section><footer class=article-footer></footer></article><footer class=site-footer><section class=copyright>&copy;
+2019 -
+2025 © 2025 Aaron Sachs. All rights reserved.</section><section class=powerby>Built with <a href=https://gohugo.io/ target=_blank rel=noopener>Hugo</a><br>Theme <b><a href=https://github.com/CaiJimmy/hugo-theme-stack target=_blank rel=noopener data-version=3.30.0>Stack</a></b> designed by <a href=https://jimmycai.com target=_blank rel=noopener>Jimmy</a></section></footer><div class=pswp tabindex=-1 role=dialog aria-hidden=true><div class=pswp__bg></div><div class=pswp__scroll-wrap><div class=pswp__container><div class=pswp__item></div><div class=pswp__item></div><div class=pswp__item></div></div><div class="pswp__ui pswp__ui--hidden"><div class=pswp__top-bar><div class=pswp__counter></div><button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+<button class="pswp__button pswp__button--share" title=Share></button>
+<button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+<button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button><div class=pswp__preloader><div class=pswp__preloader__icn><div class=pswp__preloader__cut><div class=pswp__preloader__donut></div></div></div></div></div><div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap"><div class=pswp__share-tooltip></div></div><button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+</button>
+<button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)"></button><div class=pswp__caption><div class=pswp__caption__center></div></div></div></div></div><script src=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo=" crossorigin=anonymous defer></script><script src=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU=" crossorigin=anonymous defer></script><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css crossorigin=anonymous><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css crossorigin=anonymous></main></div><script src=https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z+KMkF24hUW8WePSA9HM=" crossorigin=anonymous></script><script type=text/javascript src=/ts/main.1e9a3bafd846ced4c345d084b355fb8c7bae75701c338f8a1f8a82c780137826.js defer></script><script>(function(){const e=document.createElement("link");e.href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap",e.type="text/css",e.rel="stylesheet",document.head.appendChild(e)})()</script></body></html>

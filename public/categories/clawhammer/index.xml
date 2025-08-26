@@ -1,33 +1,4 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?>
-<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
-    <channel>
-        <title>Clawhammer on Staring Blankly at a Screen</title>
-        <link>http://localhost:1313/categories/clawhammer/</link>
-        <description>Recent content in Clawhammer on Staring Blankly at a Screen</description>
-        <generator>Hugo -- gohugo.io</generator>
-        <language>en-us</language>
-        <copyright>© 2025 Aaron Sachs. All rights reserved.</copyright>
-        <lastBuildDate>Fri, 18 Nov 2016 01:45:00 +0000</lastBuildDate><atom:link href="http://localhost:1313/categories/clawhammer/index.xml" rel="self" type="application/rss+xml" /><item>
-        <title>Wildwood Flower</title>
-        <link>http://localhost:1313/archive/wildwood-flower/</link>
-        <pubDate>Fri, 18 Nov 2016 01:45:00 +0000</pubDate>
-        
-        <guid>http://localhost:1313/archive/wildwood-flower/</guid>
-        <description>&lt;p&gt;I sat down for a bit with a pipe and my banjo. Here&amp;rsquo;s what I ended up recording:&lt;/p&gt;
-&lt;!-- raw HTML omitted --&gt;
-</description>
-        </item>
-        <item>
-        <title>A Little Bit of Banjo</title>
-        <link>http://localhost:1313/archive/a-little-bit-of-banjo/</link>
-        <pubDate>Thu, 12 May 2016 00:38:00 +0000</pubDate>
-        
-        <guid>http://localhost:1313/archive/a-little-bit-of-banjo/</guid>
-        <description>&lt;p&gt;I promised the occasional banjo tune. I&amp;rsquo;m delivering. Whaaaaaat! For your viewing pleasure:&lt;/p&gt;
-&lt;!-- raw HTML omitted --&gt;
-&lt;p&gt;Enjoy!&lt;/p&gt;
-</description>
-        </item>
-        
-    </channel>
-</rss>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Clawhammer on Staring Blankly at a Screen</title><link>https://aaron.sachs.blog/categories/clawhammer/</link><description>Recent content in Clawhammer on Staring Blankly at a Screen</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><copyright>© 2025 Aaron Sachs. All rights reserved.</copyright><lastBuildDate>Fri, 18 Nov 2016 01:45:00 +0000</lastBuildDate><atom:link href="https://aaron.sachs.blog/categories/clawhammer/index.xml" rel="self" type="application/rss+xml"/><item><title>Wildwood Flower</title><link>https://aaron.sachs.blog/archive/wildwood-flower/</link><pubDate>Fri, 18 Nov 2016 01:45:00 +0000</pubDate><guid>https://aaron.sachs.blog/archive/wildwood-flower/</guid><description>&lt;p>I sat down for a bit with a pipe and my banjo. Here&amp;rsquo;s what I ended up recording:&lt;/p>
+&lt;!-- raw HTML omitted --></description></item><item><title>A Little Bit of Banjo</title><link>https://aaron.sachs.blog/archive/a-little-bit-of-banjo/</link><pubDate>Thu, 12 May 2016 00:38:00 +0000</pubDate><guid>https://aaron.sachs.blog/archive/a-little-bit-of-banjo/</guid><description>&lt;p>I promised the occasional banjo tune. I&amp;rsquo;m delivering. Whaaaaaat! For your viewing pleasure:&lt;/p>
+&lt;!-- raw HTML omitted -->
+&lt;p>Enjoy!&lt;/p></description></item></channel></rss>

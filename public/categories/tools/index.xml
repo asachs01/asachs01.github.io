@@ -1,92 +1,72 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?>
-<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
-    <channel>
-        <title>Tools on Staring Blankly at a Screen</title>
-        <link>http://localhost:1313/categories/tools/</link>
-        <description>Recent content in Tools on Staring Blankly at a Screen</description>
-        <generator>Hugo -- gohugo.io</generator>
-        <language>en-us</language>
-        <copyright>© 2025 Aaron Sachs. All rights reserved.</copyright>
-        <lastBuildDate>Tue, 22 Aug 2017 00:42:01 +0000</lastBuildDate><atom:link href="http://localhost:1313/categories/tools/index.xml" rel="self" type="application/rss+xml" /><item>
-        <title>How I Work</title>
-        <link>http://localhost:1313/archive/how-i-work/</link>
-        <pubDate>Tue, 22 Aug 2017 00:42:01 +0000</pubDate>
-        
-        <guid>http://localhost:1313/archive/how-i-work/</guid>
-        <description>&lt;p&gt;A long time ago, in a galaxy far away, I thought I was productive. I used a whiteboard (still do, by the way) for my todo lists, was running a Windows laptop for work, and that worked. When I moved to Texas and started working at Rackspace, things changed&amp;hellip;drastically. First, my workload changed, and it changed how I had to approach my workload. I went from a workload that was so full of technical snowflakes (read &amp;lsquo;Unique and one-off issues&amp;rsquo;) and remote support (me logging into customers&amp;rsquo; laptops and desktops), that any sort of automation was useless.&lt;/p&gt;
-&lt;p&gt;When I started at Rackspace, I found that my workload was largely repeat issues (low disk on a server, same Apache misconfigurations, same user creation specifications). This led to me using quite a few tools that were focused on 1.) accurately and quickly diagnosing, or solving those issues, and 2.) using tools that allowed me to make templated responses (a la TextExpander and/or aText). While I tend to shy away from response templates, a consistent queue of 80-100 tickets and a focus on response times necessitated working quickly, and utilizing tools that allowed me to do so.&lt;/p&gt;
-&lt;p&gt;That said, I still carry that need and drive to work quickly and efficiently, and my work setup and the software I use (I feel), reflect that need. My setup also enables me to be mobile and pack light (sans the desktop setup), since working remotely is definitely contributing to my former coffee shop rat habits.&lt;/p&gt;
-&lt;p&gt;So let&amp;rsquo;s get to the good stuff:&lt;/p&gt;
-&lt;h2 id=&#34;gear-and-software&#34;&gt;Gear and Software
-&lt;/h2&gt;&lt;h4 id=&#34;my-gear&#34;&gt;My Gear
-&lt;/h4&gt;&lt;ul&gt;
-&lt;li&gt;MacBook Air (early 2015)&lt;/li&gt;
-&lt;li&gt;Custom desktop dual booting Fedora and Windows&lt;/li&gt;
-&lt;li&gt;2x Dell 2715Q monitors&lt;/li&gt;
-&lt;li&gt;Logitech Z533 desktop sound system&lt;/li&gt;
-&lt;/ul&gt;
-&lt;h4 id=&#34;when-im-on-the-move&#34;&gt;When I&amp;rsquo;m On the Move
-&lt;/h4&gt;&lt;ul&gt;
-&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;http://www.pacsafe.com/venturesafe-25l-gii-travel-pack.html&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
-    &gt;Pacsafe Venturesafe 25L backpack&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;http://www.cocooninnovations.com/product_info.php?cat_id=61&amp;amp;product_id=167&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
-    &gt;Gridit XL Organizer&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;https://www.amazon.com/gp/product/B01DZ4KHYQ/ref=oh_aui_search_detailpage?ie=UTF8&amp;amp;psc=1&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
-    &gt;Aukey USB Charger&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;https://www.amazon.com/Anker-PowerCore-20100-Capacity-Technology/dp/B00X5RV14Y/ref=sr_1_1?ie=UTF8&amp;amp;qid=1478554908&amp;amp;sr=8-1&amp;amp;keywords=anker&amp;#43;20000&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
-    &gt;Anker PowerCore 20100&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;Copious amounts of usb keys&lt;/li&gt;
-&lt;li&gt;1tb Western Digital USB3 drive&lt;/li&gt;
-&lt;/ul&gt;
-&lt;h4 id=&#34;mac-osx-toolssofware&#34;&gt;Mac OSX Tools/Sofware
-&lt;/h4&gt;&lt;ul&gt;
-&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;https://www.boastr.net/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
-    &gt;BetterTouchTool&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;https://smilesoftware.com/textexpander&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
-    &gt;TextExpander&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;https://bahoom.com/hyperdock/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
-    &gt;HyperDock&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;http://symless.com/synergy/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
-    &gt;Synergy&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;http://brew.sh/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
-    &gt;Homebrew&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;https://atom.io/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
-    &gt;Atom.io&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;https://www.iterm2.com/version3.html&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
-    &gt;iTerm2&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;Slack (not just for messaging)&lt;/li&gt;
-&lt;/ul&gt;
-&lt;h4 id=&#34;other-apps&#34;&gt;Other Apps
-&lt;/h4&gt;&lt;ul&gt;
-&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;https://www.lucidchart.com/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
-    &gt;Lucidchart&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;https://www.brain.fm/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
-    &gt;Brain.fm&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;h4 id=&#34;my-workspace&#34;&gt;My Workspace
-&lt;/h4&gt;&lt;ul&gt;
-&lt;li&gt;Hand-built iron pipe desk (I&amp;rsquo;ll show it off in the week 5 post for the Support Driven writing challenge)&lt;/li&gt;
-&lt;li&gt;&amp;hellip;Starbucks*&lt;/li&gt;
-&lt;/ul&gt;
-&lt;h4 id=&#34;other-tools&#34;&gt;Other Tools
-&lt;/h4&gt;&lt;ul&gt;
-&lt;li&gt;5&amp;rsquo;x3&amp;rsquo; whiteboard&lt;/li&gt;
-&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;https://www.codeandquill.com/collections/notebooks/products/origin/?variant=1015774761&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
-    &gt;Code &amp;amp; Quill Origin Notebook&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;So now that those are out of the way, let me get to my favorite tools. The ones that are indispensable.&lt;/p&gt;
-&lt;h2 id=&#34;my-favorite-tools&#34;&gt;My Favorite Tools
-&lt;/h2&gt;&lt;h3 id=&#34;favorite-osx-tool-software&#34;&gt;Favorite OSX Tool Software:
-&lt;/h3&gt;&lt;p&gt;&lt;strong&gt;BetterTouchTool&lt;/strong&gt;: It was either this, or Atom. I know, who knew a text editor could be awesome. Well, it is, and you should totally use it (or SublimeText), if you&amp;rsquo;re not already. But anywho, the real star: BetterTouchTool. I&amp;rsquo;m a sucker for window snapping. You know, having a split screen? I use this DAILY. Not only does it do window snapping, but it also creates hotkeys/macros for doing snapping,  other window positioning preferences, and various and sundry other functions. To be honest, I&amp;rsquo;m likely underutilizing it, but it&amp;rsquo;s awesome. Go snag it.&lt;/p&gt;
-&lt;h3 id=&#34;favorite-non-digital-tool&#34;&gt;Favorite Non-Digital Tool:
-&lt;/h3&gt;&lt;p&gt;&lt;strong&gt;Gridit XL Organizer&lt;/strong&gt;: Let me say, it&amp;rsquo;s not easy having a favorite out of the tools/gear that I have. The Code &amp;amp; Quill notebook almost won out here. But here&amp;rsquo;s why the Gridit wins: It took the chaos that was my backpack, and brought it all into order. It holds all the cables I have (and let&amp;rsquo;s face it, good cable management is next to godliness) and keeps them tangle-free and organized. It&amp;rsquo;s without a doubt the best $15 (at the time) I&amp;rsquo;ve spent on gear.&lt;/p&gt;
-&lt;h3 id=&#34;favorite-webapp&#34;&gt;Favorite WebApp:
-&lt;/h3&gt;&lt;p&gt;&lt;strong&gt;Brain.fm&lt;/strong&gt;: Hands down, Brain.fm is worth the subscription for me to stay sane and focus. I don&amp;rsquo;t do music with lyrics when I need to focus&amp;ndash;I end up jamming out in the middle of coffee shops and get weird looks. I&amp;rsquo;m stuck on this one song in the &amp;ldquo;Intense Focus Mode&amp;rdquo; that I just end up on a roll every single time I listen to the track. I&amp;rsquo;ve used it when I&amp;rsquo;m relaxing too (e.g., reading a book, or writing this post, for example). I can&amp;rsquo;t get enough of Brain.fm. Not only is the app great, but their support is fantastic, and responsive. Definitely worth the subscription.&lt;/p&gt;
-&lt;p&gt;As a note, there are some tools that I&amp;rsquo;ve tried like Todoist, Evernote, Magpie, and Wunderlist, just to name some of the ones I formerly used. I&amp;rsquo;ve found that fore me, they just haven&amp;rsquo;t stuck. Instead, I stick to my Code &amp;amp; Quill notebook for notetaking, and have started using Slack&amp;rsquo;s native &amp;lsquo;remind&amp;rsquo; function for task management (they start off on the whiteboard so i remember them first, and then make their way to Slack). This seems to have streamlined a lot of my task management and has done away with the task/notetaking tool overload that I&amp;rsquo;ve found myself in lately.&lt;/p&gt;
-&lt;p&gt;Well, there you have it! This, ladies and gents, is how I work.&lt;/p&gt;
-&lt;p&gt;* So Starbucks requires a bit of explanation and defense (as most people who know me well find it a bit appalling that even a mild coffee snob like myself would spend his/her time at a Starbucks). Let me start by saying, I&amp;rsquo;ve found that most local coffee shops in SA do one of two things well: amenities or coffee. There&amp;rsquo;s really not a place here that does both well. Most of the local coffee shops focus on the latter, and rightfully so. However, there&amp;rsquo;s a bit of a knock-on effect: there&amp;rsquo;s a ton of people (most of them students, or remote workers like myself) all pounding the poor little consumer-grade wireless network to death. So I have a choice: Great coffee and crap internet, which as most workers know, it&amp;rsquo;s kind of needed to do our jobs, or mediocre coffee and internet comparable to what I have at my house. I opt for the latter, since I tend to do the coffee pretty decently as a former barista.&lt;/p&gt;
-</description>
-        </item>
-        
-    </channel>
-</rss>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Tools on Staring Blankly at a Screen</title><link>https://aaron.sachs.blog/categories/tools/</link><description>Recent content in Tools on Staring Blankly at a Screen</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><copyright>© 2025 Aaron Sachs. All rights reserved.</copyright><lastBuildDate>Tue, 22 Aug 2017 00:42:01 +0000</lastBuildDate><atom:link href="https://aaron.sachs.blog/categories/tools/index.xml" rel="self" type="application/rss+xml"/><item><title>How I Work</title><link>https://aaron.sachs.blog/archive/how-i-work/</link><pubDate>Tue, 22 Aug 2017 00:42:01 +0000</pubDate><guid>https://aaron.sachs.blog/archive/how-i-work/</guid><description>&lt;p>A long time ago, in a galaxy far away, I thought I was productive. I used a whiteboard (still do, by the way) for my todo lists, was running a Windows laptop for work, and that worked. When I moved to Texas and started working at Rackspace, things changed&amp;hellip;drastically. First, my workload changed, and it changed how I had to approach my workload. I went from a workload that was so full of technical snowflakes (read &amp;lsquo;Unique and one-off issues&amp;rsquo;) and remote support (me logging into customers&amp;rsquo; laptops and desktops), that any sort of automation was useless.&lt;/p>
+&lt;p>When I started at Rackspace, I found that my workload was largely repeat issues (low disk on a server, same Apache misconfigurations, same user creation specifications). This led to me using quite a few tools that were focused on 1.) accurately and quickly diagnosing, or solving those issues, and 2.) using tools that allowed me to make templated responses (a la TextExpander and/or aText). While I tend to shy away from response templates, a consistent queue of 80-100 tickets and a focus on response times necessitated working quickly, and utilizing tools that allowed me to do so.&lt;/p>
+&lt;p>That said, I still carry that need and drive to work quickly and efficiently, and my work setup and the software I use (I feel), reflect that need. My setup also enables me to be mobile and pack light (sans the desktop setup), since working remotely is definitely contributing to my former coffee shop rat habits.&lt;/p>
+&lt;p>So let&amp;rsquo;s get to the good stuff:&lt;/p>
+&lt;h2 id="gear-and-software">Gear and Software
+&lt;/h2>&lt;h4 id="my-gear">My Gear
+&lt;/h4>&lt;ul>
+&lt;li>MacBook Air (early 2015)&lt;/li>
+&lt;li>Custom desktop dual booting Fedora and Windows&lt;/li>
+&lt;li>2x Dell 2715Q monitors&lt;/li>
+&lt;li>Logitech Z533 desktop sound system&lt;/li>
+&lt;/ul>
+&lt;h4 id="when-im-on-the-move">When I&amp;rsquo;m On the Move
+&lt;/h4>&lt;ul>
+&lt;li>&lt;a class="link" href="http://www.pacsafe.com/venturesafe-25l-gii-travel-pack.html" target="_blank" rel="noopener"
+>Pacsafe Venturesafe 25L backpack&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="http://www.cocooninnovations.com/product_info.php?cat_id=61&amp;amp;product_id=167" target="_blank" rel="noopener"
+>Gridit XL Organizer&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="https://www.amazon.com/gp/product/B01DZ4KHYQ/ref=oh_aui_search_detailpage?ie=UTF8&amp;amp;psc=1" target="_blank" rel="noopener"
+>Aukey USB Charger&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="https://www.amazon.com/Anker-PowerCore-20100-Capacity-Technology/dp/B00X5RV14Y/ref=sr_1_1?ie=UTF8&amp;amp;qid=1478554908&amp;amp;sr=8-1&amp;amp;keywords=anker&amp;#43;20000" target="_blank" rel="noopener"
+>Anker PowerCore 20100&lt;/a>&lt;/li>
+&lt;li>Copious amounts of usb keys&lt;/li>
+&lt;li>1tb Western Digital USB3 drive&lt;/li>
+&lt;/ul>
+&lt;h4 id="mac-osx-toolssofware">Mac OSX Tools/Sofware
+&lt;/h4>&lt;ul>
+&lt;li>&lt;a class="link" href="https://www.boastr.net/" target="_blank" rel="noopener"
+>BetterTouchTool&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="https://smilesoftware.com/textexpander" target="_blank" rel="noopener"
+>TextExpander&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="https://bahoom.com/hyperdock/" target="_blank" rel="noopener"
+>HyperDock&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="http://symless.com/synergy/" target="_blank" rel="noopener"
+>Synergy&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="http://brew.sh/" target="_blank" rel="noopener"
+>Homebrew&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="https://atom.io/" target="_blank" rel="noopener"
+>Atom.io&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="https://www.iterm2.com/version3.html" target="_blank" rel="noopener"
+>iTerm2&lt;/a>&lt;/li>
+&lt;li>Slack (not just for messaging)&lt;/li>
+&lt;/ul>
+&lt;h4 id="other-apps">Other Apps
+&lt;/h4>&lt;ul>
+&lt;li>&lt;a class="link" href="https://www.lucidchart.com/" target="_blank" rel="noopener"
+>Lucidchart&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="https://www.brain.fm/" target="_blank" rel="noopener"
+>Brain.fm&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;h4 id="my-workspace">My Workspace
+&lt;/h4>&lt;ul>
+&lt;li>Hand-built iron pipe desk (I&amp;rsquo;ll show it off in the week 5 post for the Support Driven writing challenge)&lt;/li>
+&lt;li>&amp;hellip;Starbucks*&lt;/li>
+&lt;/ul>
+&lt;h4 id="other-tools">Other Tools
+&lt;/h4>&lt;ul>
+&lt;li>5&amp;rsquo;x3&amp;rsquo; whiteboard&lt;/li>
+&lt;li>&lt;a class="link" href="https://www.codeandquill.com/collections/notebooks/products/origin/?variant=1015774761" target="_blank" rel="noopener"
+>Code &amp;amp; Quill Origin Notebook&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;p>So now that those are out of the way, let me get to my favorite tools. The ones that are indispensable.&lt;/p>
+&lt;h2 id="my-favorite-tools">My Favorite Tools
+&lt;/h2>&lt;h3 id="favorite-osx-tool-software">Favorite OSX Tool Software:
+&lt;/h3>&lt;p>&lt;strong>BetterTouchTool&lt;/strong>: It was either this, or Atom. I know, who knew a text editor could be awesome. Well, it is, and you should totally use it (or SublimeText), if you&amp;rsquo;re not already. But anywho, the real star: BetterTouchTool. I&amp;rsquo;m a sucker for window snapping. You know, having a split screen? I use this DAILY. Not only does it do window snapping, but it also creates hotkeys/macros for doing snapping, other window positioning preferences, and various and sundry other functions. To be honest, I&amp;rsquo;m likely underutilizing it, but it&amp;rsquo;s awesome. Go snag it.&lt;/p>
+&lt;h3 id="favorite-non-digital-tool">Favorite Non-Digital Tool:
+&lt;/h3>&lt;p>&lt;strong>Gridit XL Organizer&lt;/strong>: Let me say, it&amp;rsquo;s not easy having a favorite out of the tools/gear that I have. The Code &amp;amp; Quill notebook almost won out here. But here&amp;rsquo;s why the Gridit wins: It took the chaos that was my backpack, and brought it all into order. It holds all the cables I have (and let&amp;rsquo;s face it, good cable management is next to godliness) and keeps them tangle-free and organized. It&amp;rsquo;s without a doubt the best $15 (at the time) I&amp;rsquo;ve spent on gear.&lt;/p>
+&lt;h3 id="favorite-webapp">Favorite WebApp:
+&lt;/h3>&lt;p>&lt;strong>Brain.fm&lt;/strong>: Hands down, Brain.fm is worth the subscription for me to stay sane and focus. I don&amp;rsquo;t do music with lyrics when I need to focus&amp;ndash;I end up jamming out in the middle of coffee shops and get weird looks. I&amp;rsquo;m stuck on this one song in the &amp;ldquo;Intense Focus Mode&amp;rdquo; that I just end up on a roll every single time I listen to the track. I&amp;rsquo;ve used it when I&amp;rsquo;m relaxing too (e.g., reading a book, or writing this post, for example). I can&amp;rsquo;t get enough of Brain.fm. Not only is the app great, but their support is fantastic, and responsive. Definitely worth the subscription.&lt;/p>
+&lt;p>As a note, there are some tools that I&amp;rsquo;ve tried like Todoist, Evernote, Magpie, and Wunderlist, just to name some of the ones I formerly used. I&amp;rsquo;ve found that fore me, they just haven&amp;rsquo;t stuck. Instead, I stick to my Code &amp;amp; Quill notebook for notetaking, and have started using Slack&amp;rsquo;s native &amp;lsquo;remind&amp;rsquo; function for task management (they start off on the whiteboard so i remember them first, and then make their way to Slack). This seems to have streamlined a lot of my task management and has done away with the task/notetaking tool overload that I&amp;rsquo;ve found myself in lately.&lt;/p>
+&lt;p>Well, there you have it! This, ladies and gents, is how I work.&lt;/p>
+&lt;p>* So Starbucks requires a bit of explanation and defense (as most people who know me well find it a bit appalling that even a mild coffee snob like myself would spend his/her time at a Starbucks). Let me start by saying, I&amp;rsquo;ve found that most local coffee shops in SA do one of two things well: amenities or coffee. There&amp;rsquo;s really not a place here that does both well. Most of the local coffee shops focus on the latter, and rightfully so. However, there&amp;rsquo;s a bit of a knock-on effect: there&amp;rsquo;s a ton of people (most of them students, or remote workers like myself) all pounding the poor little consumer-grade wireless network to death. So I have a choice: Great coffee and crap internet, which as most workers know, it&amp;rsquo;s kind of needed to do our jobs, or mediocre coffee and internet comparable to what I have at my house. I opt for the latter, since I tend to do the coffee pretty decently as a former barista.&lt;/p></description></item></channel></rss>

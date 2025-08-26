@@ -1,830 +1,756 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?>
-<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
-    <channel>
-        <title>Monitoring on Staring Blankly at a Screen</title>
-        <link>http://localhost:1313/categories/monitoring/</link>
-        <description>Recent content in Monitoring on Staring Blankly at a Screen</description>
-        <generator>Hugo -- gohugo.io</generator>
-        <language>en-us</language>
-        <copyright>© 2025 Aaron Sachs. All rights reserved.</copyright>
-        <lastBuildDate>Thu, 06 Jun 2019 10:31:40 +0000</lastBuildDate><atom:link href="http://localhost:1313/categories/monitoring/index.xml" rel="self" type="application/rss+xml" /><item>
-        <title>Badass Monitoring, Pt 2: The &#39;Why&#39;</title>
-        <link>http://localhost:1313/archive/sensu-gremlin-part-2/</link>
-        <pubDate>Thu, 06 Jun 2019 10:31:40 +0000</pubDate>
-        
-        <guid>http://localhost:1313/archive/sensu-gremlin-part-2/</guid>
-        <description>&lt;h1 id=&#34;back-it-up&#34;&gt;Back it up
-&lt;/h1&gt;&lt;p&gt;Oh man, did I get ahead of myself in my [last post][1]. I started chatting tools, and I realize now that I really should have been talking more about why I&amp;rsquo;m using Sensu and Gremlin. But it didn&amp;rsquo;t occur to me until this past week at [Monitorama][2].&lt;/p&gt;
-&lt;p&gt;[John Allspaw][3] gave the keynote talk (Taking Human Performance Seriously) this year. While you can watch the talk [here][4], I&amp;rsquo;ll highlight a few points here:&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;People will pursue what they think will be productive, and won&amp;rsquo;t pursue that which they feel isn&amp;rsquo;t productive&lt;/li&gt;
-&lt;li&gt;Monitoring &amp;amp; observability are inextricably linked with other activities&lt;/li&gt;
-&lt;li&gt;Ask and develop better questions when doing incident analysis&lt;/li&gt;
-&lt;li&gt;Disagreements are data&lt;/li&gt;
-&lt;li&gt;Incidents are investments that your organization accidentally made&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;There are a ton of other great points that John makes. Please, take a few minutes and give it a listen.&lt;/p&gt;
-&lt;h1 id=&#34;what-does-it-mean-basil&#34;&gt;What does it mean, Basil?
-&lt;/h1&gt;&lt;p&gt;Ok, so what does all of that mean and what does it have to do with chaos engineering experiments and monitoring? Everything! When you consider what happens with an incident, the last thing anyone wants is more monitoring noise, or to be surprised by the information they receive. It&amp;rsquo;s not useful.&lt;/p&gt;
-&lt;p&gt;The tools we use when making sense of an incident should provide us with information in such a way that our reasoning about and making inferences during an incident are better because of that information. Informational cruft (i.e., contextless, repeated, action-less alerts) ultimately do damage, or at the very least, don&amp;rsquo;t contribute to making sense of an incident.&lt;/p&gt;
-&lt;p&gt;This is why I&amp;rsquo;m using Sensu and Gremlin&amp;ndash;to refine the tool that I use for monitoring so that the information I have is of high quality and is a useful part of my information gathering and sense-making processes.&lt;/p&gt;
-&lt;h1 id=&#34;oh-the-places-well-go&#34;&gt;Oh the places we&amp;rsquo;ll go
-&lt;/h1&gt;&lt;p&gt;The rest of this series is going to focus on this: making Sensu a high-quality information gathering and sense-making tool for incidents. Not that it isn&amp;rsquo;t already a great tool, but just slapping a status check on a group of boxen doesn&amp;rsquo;t 👏 make 👏 for 👏 useful 👏 monitoring! There&amp;rsquo;s more to metric gathering and status checks. So we&amp;rsquo;re going to work through that. We&amp;rsquo;ll go from the most minimal thing we can do (a status check) to an alert that provide us with high-quality information for future troubleshooting. We&amp;rsquo;ll use Gremlin along the way as the means of refining those alerts.&lt;/p&gt;
-&lt;p&gt;Cheers,&lt;/p&gt;
-&lt;p&gt;Aaron&lt;/p&gt;
-&lt;p&gt;&lt;em&gt;&lt;/em&gt;
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Monitoring on Staring Blankly at a Screen</title><link>https://aaron.sachs.blog/categories/monitoring/</link><description>Recent content in Monitoring on Staring Blankly at a Screen</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><copyright>© 2025 Aaron Sachs. All rights reserved.</copyright><lastBuildDate>Thu, 06 Jun 2019 10:31:40 +0000</lastBuildDate><atom:link href="https://aaron.sachs.blog/categories/monitoring/index.xml" rel="self" type="application/rss+xml"/><item><title>Badass Monitoring, Pt 2: The 'Why'</title><link>https://aaron.sachs.blog/archive/sensu-gremlin-part-2/</link><pubDate>Thu, 06 Jun 2019 10:31:40 +0000</pubDate><guid>https://aaron.sachs.blog/archive/sensu-gremlin-part-2/</guid><description>&lt;h1 id="back-it-up">Back it up
+&lt;/h1>&lt;p>Oh man, did I get ahead of myself in my [last post][1]. I started chatting tools, and I realize now that I really should have been talking more about why I&amp;rsquo;m using Sensu and Gremlin. But it didn&amp;rsquo;t occur to me until this past week at [Monitorama][2].&lt;/p>
+&lt;p>[John Allspaw][3] gave the keynote talk (Taking Human Performance Seriously) this year. While you can watch the talk [here][4], I&amp;rsquo;ll highlight a few points here:&lt;/p>
+&lt;ul>
+&lt;li>People will pursue what they think will be productive, and won&amp;rsquo;t pursue that which they feel isn&amp;rsquo;t productive&lt;/li>
+&lt;li>Monitoring &amp;amp; observability are inextricably linked with other activities&lt;/li>
+&lt;li>Ask and develop better questions when doing incident analysis&lt;/li>
+&lt;li>Disagreements are data&lt;/li>
+&lt;li>Incidents are investments that your organization accidentally made&lt;/li>
+&lt;/ul>
+&lt;p>There are a ton of other great points that John makes. Please, take a few minutes and give it a listen.&lt;/p>
+&lt;h1 id="what-does-it-mean-basil">What does it mean, Basil?
+&lt;/h1>&lt;p>Ok, so what does all of that mean and what does it have to do with chaos engineering experiments and monitoring? Everything! When you consider what happens with an incident, the last thing anyone wants is more monitoring noise, or to be surprised by the information they receive. It&amp;rsquo;s not useful.&lt;/p>
+&lt;p>The tools we use when making sense of an incident should provide us with information in such a way that our reasoning about and making inferences during an incident are better because of that information. Informational cruft (i.e., contextless, repeated, action-less alerts) ultimately do damage, or at the very least, don&amp;rsquo;t contribute to making sense of an incident.&lt;/p>
+&lt;p>This is why I&amp;rsquo;m using Sensu and Gremlin&amp;ndash;to refine the tool that I use for monitoring so that the information I have is of high quality and is a useful part of my information gathering and sense-making processes.&lt;/p>
+&lt;h1 id="oh-the-places-well-go">Oh the places we&amp;rsquo;ll go
+&lt;/h1>&lt;p>The rest of this series is going to focus on this: making Sensu a high-quality information gathering and sense-making tool for incidents. Not that it isn&amp;rsquo;t already a great tool, but just slapping a status check on a group of boxen doesn&amp;rsquo;t 👏 make 👏 for 👏 useful 👏 monitoring! There&amp;rsquo;s more to metric gathering and status checks. So we&amp;rsquo;re going to work through that. We&amp;rsquo;ll go from the most minimal thing we can do (a status check) to an alert that provide us with high-quality information for future troubleshooting. We&amp;rsquo;ll use Gremlin along the way as the means of refining those alerts.&lt;/p>
+&lt;p>Cheers,&lt;/p>
+&lt;p>Aaron&lt;/p>
+&lt;p>&lt;em>&lt;/em>
 [1]: ../sensu-gremlin-intro/
-[2]: &lt;a class=&#34;link&#34; href=&#34;https://monitorama.com/2019/pdx.html&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
-    &gt;https://monitorama.com/2019/pdx.html&lt;/a&gt;&lt;br&gt;
-[3]: &lt;a class=&#34;link&#34; href=&#34;https://twitter.com/allspaw&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
-    &gt;https://twitter.com/allspaw&lt;/a&gt;
-[4]: &lt;a class=&#34;link&#34; href=&#34;https://youtu.be/eZJoevaojyE?t=2497&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
-    &gt;https://youtu.be/eZJoevaojyE?t=2497&lt;/a&gt;&lt;/p&gt;
-</description>
-        </item>
-        <item>
-        <title>Badass Monitoring, Pt 1: Sensu &amp; Gremlin</title>
-        <link>http://localhost:1313/archive/sensu-gremlin-intro/</link>
-        <pubDate>Thu, 30 May 2019 09:03:24 -0500</pubDate>
-        
-        <guid>http://localhost:1313/archive/sensu-gremlin-intro/</guid>
-        <description>&lt;p&gt;One of my earliest jobs was as an admin for an MSP. We&amp;rsquo;d routinely generate alerts that weren&amp;rsquo;t actionable, lacked context, and for most of our customers, were considered noise. From a monitoring perspective, it was bad. Customers didn&amp;rsquo;t trust in the alerts they received and often resorted to having some additional monitoring product installed on their systems. It&amp;rsquo;s safe to say that our auto-generated tickets and emails were largely ignored.&lt;/p&gt;
-&lt;p&gt;In an effort to avoid repeating mistakes of the past, I want to ensure that I have actionable alerts that are context heavy. Thankfully, there are a couple of tools that I&amp;rsquo;ve found go a long way in helping me with that effort: Sensu and Gremlin. I&amp;rsquo;ll do an intro to those tools today, and we&amp;rsquo;ll pick up on how these tools work together in the next post. It&amp;rsquo;s worth mentioning that I am a Sensu employee.&lt;/p&gt;
-&lt;p&gt;With that out of the way, let&amp;rsquo;s get to the tools!&lt;/p&gt;
-&lt;h1 id=&#34;the-tools&#34;&gt;&lt;strong&gt;The Tools&lt;/strong&gt;
-&lt;/h1&gt;&lt;h2 id=&#34;sensu&#34;&gt;&lt;strong&gt;Sensu&lt;/strong&gt;
-&lt;/h2&gt;&lt;p&gt;If you&amp;rsquo;ve not used &lt;a class=&#34;link&#34; href=&#34;https://sensu.io&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
-    &gt;Sensu&lt;/a&gt; before, allow me to make a formal introduction. At Sensu, we talk about it as a &amp;ldquo;monitoring event pipeline.&amp;rdquo; The concept is similar to a CI/CD pipeline, except that instead of releasing software software, I&amp;rsquo;m sending monitoring event data. The goal with the pipeline being that by the time I receive a monitoring event or alert, I know beyond a shadow of a doubt that what I have in front of me has been verified and provides me with exactly what I need to act on the data.&lt;/p&gt;
-&lt;p&gt;For this series, I&amp;rsquo;ll be using Sensu as my monitoring tool of choice.&lt;/p&gt;
-&lt;h2 id=&#34;gremlin&#34;&gt;&lt;strong&gt;Gremlin&lt;/strong&gt;
-&lt;/h2&gt;&lt;p&gt;If you&amp;rsquo;re in IT, you&amp;rsquo;re probably familiar with Gremlins.&lt;/p&gt;
-&lt;p&gt;![gremlin gif][1]&lt;/p&gt;
-&lt;p&gt;Yes, those ones. They&amp;rsquo;ve been known to cause many an issue, but in this case, I&amp;rsquo;m talking about this [Gremlin][2] in particular. Gremlin is a [chaos engineering][3] tool that allows you to run targeted attacks on your infrastructure. This can be anything from a time-drift attack to more complicated types of attacks. The goal here will be to apply the principles of chaos engineering to uncover any weaknesses in our Sensu deployment and ensure that it is able to withstand real-world conditions.&lt;/p&gt;
-&lt;p&gt;We&amp;rsquo;ll also use Gremlin to introduce conditions that will generate Sensu alerts. By introducing those conditions, we&amp;rsquo;ll be able to ensure that the alerts generated follow the [CASE][4] method.&lt;/p&gt;
-&lt;h1 id=&#34;the-setup&#34;&gt;&lt;strong&gt;The Setup&lt;/strong&gt;
-&lt;/h1&gt;&lt;h2 id=&#34;sensu-1&#34;&gt;&lt;strong&gt;Sensu&lt;/strong&gt;
-&lt;/h2&gt;&lt;p&gt;I&amp;rsquo;ve already set up Sensu in my own environment (which is Ubuntu 18.04), so I&amp;rsquo;m not going to walk through that here. However, if you don&amp;rsquo;t have a working Sensu deployment, you&amp;rsquo;ll want to checkout the [Sensu installation doc][5], so that you can get all of the various Sensu components installed. It&amp;rsquo;s worth noting that for some our later testing, we&amp;rsquo;ll be using a clustered deployment. For that, you&amp;rsquo;ll want to take a look at the [clustering doc][6].&lt;/p&gt;
-&lt;h2 id=&#34;gremlin-1&#34;&gt;&lt;strong&gt;Gremlin&lt;/strong&gt;
-&lt;/h2&gt;&lt;p&gt;Just like Sensu, we&amp;rsquo;ll need to install Gremlin&amp;rsquo;s agent so we can start &lt;del&gt;doing pseudo-nefarious stuff&lt;/del&gt; performing attacks on our test boxen. 😈 In this case, since I&amp;rsquo;m using Ubuntu 18.04 as my test box of choice, I&amp;rsquo;ll also follow [Gremlin&amp;rsquo;s installation guide][7] for Ubuntu as well (though it&amp;rsquo;s for Ubuntu 16.04, this should still work in our case).&lt;/p&gt;
-&lt;h1 id=&#34;next-steps&#34;&gt;Next Steps
-&lt;/h1&gt;&lt;p&gt;Once you&amp;rsquo;ve got both Sensu and Gremlin installed, let&amp;rsquo;s run a couple of tests to make sure things are working like we expect them to.&lt;/p&gt;
-&lt;h2 id=&#34;sensu-2&#34;&gt;Sensu
-&lt;/h2&gt;&lt;p&gt;One of the cool things about Sensu is that you can monitor anything and you can have alerts generated from any number of things, not just the [community plugins][8] or [assets][8] Sensu offers. We can create some ad-hoc alerts using the [agent API][9] just to see what an alert might look like in our dashboard. To do that, run the following on your test VM:&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;curl -X POST \
--H &#39;Content-Type: application/json&#39; \
--d &#39;{
-  &amp;quot;check&amp;quot;: {
-    &amp;quot;metadata&amp;quot;: {
-      &amp;quot;name&amp;quot;: &amp;quot;mysql-backup-job&amp;quot;
-    },
-    &amp;quot;status&amp;quot;: 0,
-    &amp;quot;output&amp;quot;: &amp;quot;mysql backup initiated&amp;quot;,
-    &amp;quot;ttl&amp;quot;: 25200
-  }
-}&#39; \
+[2]: &lt;a class="link" href="https://monitorama.com/2019/pdx.html" target="_blank" rel="noopener"
+>https://monitorama.com/2019/pdx.html&lt;/a>&lt;br>
+[3]: &lt;a class="link" href="https://twitter.com/allspaw" target="_blank" rel="noopener"
+>https://twitter.com/allspaw&lt;/a>
+[4]: &lt;a class="link" href="https://youtu.be/eZJoevaojyE?t=2497" target="_blank" rel="noopener"
+>https://youtu.be/eZJoevaojyE?t=2497&lt;/a>&lt;/p></description></item><item><title>Badass Monitoring, Pt 1: Sensu &amp; Gremlin</title><link>https://aaron.sachs.blog/archive/sensu-gremlin-intro/</link><pubDate>Thu, 30 May 2019 09:03:24 -0500</pubDate><guid>https://aaron.sachs.blog/archive/sensu-gremlin-intro/</guid><description>&lt;p>One of my earliest jobs was as an admin for an MSP. We&amp;rsquo;d routinely generate alerts that weren&amp;rsquo;t actionable, lacked context, and for most of our customers, were considered noise. From a monitoring perspective, it was bad. Customers didn&amp;rsquo;t trust in the alerts they received and often resorted to having some additional monitoring product installed on their systems. It&amp;rsquo;s safe to say that our auto-generated tickets and emails were largely ignored.&lt;/p>
+&lt;p>In an effort to avoid repeating mistakes of the past, I want to ensure that I have actionable alerts that are context heavy. Thankfully, there are a couple of tools that I&amp;rsquo;ve found go a long way in helping me with that effort: Sensu and Gremlin. I&amp;rsquo;ll do an intro to those tools today, and we&amp;rsquo;ll pick up on how these tools work together in the next post. It&amp;rsquo;s worth mentioning that I am a Sensu employee.&lt;/p>
+&lt;p>With that out of the way, let&amp;rsquo;s get to the tools!&lt;/p>
+&lt;h1 id="the-tools">&lt;strong>The Tools&lt;/strong>
+&lt;/h1>&lt;h2 id="sensu">&lt;strong>Sensu&lt;/strong>
+&lt;/h2>&lt;p>If you&amp;rsquo;ve not used &lt;a class="link" href="https://sensu.io" target="_blank" rel="noopener"
+>Sensu&lt;/a> before, allow me to make a formal introduction. At Sensu, we talk about it as a &amp;ldquo;monitoring event pipeline.&amp;rdquo; The concept is similar to a CI/CD pipeline, except that instead of releasing software software, I&amp;rsquo;m sending monitoring event data. The goal with the pipeline being that by the time I receive a monitoring event or alert, I know beyond a shadow of a doubt that what I have in front of me has been verified and provides me with exactly what I need to act on the data.&lt;/p>
+&lt;p>For this series, I&amp;rsquo;ll be using Sensu as my monitoring tool of choice.&lt;/p>
+&lt;h2 id="gremlin">&lt;strong>Gremlin&lt;/strong>
+&lt;/h2>&lt;p>If you&amp;rsquo;re in IT, you&amp;rsquo;re probably familiar with Gremlins.&lt;/p>
+&lt;p>![gremlin gif][1]&lt;/p>
+&lt;p>Yes, those ones. They&amp;rsquo;ve been known to cause many an issue, but in this case, I&amp;rsquo;m talking about this [Gremlin][2] in particular. Gremlin is a [chaos engineering][3] tool that allows you to run targeted attacks on your infrastructure. This can be anything from a time-drift attack to more complicated types of attacks. The goal here will be to apply the principles of chaos engineering to uncover any weaknesses in our Sensu deployment and ensure that it is able to withstand real-world conditions.&lt;/p>
+&lt;p>We&amp;rsquo;ll also use Gremlin to introduce conditions that will generate Sensu alerts. By introducing those conditions, we&amp;rsquo;ll be able to ensure that the alerts generated follow the [CASE][4] method.&lt;/p>
+&lt;h1 id="the-setup">&lt;strong>The Setup&lt;/strong>
+&lt;/h1>&lt;h2 id="sensu-1">&lt;strong>Sensu&lt;/strong>
+&lt;/h2>&lt;p>I&amp;rsquo;ve already set up Sensu in my own environment (which is Ubuntu 18.04), so I&amp;rsquo;m not going to walk through that here. However, if you don&amp;rsquo;t have a working Sensu deployment, you&amp;rsquo;ll want to checkout the [Sensu installation doc][5], so that you can get all of the various Sensu components installed. It&amp;rsquo;s worth noting that for some our later testing, we&amp;rsquo;ll be using a clustered deployment. For that, you&amp;rsquo;ll want to take a look at the [clustering doc][6].&lt;/p>
+&lt;h2 id="gremlin-1">&lt;strong>Gremlin&lt;/strong>
+&lt;/h2>&lt;p>Just like Sensu, we&amp;rsquo;ll need to install Gremlin&amp;rsquo;s agent so we can start &lt;del>doing pseudo-nefarious stuff&lt;/del> performing attacks on our test boxen. 😈 In this case, since I&amp;rsquo;m using Ubuntu 18.04 as my test box of choice, I&amp;rsquo;ll also follow [Gremlin&amp;rsquo;s installation guide][7] for Ubuntu as well (though it&amp;rsquo;s for Ubuntu 16.04, this should still work in our case).&lt;/p>
+&lt;h1 id="next-steps">Next Steps
+&lt;/h1>&lt;p>Once you&amp;rsquo;ve got both Sensu and Gremlin installed, let&amp;rsquo;s run a couple of tests to make sure things are working like we expect them to.&lt;/p>
+&lt;h2 id="sensu-2">Sensu
+&lt;/h2>&lt;p>One of the cool things about Sensu is that you can monitor anything and you can have alerts generated from any number of things, not just the [community plugins][8] or [assets][8] Sensu offers. We can create some ad-hoc alerts using the [agent API][9] just to see what an alert might look like in our dashboard. To do that, run the following on your test VM:&lt;/p>
+&lt;pre>&lt;code>curl -X POST \
+-H 'Content-Type: application/json' \
+-d '{
+&amp;quot;check&amp;quot;: {
+&amp;quot;metadata&amp;quot;: {
+&amp;quot;name&amp;quot;: &amp;quot;mysql-backup-job&amp;quot;
+},
+&amp;quot;status&amp;quot;: 0,
+&amp;quot;output&amp;quot;: &amp;quot;mysql backup initiated&amp;quot;,
+&amp;quot;ttl&amp;quot;: 25200
+}
+}' \
 http://127.0.0.1:3031/events
-&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;That command creates a mock event and sends it to the agent API. Now, this might be useful if I had some sort of code that monitored a mysql backup job and emitted this message. In our case, it&amp;rsquo;s just for us to make sure that we&amp;rsquo;ve set up and configured Sensu correctly. A successful test should leave you with an event that looks something like this:&lt;/p&gt;
-&lt;p&gt;&lt;!-- raw HTML omitted --&gt;&lt;!-- raw HTML omitted --&gt;&lt;!-- raw HTML omitted --&gt;&lt;/p&gt;
-&lt;p&gt;BOOM! 💥 Our test worked! Let&amp;rsquo;s just run a quick sample attack with Gremlin now.&lt;/p&gt;
-&lt;h2 id=&#34;gremlin-2&#34;&gt;Gremlin
-&lt;/h2&gt;&lt;p&gt;Just like we tested Sensu to make sure we&amp;rsquo;re able to receive events, we&amp;rsquo;re going to test our Gremlin agent. You can see me run the attack below:&lt;/p&gt;
-&lt;p&gt;&lt;!-- raw HTML omitted --&gt;Screen Recording 2019-06-14 at 03.25 PM.mov&lt;!-- raw HTML omitted --&gt;&lt;/p&gt;
-&lt;p&gt;There we have it! Both Sensu and Gremlin are working like we expect them to. In the next post, I&amp;rsquo;m going to dig a bit more into the &amp;ldquo;why&amp;rdquo; of using a chaos engineering tool like Gremlin to test monitoring tools like Sensu.&lt;/p&gt;
-&lt;p&gt;&lt;em&gt;&lt;/em&gt;
-[1]: &lt;a class=&#34;link&#34; href=&#34;https://media.giphy.com/media/BqPljBK6V9ZPG/giphy.gif&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
-    &gt;https://media.giphy.com/media/BqPljBK6V9ZPG/giphy.gif&lt;/a&gt;
-[2]: &lt;a class=&#34;link&#34; href=&#34;https://www.gremlin.com/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
-    &gt;https://www.gremlin.com/&lt;/a&gt;
-[3]: &lt;a class=&#34;link&#34; href=&#34;https://principlesofchaos.org/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
-    &gt;https://principlesofchaos.org/&lt;/a&gt;
-[4]: &lt;a class=&#34;link&#34; href=&#34;http://onemogin.com/monitoring/case-method-better-monitoring-for-humans.html&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
-    &gt;http://onemogin.com/monitoring/case-method-better-monitoring-for-humans.html&lt;/a&gt;
-[5]: &lt;a class=&#34;link&#34; href=&#34;https://docs.sensu.io/sensu-go/5.9/installation/install-sensu/#install-the-sensu-backend&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
-    &gt;https://docs.sensu.io/sensu-go/5.9/installation/install-sensu/#install-the-sensu-backend&lt;/a&gt;
-[6]: &lt;a class=&#34;link&#34; href=&#34;https://docs.sensu.io/sensu-go/5.9/guides/clustering/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
-    &gt;https://docs.sensu.io/sensu-go/5.9/guides/clustering/&lt;/a&gt;
-[7]: &lt;a class=&#34;link&#34; href=&#34;https://www.gremlin.com/community/tutorials/how-to-install-and-use-gremlin-on-ubuntu-16-04/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
-    &gt;https://www.gremlin.com/community/tutorials/how-to-install-and-use-gremlin-on-ubuntu-16-04/&lt;/a&gt;&lt;/p&gt;
-</description>
-        </item>
-        <item>
-        <title>Compiling and Running Sensu Go on OS X</title>
-        <link>http://localhost:1313/archive/sensu-go-on-osx/</link>
-        <pubDate>Thu, 16 May 2019 19:49:32 -0500</pubDate>
-        
-        <guid>http://localhost:1313/archive/sensu-go-on-osx/</guid>
-        <description>&lt;p&gt;I&amp;rsquo;ve been messing around with compiling Sensu Go for several different platforms lately. In my &lt;a class=&#34;link&#34; href=&#34;../sensu-go-on-arm/&#34; &gt;last post&lt;/a&gt;, I got Sensu Go agents running on my Raspberry Pis and Nvidia Jetson Nanos. I wanted to see if I could get an agent running on OS X as well, because who doesn&amp;rsquo;t want to monitor their laptop!&lt;/p&gt;
-&lt;h1 id=&#34;the-setup&#34;&gt;The Setup
-&lt;/h1&gt;&lt;p&gt;Similar to what I did previously (and subsequently learned a ton more about), we&amp;rsquo;ll need to compile the Sensu Go packages since they&amp;rsquo;re not currently packaged for OS X. Let&amp;rsquo;s take a look at what we&amp;rsquo;ll need to get started:&lt;/p&gt;
-&lt;ol&gt;
-&lt;li&gt;Install Go on your system&lt;/li&gt;
-&lt;li&gt;Grab Sensu Go&lt;/li&gt;
-&lt;li&gt;Build your binaries&lt;/li&gt;
-&lt;/ol&gt;
-&lt;h2 id=&#34;installing-go&#34;&gt;Installing Go
-&lt;/h2&gt;&lt;p&gt;If you&amp;rsquo;ve not already installed Go on your system, please see &lt;a class=&#34;link&#34; href=&#34;https://golang.org/dl/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
-    &gt;Go&amp;rsquo;s installation documentation&lt;/a&gt;. You can either download Go there, or install it with &lt;code&gt;brew install golang&lt;/code&gt;&lt;/p&gt;
-&lt;h2 id=&#34;obtaining-sensu-go&#34;&gt;Obtaining Sensu Go
-&lt;/h2&gt;&lt;p&gt;If you haven&amp;rsquo;t read the last post, it&amp;rsquo;s trivial to download Sensu Go into your Go workspace. Just run the following:&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
-&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
-&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
-&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-fallback&#34; data-lang=&#34;fallback&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;go get github.com/sensu/sensu-go/...
-&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
-&lt;/div&gt;
-&lt;/div&gt;&lt;p&gt;And head to &lt;code&gt;$GOPATH/src/github.com/sensu/sensu-go&lt;/code&gt;.&lt;/p&gt;
-&lt;h2 id=&#34;building-the-binaries&#34;&gt;Building the Binaries
-&lt;/h2&gt;&lt;p&gt;So instead of using &lt;code&gt;build.sh&lt;/code&gt; to create our binaries, we&amp;rsquo;re going to do something a bit different, and use what I feel to be an easier way of building our binaries.&lt;/p&gt;
-&lt;p&gt;From inside &lt;code&gt;$GOPATH/src/github.com/sensu/sensu-go&lt;/code&gt;, we&amp;rsquo;re going to run this command:&lt;/p&gt;
-&lt;p&gt;&lt;code&gt;GOOS=darwin GOARCH=amd64 go install ./...&lt;/code&gt;&lt;/p&gt;
-&lt;p&gt;Once that&amp;rsquo;s finished, you should see the binaries in &lt;code&gt;$GOPATH/bin/&lt;/code&gt;:&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
-&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;3
-&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
-&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-gdscript3&#34; data-lang=&#34;gdscript3&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;o&#34;&gt;$&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;ls&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;n&#34;&gt;check_protoc&lt;/span&gt;  &lt;span class=&#34;n&#34;&gt;gengraphql&lt;/span&gt;  &lt;span class=&#34;n&#34;&gt;linux_arm64&lt;/span&gt;  &lt;span class=&#34;n&#34;&gt;make_typemap&lt;/span&gt;   &lt;span class=&#34;n&#34;&gt;sensu&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;-&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;agent&lt;/span&gt;    &lt;span class=&#34;n&#34;&gt;sensuctl&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;n&#34;&gt;example&lt;/span&gt;       &lt;span class=&#34;n&#34;&gt;linux_arm&lt;/span&gt;   &lt;span class=&#34;n&#34;&gt;loadit&lt;/span&gt;       &lt;span class=&#34;n&#34;&gt;proto2graphql&lt;/span&gt;  &lt;span class=&#34;n&#34;&gt;sensu&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;-&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;backend&lt;/span&gt;  &lt;span class=&#34;n&#34;&gt;version&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
-&lt;/div&gt;
-&lt;/div&gt;&lt;p&gt;You&amp;rsquo;ll notice I have a couple of other builds there, but we&amp;rsquo;re concerned &lt;em&gt;only&lt;/em&gt; with the &lt;code&gt;sensu-agent&lt;/code&gt; binary.&lt;/p&gt;
-&lt;p&gt;Cool! Now that it&amp;rsquo;s built, let&amp;rsquo;s move on to actually running Sensu Go on OS X.&lt;/p&gt;
-&lt;h1 id=&#34;running-sensu-go&#34;&gt;Running Sensu Go
-&lt;/h1&gt;&lt;p&gt;Since Sensu Go isn&amp;rsquo;t currently packaged for OS X, there&amp;rsquo;s a bit of finagling we have to do to get it to run as a service.&lt;/p&gt;
-&lt;p&gt;Of course, you can always just start up the Sensu agent, but exiting will prevent it from running. So, we need a better approach. We&amp;rsquo;re going to follow a similar path from my last post, and do the following:&lt;/p&gt;
-&lt;ol&gt;
-&lt;li&gt;Create the plist file for the respective services&lt;/li&gt;
-&lt;li&gt;Create the Sensu user/group&lt;/li&gt;
-&lt;li&gt;Create the respective directories needed for Sensu to operate&lt;/li&gt;
-&lt;li&gt;Grab config files for Sensu Go&lt;/li&gt;
-&lt;/ol&gt;
-&lt;h2 id=&#34;creating-the-plist-file&#34;&gt;Creating the Plist File
-&lt;/h2&gt;&lt;p&gt;If you&amp;rsquo;ve never dived into running OS X services, plist files are property files written in XML that define how you want to run an application or service. We&amp;rsquo;ll need this in order to have the Sensu agent run whenever we log in.&lt;/p&gt;
-&lt;p&gt;The file looks like this:&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
-&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt; 1
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;11
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;12
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;13
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;14
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;15
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;16
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;17
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;18
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;19
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;20
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;21
-&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
-&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-gdscript3&#34; data-lang=&#34;gdscript3&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;o&#34;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&#34;err&#34;&gt;?&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;xml&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;version&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;&lt;span class=&#34;s2&#34;&gt;&amp;#34;1.0&amp;#34;&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;encoding&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;&lt;span class=&#34;s2&#34;&gt;&amp;#34;UTF-8&amp;#34;&lt;/span&gt;&lt;span class=&#34;err&#34;&gt;?&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;&amp;gt;&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;o&#34;&gt;&amp;lt;!&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;DOCTYPE&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;plist&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;PUBLIC&lt;/span&gt; &lt;span class=&#34;s2&#34;&gt;&amp;#34;-//Apple//DTD PLIST 1.0//EN&amp;#34;&lt;/span&gt; &lt;span class=&#34;s2&#34;&gt;&amp;#34;http://www.apple.com/DTDs/PropertyList-1.0.dtd&amp;#34;&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;&amp;gt;&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;o&#34;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;plist&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;version&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;&lt;span class=&#34;s2&#34;&gt;&amp;#34;1.0&amp;#34;&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;&amp;gt;&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  &lt;span class=&#34;o&#34;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;dict&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;&amp;gt;&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;o&#34;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;key&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;&amp;gt;&lt;/span&gt;&lt;span class=&#34;ne&#34;&gt;Label&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;&amp;lt;/&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;key&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;&amp;gt;&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;o&#34;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;string&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;&amp;gt;&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;io&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;sensu&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;sensu&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;-&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;agent&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;plist&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;&amp;lt;/&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;string&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;&amp;gt;&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;o&#34;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;key&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;&amp;gt;&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;UserName&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;&amp;lt;/&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;key&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;&amp;gt;&amp;lt;&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;string&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;&amp;gt;&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;_sensu&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;&amp;lt;/&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;string&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;&amp;gt;&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;o&#34;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;key&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;&amp;gt;&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;GroupName&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;&amp;lt;/&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;key&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;&amp;gt;&amp;lt;&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;string&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;&amp;gt;&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;_sensu&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;&amp;lt;/&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;string&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;&amp;gt;&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;o&#34;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;key&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;&amp;gt;&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;ProgramArguments&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;&amp;lt;/&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;key&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;&amp;gt;&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;o&#34;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;array&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;&amp;gt;&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;      &lt;span class=&#34;o&#34;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;string&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;&amp;gt;/&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;usr&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;/&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;local&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;/&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;bin&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;/&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;sensu&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;-&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;agent&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;&amp;lt;/&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;string&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;&amp;gt;&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;      &lt;span class=&#34;o&#34;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;string&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;&amp;gt;&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;start&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;&amp;lt;/&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;string&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;&amp;gt;&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;o&#34;&gt;&amp;lt;/&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;array&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;&amp;gt;&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;o&#34;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;key&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;&amp;gt;&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;RunAtLoad&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;&amp;lt;/&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;key&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;&amp;gt;&amp;lt;&lt;/span&gt;&lt;span class=&#34;bp&#34;&gt;true&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;/&amp;gt;&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;o&#34;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;key&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;&amp;gt;&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;KeepAlive&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;&amp;lt;/&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;key&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;&amp;gt;&amp;lt;&lt;/span&gt;&lt;span class=&#34;bp&#34;&gt;true&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;/&amp;gt;&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;o&#34;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;key&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;&amp;gt;&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;StandardOutPath&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;&amp;lt;/&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;key&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;&amp;gt;&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;o&#34;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;string&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;&amp;gt;/&lt;/span&gt;&lt;span class=&#34;k&#34;&gt;var&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;/&lt;/span&gt;&lt;span class=&#34;nb&#34;&gt;log&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;/&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;sensu&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;/&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;sensu&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;-&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;agent&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;log&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;&amp;lt;/&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;string&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;&amp;gt;&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;o&#34;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;key&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;&amp;gt;&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;StandardErrorPath&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;&amp;lt;/&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;key&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;&amp;gt;&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;o&#34;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;string&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;&amp;gt;/&lt;/span&gt;&lt;span class=&#34;k&#34;&gt;var&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;/&lt;/span&gt;&lt;span class=&#34;nb&#34;&gt;log&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;/&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;sensu&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;/&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;sensu&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;-&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;agent&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;log&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;&amp;lt;/&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;string&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;&amp;gt;&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  &lt;span class=&#34;o&#34;&gt;&amp;lt;/&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;dict&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;&amp;gt;&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;o&#34;&gt;&amp;lt;/&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;plist&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;&amp;gt;&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
-&lt;/div&gt;
-&lt;/div&gt;&lt;p&gt;In the interest of making things slightly easier than a copy/paste, you can run this:&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
-&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
-&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
-&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-fallback&#34; data-lang=&#34;fallback&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;sudo curl -s -L x  https://gist.githubusercontent.com/asachs01/ecf83fe92624e7f346d2c5362d825e1c/raw/ec9bec6b97fd89b671ce0ceba2a3780eca04fef6/io.sensu.sensu-agent.plist -o /Library/LaunchDaemons/io.sensu.sensu-agent.plist
-&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
-&lt;/div&gt;
-&lt;/div&gt;&lt;p&gt;It&amp;rsquo;s worth noting that we&amp;rsquo;re placing this in &lt;code&gt;/Library/LaunchDaemons&lt;/code&gt; versus &lt;code&gt;/Library/LaunchAgents&lt;/code&gt;. This is because we want to run the service at boot, not just login (you can read more &lt;a class=&#34;link&#34; href=&#34;http://www.grivet-tools.com/blog/2014/launchdaemons-vs-launchagents/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
-    &gt;here&lt;/a&gt;)&lt;/p&gt;
-&lt;p&gt;Alright, now it&amp;rsquo;s time to create the Sensu user and group.&lt;/p&gt;
-&lt;h2 id=&#34;create-the-sensu-usergroup&#34;&gt;Create the Sensu User/Group
-&lt;/h2&gt;&lt;p&gt;This isn&amp;rsquo;t nearly as straighforward as I&amp;rsquo;d hoped. If you recall, for Linux systems, this is as easy as a &lt;code&gt;useradd&lt;/code&gt;. In OS X, however, we use the command &lt;code&gt;dscl&lt;/code&gt;, which takes a few different arguments.&lt;/p&gt;
-&lt;p&gt;In Sensu Core, the OS X package had a script to run this as part of its postinstall process. After doing some digging and dissecting of that package, it turns out that there&amp;rsquo;s a handy little function in the script that will do the trick. It looks like this:&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
-&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt; 1
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;11
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;12
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;13
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;14
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;15
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;16
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;17
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;18
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;19
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;20
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;21
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;22
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;23
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;24
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;25
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;26
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;27
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;28
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;29
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;30
-&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
-&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;cp&#34;&gt;#!/bin/sh
-&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;cp&#34;&gt;&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;create_sensu_user_group&lt;span class=&#34;o&#34;&gt;()&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;o&#34;&gt;{&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;c1&#34;&gt;# create sensu group&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;nb&#34;&gt;set&lt;/span&gt; +e
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;        dscl . -list /Groups &lt;span class=&#34;p&#34;&gt;|&lt;/span&gt; grep &lt;span class=&#34;s2&#34;&gt;&amp;#34;^_sensu&amp;#34;&lt;/span&gt; &amp;gt; /dev/null
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;        &lt;span class=&#34;nv&#34;&gt;RC&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;&lt;span class=&#34;nv&#34;&gt;$?&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;nb&#34;&gt;set&lt;/span&gt; -e
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;k&#34;&gt;if&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;[&lt;/span&gt; &lt;span class=&#34;s2&#34;&gt;&amp;#34;&lt;/span&gt;&lt;span class=&#34;si&#34;&gt;${&lt;/span&gt;&lt;span class=&#34;nv&#34;&gt;RC&lt;/span&gt;&lt;span class=&#34;si&#34;&gt;}&lt;/span&gt;&lt;span class=&#34;s2&#34;&gt;&amp;#34;&lt;/span&gt; !&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;s2&#34;&gt;&amp;#34;0&amp;#34;&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;]&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;then&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;                &lt;span class=&#34;nv&#34;&gt;last_used_gid&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;&lt;span class=&#34;sb&#34;&gt;`&lt;/span&gt;dscacheutil -q group &lt;span class=&#34;p&#34;&gt;|&lt;/span&gt; grep gid &lt;span class=&#34;p&#34;&gt;|&lt;/span&gt; tail -n &lt;span class=&#34;m&#34;&gt;1&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;|&lt;/span&gt; awk &lt;span class=&#34;s1&#34;&gt;&amp;#39;{ print $2 }&amp;#39;&lt;/span&gt;&lt;span class=&#34;sb&#34;&gt;`&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;        &lt;span class=&#34;nv&#34;&gt;sensu_gid&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;&lt;span class=&#34;sb&#34;&gt;`&lt;/span&gt;&lt;span class=&#34;nb&#34;&gt;echo&lt;/span&gt; &lt;span class=&#34;s2&#34;&gt;&amp;#34;&lt;/span&gt;&lt;span class=&#34;nv&#34;&gt;$last_used_gid&lt;/span&gt;&lt;span class=&#34;s2&#34;&gt; + 1&amp;#34;&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;|&lt;/span&gt; bc&lt;span class=&#34;sb&#34;&gt;`&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;        dscl . -create Groups/_sensu
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;        dscl . -create Groups/_sensu PrimaryGroupID &lt;span class=&#34;nv&#34;&gt;$sensu_gid&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;k&#34;&gt;fi&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;c1&#34;&gt;# create sensu user&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;nb&#34;&gt;set&lt;/span&gt; +e
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;        dscl . -list /Users &lt;span class=&#34;p&#34;&gt;|&lt;/span&gt; grep &lt;span class=&#34;s2&#34;&gt;&amp;#34;^_sensu&amp;#34;&lt;/span&gt; &amp;gt; /dev/null
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;        &lt;span class=&#34;nv&#34;&gt;RC&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;&lt;span class=&#34;nv&#34;&gt;$?&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;nb&#34;&gt;set&lt;/span&gt; -e
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;k&#34;&gt;if&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;[&lt;/span&gt; &lt;span class=&#34;s2&#34;&gt;&amp;#34;&lt;/span&gt;&lt;span class=&#34;si&#34;&gt;${&lt;/span&gt;&lt;span class=&#34;nv&#34;&gt;RC&lt;/span&gt;&lt;span class=&#34;si&#34;&gt;}&lt;/span&gt;&lt;span class=&#34;s2&#34;&gt;&amp;#34;&lt;/span&gt; !&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;s2&#34;&gt;&amp;#34;0&amp;#34;&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;]&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;then&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;                &lt;span class=&#34;nv&#34;&gt;sensu_gid&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;&lt;span class=&#34;sb&#34;&gt;`&lt;/span&gt;dscl . -read /Groups/_sensu &lt;span class=&#34;p&#34;&gt;|&lt;/span&gt; awk &lt;span class=&#34;s1&#34;&gt;&amp;#39;($1 == &amp;#34;PrimaryGroupID:&amp;#34;) { print $2 }&amp;#39;&lt;/span&gt;&lt;span class=&#34;sb&#34;&gt;`&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;        dscl . -create /Users/_sensu UniqueID &lt;span class=&#34;nv&#34;&gt;$sensu_gid&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;        dscl . -create /Users/_sensu PrimaryGroupID &lt;span class=&#34;nv&#34;&gt;$sensu_gid&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;        dscl . -create /Users/_sensu UserShell /usr/bin/false
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;k&#34;&gt;fi&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;o&#34;&gt;}&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;create_sensu_user_group
-&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
-&lt;/div&gt;
-&lt;/div&gt;&lt;p&gt;You can pull this down by running:&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
-&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
-&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
-&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-fallback&#34; data-lang=&#34;fallback&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;curl -LO https://gist.githubusercontent.com/asachs01/ecf83fe92624e7f346d2c5362d825e1c/raw/ec9bec6b97fd89b671ce0ceba2a3780eca04fef6/create_sensu_user_group.sh
-&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
-&lt;/div&gt;
-&lt;/div&gt;&lt;p&gt;And then:&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
-&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
-&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
-&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-fallback&#34; data-lang=&#34;fallback&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;chmod +x create_sensu_user_group.sh
-&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
-&lt;/div&gt;
-&lt;/div&gt;&lt;p&gt;And run it:&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
-&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
-&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
-&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-fallback&#34; data-lang=&#34;fallback&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;./create_sensu_user_group.sh
-&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
-&lt;/div&gt;
-&lt;/div&gt;&lt;p&gt;Which will give us our user and group. Now, on to the directories.&lt;/p&gt;
-&lt;h2 id=&#34;create-sensu-directories&#34;&gt;Create Sensu Directories
-&lt;/h2&gt;&lt;p&gt;In this part of the exercise, we&amp;rsquo;re going to diverge slightly from how we did things on the Pis and Nanos. We&amp;rsquo;re going to just run:&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
-&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
-&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
-&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-fallback&#34; data-lang=&#34;fallback&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;sudo mkdir -p /etc/sensu/cache/sensu-agent
-&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
-&lt;/div&gt;
-&lt;/div&gt;&lt;p&gt;The reason for this is due to my own inability to figure out why I couldn&amp;rsquo;t have Sensu create and manage the &lt;code&gt;/var/cache/sensu&lt;/code&gt; directory like I&amp;rsquo;d expected. After several hours of pounding away at what I thought would be simple permissions issue, I decided that I&amp;rsquo;d just run the command above and change my cache directory in the config.&lt;/p&gt;
-&lt;p&gt;So from here, we need to run:&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
-&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
-&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
-&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-fallback&#34; data-lang=&#34;fallback&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;sudo chown -R _sensu:_sensu /etc/sensu 
-&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
-&lt;/div&gt;
-&lt;/div&gt;&lt;p&gt;This should get us where we need to go in terms of files and permissions.&lt;/p&gt;
-&lt;h2 id=&#34;obtaining-sensu-go-config-files&#34;&gt;Obtaining Sensu Go Config Files
-&lt;/h2&gt;&lt;p&gt;Like the last post, this stays the same.&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
-&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;3
-&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
-&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-fallback&#34; data-lang=&#34;fallback&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;curl -LO http://docs.sensu.io/sensu-go/latest/files/agent.yml
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;sudo cp agent.yml /etc/sensu
-&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
-&lt;/div&gt;
-&lt;/div&gt;&lt;h2 id=&#34;starting-sensu-go&#34;&gt;Starting Sensu Go
-&lt;/h2&gt;&lt;p&gt;Alright, now we&amp;rsquo;re pretty much set and just need to start up the Sensu agent:&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
-&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
-&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
-&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-gdscript3&#34; data-lang=&#34;gdscript3&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;n&#34;&gt;sudo&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;launchctl&lt;/span&gt; &lt;span class=&#34;nb&#34;&gt;load&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;-&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;w&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;/&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;Library&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;/&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;LaunchDaemons&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;/&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;io&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;sensu&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;sensu&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;-&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;agent&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;plist&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
-&lt;/div&gt;
-&lt;/div&gt;&lt;p&gt;Now, let&amp;rsquo;s check to make sure the agent is running:&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
-&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
-&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
-&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-fallback&#34; data-lang=&#34;fallback&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;sudo ps -ef | grep -v grep |grep &amp;#34;sensu-agent&amp;#34;  
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  400 12927     1   0 11:51AM ??         0:04.14 /usr/local/bin/sensu-agent start
-&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
-&lt;/div&gt;
-&lt;/div&gt;&lt;p&gt;And we can do a couple of other things to verify that the agent is doing what we expect:&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
-&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
-&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
-&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-gdscript3&#34; data-lang=&#34;gdscript3&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;n&#34;&gt;tail&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;-&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;f&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;/&lt;/span&gt;&lt;span class=&#34;k&#34;&gt;var&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;/&lt;/span&gt;&lt;span class=&#34;nb&#34;&gt;log&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;/&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;sensu&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;/&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;sensu&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;-&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;agent&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;log&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
-&lt;/div&gt;
-&lt;/div&gt;&lt;p&gt;Which should give us logs that show we&amp;rsquo;re doing things and then also check to see that the agent shows up in the dashboard:&lt;/p&gt;
-&lt;p&gt;&lt;img src=&#34;http://localhost:1313/img/sensu_osx.png&#34;
-	
-	
-	
-	loading=&#34;lazy&#34;
-	
-		alt=&#34;screenshot of sensu on osx&#34;
-	
-	
-&gt;&lt;/p&gt;
-&lt;p&gt;Boom! There you have it!&lt;/p&gt;
-&lt;p&gt;Cheers,&lt;/p&gt;
-&lt;p&gt;Aaron&lt;/p&gt;
-</description>
-        </item>
-        <item>
-        <title>Compiling and Running Sensu Go on ARM</title>
-        <link>http://localhost:1313/archive/sensu-go-on-arm/</link>
-        <pubDate>Thu, 09 May 2019 19:49:32 -0500</pubDate>
-        
-        <guid>http://localhost:1313/archive/sensu-go-on-arm/</guid>
-        <description>&lt;h1 id=&#34;updates&#34;&gt;UPDATES
-&lt;/h1&gt;&lt;p&gt;When I originally wrote this post, I was operating under some outdated assumptions when it comes to building Sensu on arm devices. I&amp;rsquo;ll post the updates here at the beginning of the article, and you can read on to see how I&amp;rsquo;d previously set up Sensu on my Nvidia Jetson Nanos.&lt;/p&gt;
-&lt;h2 id=&#34;compiling-sensu-go&#34;&gt;Compiling Sensu Go
-&lt;/h2&gt;&lt;p&gt;As a Go novice, I didn&amp;rsquo;t fully understand the workflow for compiling Sensu for arm devices. As it so happens, it&amp;rsquo;s fairly easy to cross-compile from whatever device you&amp;rsquo;re on and then just transfer the binaries to the system you want to run on. I found this out the hard way by trying to compile on the Raspberry Pi&amp;rsquo;s I have. This resulted in them locking up.&lt;/p&gt;
-&lt;p&gt;So let&amp;rsquo;s walk through the non-build-script way of doing this:&lt;/p&gt;
-&lt;ol&gt;
-&lt;li&gt;Install Go&lt;/li&gt;
-&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;#obtaining-sensu-go&#34; &gt;Obtain Sensu Go&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;Build the binary for your arm system of choice using &lt;code&gt;GOOS=linux GOARCH=arm go install ./...&lt;/code&gt; from inside the project root (&lt;code&gt;$GOPATH/src/github/sensu/sensu-go&lt;/code&gt;)&lt;/li&gt;
-&lt;li&gt;Transfer to the binary/binaries to your Pi&amp;rsquo;s, Nano&amp;rsquo;s, or other arm board&lt;/li&gt;
-&lt;li&gt;Proceed through the &lt;a class=&#34;link&#34; href=&#34;#running-sensu-go&#34; &gt;rest of the setup&lt;/a&gt;&lt;/li&gt;
-&lt;/ol&gt;
-&lt;p&gt;Now, you can absolutely run through the original post as it was and &lt;em&gt;still&lt;/em&gt; run Sensu. However, I find that cross compiling from a system with a bit more oomph is going to make things easier.&lt;/p&gt;
-&lt;h1 id=&#34;original-post&#34;&gt;Original post
-&lt;/h1&gt;&lt;p&gt;In this post, I&amp;rsquo;ll cover how I am running Sensu Go on several NVIDIA Jetson Nanos. Though this is being done on a Nano, you could use the same approach I use here on a Raspberry Pi, or any other armv7 board. I would note that this is a temporary until official Sensu Go arm packages are released.&lt;/p&gt;
-&lt;h1 id=&#34;the-setup&#34;&gt;The Setup
-&lt;/h1&gt;&lt;p&gt;There are several things you&amp;rsquo;ll need to do before you can start playing around with Sensu Go.&lt;/p&gt;
-&lt;ol&gt;
-&lt;li&gt;Install Go on your system&lt;/li&gt;
-&lt;li&gt;Grab Sensu Go&lt;/li&gt;
-&lt;li&gt;Build the binaries&lt;/li&gt;
-&lt;/ol&gt;
-&lt;h2 id=&#34;installing-go&#34;&gt;Installing Go
-&lt;/h2&gt;&lt;p&gt;While installing Go on the Jetson as fairly trivial, the goal here is to give you a complete accounting of how I did what I did.&lt;/p&gt;
-&lt;p&gt;To install Go, run:&lt;/p&gt;
-&lt;p&gt;&lt;code&gt;sudo apt-get install golang&lt;/code&gt;&lt;/p&gt;
-&lt;p&gt;You should then have it installed on your system. If you need more complete documentation on installing Go, please see &lt;a class=&#34;link&#34; href=&#34;https://golang.org/dl/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
-    &gt;Go&amp;rsquo;s docs on downloading and installing Go onto your system&lt;/a&gt;.&lt;/p&gt;
-&lt;h2 id=&#34;obtaining-sensu-go&#34;&gt;Obtaining Sensu Go
-&lt;/h2&gt;&lt;p&gt;Once you&amp;rsquo;ve installed Go, the next step is to obtain Sensu Go. To get the package, run the following:&lt;/p&gt;
-&lt;p&gt;&lt;code&gt;go get github.com/sensu/sensu-go/...&lt;/code&gt;&lt;/p&gt;
-&lt;p&gt;This will put the package at &lt;code&gt;$GOPATH/src/github.com/sensu/sensu-go&lt;/code&gt;.&lt;/p&gt;
-&lt;h2 id=&#34;building-the-binaries&#34;&gt;Building the Binaries
-&lt;/h2&gt;&lt;p&gt;Next up, we&amp;rsquo;re going to build the binaries using a script provided in the repo. You&amp;rsquo;ll want to ensure that you&amp;rsquo;re in &lt;code&gt;$GOPATH/src/github.com/sensu/sensu-go&lt;/code&gt;. Once you&amp;rsquo;re there, you&amp;rsquo;ll find a script called &lt;code&gt;build.sh&lt;/code&gt;&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
-&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;3
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;4
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;5
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;6
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;7
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;8
-&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
-&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-fallback&#34; data-lang=&#34;fallback&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;❯❯❯❯ ls
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;agent    dashboard       rpc        vendor           Dockerfile.rhel_atomic  build.ps1
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;api      docker-scripts  scripts    version          Dockerfile.testagent    build.sh
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;asset    examples        system     CHANGELOG.md     FAQ.md                  docker-compose.yaml
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;backend  graphql         testing    CONTRIBUTING.md  Gopkg.lock
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;cli      handler         transport  DCO              Gopkg.toml
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;cmd      js              types      Dockerfile       LICENSE
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;command  licenses        util       Dockerfile.rhel  README.md
-&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
-&lt;/div&gt;
-&lt;/div&gt;&lt;p&gt;We&amp;rsquo;ll run that and build our binaries:&lt;/p&gt;
-&lt;p&gt;&lt;code&gt;./build.sh&lt;/code&gt;&lt;/p&gt;
-&lt;p&gt;Now, we&amp;rsquo;ll grab that binaries that were built:&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
-&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;3
-&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
-&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-fallback&#34; data-lang=&#34;fallback&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;cd $GOPATH/bin
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;sudo cp sensu-{agent,backend} /usr/sbin/
-&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
-&lt;/div&gt;
-&lt;/div&gt;&lt;p&gt;That&amp;rsquo;s it for the prep work. Now it&amp;rsquo;s on to actually running Sensu Go.&lt;/p&gt;
-&lt;h1 id=&#34;running-sensu-go&#34;&gt;Running Sensu Go
-&lt;/h1&gt;&lt;p&gt;To run Sensu Go, we&amp;rsquo;ll need to go through the following steps:&lt;/p&gt;
-&lt;ol&gt;
-&lt;li&gt;Create the service files for the respective services&lt;/li&gt;
-&lt;li&gt;Create the Sensu user/group&lt;/li&gt;
-&lt;li&gt;Create the respective directories needed for Sensu to operate&lt;/li&gt;
-&lt;li&gt;Grab config files for Sensu Go&lt;/li&gt;
-&lt;/ol&gt;
-&lt;h2 id=&#34;creating-the-service-files&#34;&gt;Creating the Service Files
-&lt;/h2&gt;&lt;p&gt;There are two service files that will need to be created in order to use systemd to manage Sensu Go as you&amp;rsquo;d find with RHEL/Debian packages:&lt;/p&gt;
-&lt;p&gt;&lt;strong&gt;Sensu Backend Service File&lt;/strong&gt;&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
-&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt; 1
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;11
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;12
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;13
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;14
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;15
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;16
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;17
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;18
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;19
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;20
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;21
-&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
-&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-gdscript3&#34; data-lang=&#34;gdscript3&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;p&#34;&gt;[&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;Unit&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;]&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;n&#34;&gt;Description&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;The&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;Sensu&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;Backend&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;service&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;.&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;n&#34;&gt;After&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;network&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;-&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;online&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;target&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;n&#34;&gt;Wants&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;network&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;-&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;online&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;target&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;p&#34;&gt;[&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;Service&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;]&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;n&#34;&gt;Type&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;simple&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;n&#34;&gt;User&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;sensu&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;n&#34;&gt;Group&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;sensu&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;# Load env vars from /etc/default/ and /etc/sysconfig/ if they exist.&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;# Prefixing the path with &amp;#39;-&amp;#39; makes it try to load, but if the file doesn&amp;#39;t&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;# exist, it continues onward.&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;n&#34;&gt;EnvironmentFile&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;=-/&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;etc&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;/&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;default&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;/&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;sensu&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;-&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;backend&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;n&#34;&gt;EnvironmentFile&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;=-/&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;etc&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;/&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;sysconfig&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;/&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;sensu&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;-&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;backend&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;n&#34;&gt;LimitNOFILE&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;&lt;span class=&#34;mi&#34;&gt;65535&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;n&#34;&gt;ExecStart&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;=/&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;usr&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;/&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;sbin&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;/&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;sensu&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;-&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;backend&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;start&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;-&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;c&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;/&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;etc&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;/&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;sensu&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;/&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;backend&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;yml&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;n&#34;&gt;Restart&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;always&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;n&#34;&gt;WorkingDirectory&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;=/&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;p&#34;&gt;[&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;Install&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;]&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;n&#34;&gt;WantedBy&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;multi&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;-&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;user&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;target&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
-&lt;/div&gt;
-&lt;/div&gt;&lt;p&gt;To make this a bit easier, you can do the following:&lt;/p&gt;
-&lt;p&gt;&lt;code&gt;sudo curl -L https://gist.githubusercontent.com/asachs01/497ede01e9905e7917d577451ac51c1b/raw/141aa960a5481e4c536ff790561c5effd0f3b058/sensu-backend.service -o /lib/systemd/system/sensu-backend.service&lt;/code&gt;&lt;/p&gt;
-&lt;p&gt;&lt;strong&gt;Sensu Agent Service File&lt;/strong&gt;&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
-&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt; 1
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;11
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;12
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;13
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;14
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;15
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;16
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;17
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;18
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;19
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;20
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;21
-&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
-&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-gdscript3&#34; data-lang=&#34;gdscript3&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;p&#34;&gt;[&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;Unit&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;]&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;n&#34;&gt;Description&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;The&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;Sensu&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;Agent&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;process&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;.&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;n&#34;&gt;After&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;network&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;-&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;online&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;target&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;n&#34;&gt;Wants&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;network&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;-&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;online&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;target&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;p&#34;&gt;[&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;Service&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;]&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;n&#34;&gt;Type&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;simple&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;n&#34;&gt;User&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;sensu&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;n&#34;&gt;Group&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;sensu&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;# Load env vars from /etc/default/ and /etc/sysconfig/ if they exist.&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;# Prefixing the path with &amp;#39;-&amp;#39; makes it try to load, but if the file doesn&amp;#39;t&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;# exist, it continues onward.&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;n&#34;&gt;EnvironmentFile&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;=-/&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;etc&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;/&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;default&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;/&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;sensu&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;-&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;agent&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;n&#34;&gt;EnvironmentFile&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;=-/&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;etc&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;/&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;sysconfig&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;/&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;sensu&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;-&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;agent&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;n&#34;&gt;LimitNOFILE&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;&lt;span class=&#34;mi&#34;&gt;65535&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;n&#34;&gt;ExecStart&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;=/&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;usr&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;/&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;sbin&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;/&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;sensu&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;-&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;agent&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;start&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;n&#34;&gt;Restart&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;always&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;n&#34;&gt;WorkingDirectory&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;=/&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;p&#34;&gt;[&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;Install&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;]&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;n&#34;&gt;WantedBy&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;multi&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;-&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;user&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;target&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
-&lt;/div&gt;
-&lt;/div&gt;&lt;p&gt;And the same with this one:&lt;/p&gt;
-&lt;p&gt;&lt;code&gt;sudo curl -L https://gist.githubusercontent.com/asachs01/497ede01e9905e7917d577451ac51c1b/raw/141aa960a5481e4c536ff790561c5effd0f3b058/sensu-agent.service -o /lib/systemd/system/sensu-agent.service&lt;/code&gt;&lt;/p&gt;
-&lt;p&gt;Again, these will need to live at &lt;code&gt;/lib/systemd/system/sensu-backend.service&lt;/code&gt; and &lt;code&gt;/lib/systemd/system/sensu-agent.service&lt;/code&gt; respectively. Once you&amp;rsquo;ve got those in place, let&amp;rsquo;s move onto the next step.&lt;/p&gt;
-&lt;h2 id=&#34;create-the-sensu-usergroup&#34;&gt;Create the Sensu User/Group
-&lt;/h2&gt;&lt;p&gt;This is fairly simple, as we&amp;rsquo;ll only need to create a service account for Sensu:&lt;/p&gt;
-&lt;p&gt;&lt;code&gt;sudo useradd -r sensu&lt;/code&gt;&lt;/p&gt;
-&lt;p&gt;Now, onto the next step of creating the requisite directories for Sensu.&lt;/p&gt;
-&lt;h2 id=&#34;create-sensu-directories&#34;&gt;Create Sensu Directories
-&lt;/h2&gt;&lt;p&gt;There are three directories that need to be created and owned by the Sensu user:&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;&lt;code&gt;/var/lib/sensu&lt;/code&gt;&lt;/li&gt;
-&lt;li&gt;&lt;code&gt;/var/cache/sensu&lt;/code&gt;&lt;/li&gt;
-&lt;li&gt;&lt;code&gt;/etc/sensu&lt;/code&gt;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;Create each of these and change the ownership on them:&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
-&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;3
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;4
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;5
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;6
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;7
-&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
-&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-gdscript3&#34; data-lang=&#34;gdscript3&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;n&#34;&gt;sudo&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;/&lt;/span&gt;&lt;span class=&#34;k&#34;&gt;var&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;/&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;lib&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;/&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;sensu&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;n&#34;&gt;sudo&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;/&lt;/span&gt;&lt;span class=&#34;k&#34;&gt;var&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;/&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;cache&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;/&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;sensu&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;n&#34;&gt;sudo&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;mkdir&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;/&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;etc&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;/&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;sensu&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;n&#34;&gt;sudo&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;chown&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;sensu&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;.&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;/&lt;/span&gt;&lt;span class=&#34;k&#34;&gt;var&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;/&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;lib&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;/&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;sensu&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;n&#34;&gt;sudo&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;chown&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;sensu&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;.&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;/&lt;/span&gt;&lt;span class=&#34;k&#34;&gt;var&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;/&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;cache&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;/&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;sensu&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;n&#34;&gt;sudo&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;chown&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;sensu&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;.&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;/&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;etc&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;/&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;sensu&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
-&lt;/div&gt;
-&lt;/div&gt;&lt;p&gt;Alright, now for the last step: obtaining the config files.&lt;/p&gt;
-&lt;h2 id=&#34;obtaining-sensu-go-config-files&#34;&gt;Obtaining Sensu Go Config Files
-&lt;/h2&gt;&lt;p&gt;This is also a fairly quick step:&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
-&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;3
-&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
-&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-fallback&#34; data-lang=&#34;fallback&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;curl -LO http://docs.sensu.io/sensu-go/latest/files/\{agent,backend\}.yml
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;sudo cp {agent,backend}.yml /etc/sensu
-&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
-&lt;/div&gt;
-&lt;/div&gt;&lt;p&gt;Now, let&amp;rsquo;s get cooking.&lt;/p&gt;
-&lt;h2 id=&#34;start-sensu-go&#34;&gt;Start Sensu Go
-&lt;/h2&gt;&lt;p&gt;This is it. The moment you&amp;rsquo;ve been waiting for. It&amp;rsquo;s time to run Sensu!&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
-&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;3
-&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
-&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-fallback&#34; data-lang=&#34;fallback&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;sudo systemctl enable sensu-{agent,backend}
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;sudo systemctl start sensu-{agent,backend}
-&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
-&lt;/div&gt;
-&lt;/div&gt;&lt;p&gt;To ensure that Sensu is running as we expect, do a quick &lt;code&gt;sudo journalctl -fu sensu-backend&lt;/code&gt;. Journald should be free of any errors and if you go to http://IPOFYOURSYSTEM:3000, you should get a nice dashboard that looks like:&lt;/p&gt;
-&lt;p&gt;&lt;img src=&#34;https://p299.p4.n0.cdn.getcloudapp.com/items/OAuL7wme/Image&amp;#43;2020-01-17&amp;#43;at&amp;#43;12.25.47&amp;#43;PM.png?v=c53eadf0f22ed4865e2e5971c164b759&#34;
-	
-	
-	
-	loading=&#34;lazy&#34;
-	
-		alt=&#34;sensu go dashboard&#34;
-	
-	
-&gt;&lt;/p&gt;
-&lt;p&gt;There you have it! If you want to cluster a few Jetson Nanos, or Raspberry Pis up, head over to &lt;a class=&#34;link&#34; href=&#34;https://docs.sensu.io/sensu-go/5.7/guides/clustering/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
-    &gt;Sensu&amp;rsquo;s clustering guide&lt;/a&gt;.&lt;/p&gt;
-&lt;p&gt;Cheers!&lt;/p&gt;
-</description>
-        </item>
-        <item>
-        <title>Monitoring Raspberry Pi&#39;s with Sensu</title>
-        <link>http://localhost:1313/archive/monitoring-raspberry-pis-with-sensu/</link>
-        <pubDate>Thu, 16 Nov 2017 20:16:08 +0000</pubDate>
-        
-        <guid>http://localhost:1313/archive/monitoring-raspberry-pis-with-sensu/</guid>
-        <description>&lt;p&gt;Back in August, I took a Customer Success role at &lt;a class=&#34;link&#34; href=&#34;https://sensuapp.org&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
-    &gt;Sensu&lt;/a&gt;. I&amp;rsquo;d been familiar with Sensu through my various bits of tinkering and dabbling with monitoring in the past, and was happy to take the role and work with the Sensu team officially.&lt;/p&gt;
-&lt;p&gt;Now that I&amp;rsquo;ve been working with Sensu for a few months (and am officially on paternity leave for the next several weeks), I decided it was time to revisit the idea of using Sensu to monitor my Kegpi&amp;rsquo;s various sensors. I&amp;rsquo;d hit some blocks previously, but came back to it with some fresh eyes. Lo and behold, I&amp;rsquo;ve got it working! Let&amp;rsquo;s walk through how I&amp;rsquo;ve got it running.&lt;/p&gt;
-&lt;h3 id=&#34;the-setup&#34;&gt;The Setup
-&lt;/h3&gt;&lt;p&gt;Here are the prerequisites for getting Sensu to work on your Raspberry Pi:&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;Ruby &amp;gt; 2.0&lt;/li&gt;
-&lt;li&gt;Rubygems
-&lt;code&gt;sudo apt-get install ruby ruby-dev&lt;/code&gt; (this should install rubygems by default)&lt;/li&gt;
-&lt;li&gt;Sensu gem
-&lt;code&gt;sudo gem install sensu&lt;/code&gt;&lt;/li&gt;
-&lt;li&gt;A working Sensu server (you can snag one quick by downloading Vagrant, cloning my &lt;a class=&#34;link&#34; href=&#34;https://github.com/asachs01/sensu-up-and-running&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
-    &gt;&amp;ldquo;Sensu Up and Running&amp;rdquo; repo&lt;/a&gt;, and doing a &lt;code&gt;vagrant up&lt;/code&gt;)&lt;/li&gt;
-&lt;/ul&gt;
-&lt;h3 id=&#34;configuration&#34;&gt;Configuration
-&lt;/h3&gt;&lt;p&gt;Before you get started, ensure you&amp;rsquo;ve added the &lt;code&gt;sensu&lt;/code&gt; user:&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;&lt;code&gt;useradd sensu&lt;/code&gt;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;h4 id=&#34;sensu&#34;&gt;Sensu
-&lt;/h4&gt;&lt;p&gt;By default, the Sensu gem installs three services: &lt;code&gt;sensu-client&lt;/code&gt;, &lt;code&gt;sensu-server&lt;/code&gt;, and &lt;code&gt;sensu-api&lt;/code&gt;. These form the core components of any Sensu installation, but we&amp;rsquo;re ultimately about getting a client up and running on the Raspi. Before we go too much futher into configuring Sensu, I recommend that if you&amp;rsquo;re not familiar with Sensu as a monitoring framework, you should take a moment and watch some of &lt;a class=&#34;link&#34; href=&#34;https://www.youtube.com/playlist?list=PLqLtpBjHqwC-4o7HLtK3MM2V_GdtSh-Dw&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
-    &gt;Sensu&amp;rsquo;s free training videos&lt;/a&gt;.&lt;/p&gt;
-&lt;p&gt;Presuming you&amp;rsquo;ve already installed the gem, the commands to manage the Sensu client are located in &lt;code&gt;/usr/local/bin&lt;/code&gt;. The configuration files, however, are located in &lt;code&gt;/etc/sensu/conf.d&lt;/code&gt;. You&amp;rsquo;ll likely have to create that directory:&lt;/p&gt;
-&lt;p&gt;&lt;code&gt;sudo mkdir -p /etc/sensu/conf.d&lt;/code&gt;&lt;/p&gt;
-&lt;p&gt;From there, we&amp;rsquo;ll add three different configuration files, as per the &lt;a class=&#34;link&#34; href=&#34;https://sensuapp.org/docs&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
-    &gt;Sensu Documentation&lt;/a&gt;:&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;&lt;code&gt;client.json&lt;/code&gt;&lt;/li&gt;
-&lt;li&gt;&lt;code&gt;rabbitmq.json&lt;/code&gt;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;Here&amp;rsquo;s what they&amp;rsquo;ll look like:&lt;/p&gt;
-&lt;p&gt;client.json:&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
-&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;3
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;4
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;5
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;6
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;7
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;8
-&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
-&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-fallback&#34; data-lang=&#34;fallback&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;{
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt; &amp;#34;client&amp;#34;: {
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;   &amp;#34;environment&amp;#34;: &amp;#34;development&amp;#34;,
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;   &amp;#34;subscriptions&amp;#34;: [
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;     &amp;#34;dev&amp;#34;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;   ]
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt; }
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;}
-&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
-&lt;/div&gt;
-&lt;/div&gt;&lt;p&gt;rabbitmq.json&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
-&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt; 1
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;11
-&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
-&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-fallback&#34; data-lang=&#34;fallback&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;{                    
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  &amp;#34;rabbitmq&amp;#34;: {      
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &amp;#34;host&amp;#34;: &amp;#34;127.0.0.1&amp;#34;,                   
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &amp;#34;port&amp;#34;: 5672,    
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &amp;#34;vhost&amp;#34;: &amp;#34;/sensu&amp;#34;,                     
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &amp;#34;user&amp;#34;: &amp;#34;sensu&amp;#34;, 
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &amp;#34;password&amp;#34;: &amp;#34;secret&amp;#34;,                  
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &amp;#34;heartbeat&amp;#34;: 30, 
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &amp;#34;prefetch&amp;#34;: 50   
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  }                  
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;} 
-&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
-&lt;/div&gt;
-&lt;/div&gt;&lt;p&gt;Finish off by ensuring the permissions for all the files in &lt;code&gt;/etc/sensu/&lt;/code&gt; are owned by sensu:&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;&lt;code&gt;chown sensu. /etc/sensu/&lt;/code&gt;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;&lt;strong&gt;NOTE&lt;/strong&gt;: The credentials listed above should be changed. They&amp;rsquo;re merely examples pulled straight from the Sensu documentation and should NOT be used as is on any system you care about. You&amp;rsquo;ll also need to chage the IP addresses for Rabbit to the IP of the system(s) you have those running on. If you&amp;rsquo;re using the Sensu Up and Running Vagrant box, the IP addresses will be the same.&lt;/p&gt;
-&lt;h4 id=&#34;systemd&#34;&gt;Systemd
-&lt;/h4&gt;&lt;p&gt;If you&amp;rsquo;re used to a system using systemd for service management, you&amp;rsquo;ll be familiar with the service files located in &lt;code&gt;/etc/systemd/system&lt;/code&gt;. Sensu includes service files for each of the components, but for them to work on a Raspberry Pi, they need to be slightly modified. You&amp;rsquo;ll need to create the service file like so:&lt;/p&gt;
-&lt;p&gt;&lt;code&gt;sudo vim /etc/systemd/system/sensu-client.service&lt;/code&gt;&lt;/p&gt;
-&lt;p&gt;With the following content:&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
-&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt; 1
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;11
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;12
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;13
-&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
-&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-fallback&#34; data-lang=&#34;fallback&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;[Unit]               
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;Description=sensu client                   
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;[Service]            
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;User=sensu           
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;Group=sensu          
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;ExecStart=/usr/local/bin/sensu-client                                    
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;KillMode=process     
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;Restart=on-failure   
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;RestartSec=1min      
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;[Install]            
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;WantedBy=multi-user.target
-&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
-&lt;/div&gt;
-&lt;/div&gt;&lt;p&gt;From there, start the service:
-&lt;code&gt;sudo systemctl start sensu-client&lt;/code&gt;&lt;/p&gt;
-&lt;p&gt;And set it to start at boot:
-&lt;code&gt;sudo systemctl enable sensu-client&lt;/code&gt;&lt;/p&gt;
-&lt;p&gt;Which, if you&amp;rsquo;re using the Sensu Up and Running repo I mentioned earlier, should get you something that looks like this:&lt;/p&gt;
-&lt;p&gt;&lt;img src=&#34;http://localhost:1313/img/kegpi-sensu.png&#34;
-	
-	
-	
-	loading=&#34;lazy&#34;
-	
-		alt=&#34;kegpi-sensu&#34;
-	
-	
-&gt;&lt;/p&gt;
-&lt;h3 id=&#34;next-steps&#34;&gt;Next Steps
-&lt;/h3&gt;&lt;p&gt;So what do you do after getting Sensu working on your Raspi? Well, it&amp;rsquo;s up to you! In my case, I&amp;rsquo;ll use it to monitor the temperature, whether or not the door is open, and remaining liquid in the kegs for my kegerator.&lt;/p&gt;
-&lt;p&gt;In your case, you may want to monitor some system-level activity, like load, available RAM, or something of the like. You could also use it to say, monitor a web app you&amp;rsquo;re running on the Raspi, or, since Sensu&amp;rsquo;s plugins can be written in any programming language, use it to monitor any number of sensors you can attach to the Pi. Again, if you haven&amp;rsquo;t already, take a look over &lt;a class=&#34;link&#34; href=&#34;https://www.youtube.com/playlist?list=PLqLtpBjHqwC-4o7HLtK3MM2V_GdtSh-Dw&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
-    &gt;Sensu&amp;rsquo;s training videos&lt;/a&gt; to get a better idea of how Sensu works and what you can do with it.&lt;/p&gt;
-</description>
-        </item>
-        
-    </channel>
-</rss>
+&lt;/code>&lt;/pre>
+&lt;p>That command creates a mock event and sends it to the agent API. Now, this might be useful if I had some sort of code that monitored a mysql backup job and emitted this message. In our case, it&amp;rsquo;s just for us to make sure that we&amp;rsquo;ve set up and configured Sensu correctly. A successful test should leave you with an event that looks something like this:&lt;/p>
+&lt;p>&lt;!-- raw HTML omitted -->&lt;!-- raw HTML omitted -->&lt;!-- raw HTML omitted -->&lt;/p>
+&lt;p>BOOM! 💥 Our test worked! Let&amp;rsquo;s just run a quick sample attack with Gremlin now.&lt;/p>
+&lt;h2 id="gremlin-2">Gremlin
+&lt;/h2>&lt;p>Just like we tested Sensu to make sure we&amp;rsquo;re able to receive events, we&amp;rsquo;re going to test our Gremlin agent. You can see me run the attack below:&lt;/p>
+&lt;p>&lt;!-- raw HTML omitted -->Screen Recording 2019-06-14 at 03.25 PM.mov&lt;!-- raw HTML omitted -->&lt;/p>
+&lt;p>There we have it! Both Sensu and Gremlin are working like we expect them to. In the next post, I&amp;rsquo;m going to dig a bit more into the &amp;ldquo;why&amp;rdquo; of using a chaos engineering tool like Gremlin to test monitoring tools like Sensu.&lt;/p>
+&lt;p>&lt;em>&lt;/em>
+[1]: &lt;a class="link" href="https://media.giphy.com/media/BqPljBK6V9ZPG/giphy.gif" target="_blank" rel="noopener"
+>https://media.giphy.com/media/BqPljBK6V9ZPG/giphy.gif&lt;/a>
+[2]: &lt;a class="link" href="https://www.gremlin.com/" target="_blank" rel="noopener"
+>https://www.gremlin.com/&lt;/a>
+[3]: &lt;a class="link" href="https://principlesofchaos.org/" target="_blank" rel="noopener"
+>https://principlesofchaos.org/&lt;/a>
+[4]: &lt;a class="link" href="http://onemogin.com/monitoring/case-method-better-monitoring-for-humans.html" target="_blank" rel="noopener"
+>http://onemogin.com/monitoring/case-method-better-monitoring-for-humans.html&lt;/a>
+[5]: &lt;a class="link" href="https://docs.sensu.io/sensu-go/5.9/installation/install-sensu/#install-the-sensu-backend" target="_blank" rel="noopener"
+>https://docs.sensu.io/sensu-go/5.9/installation/install-sensu/#install-the-sensu-backend&lt;/a>
+[6]: &lt;a class="link" href="https://docs.sensu.io/sensu-go/5.9/guides/clustering/" target="_blank" rel="noopener"
+>https://docs.sensu.io/sensu-go/5.9/guides/clustering/&lt;/a>
+[7]: &lt;a class="link" href="https://www.gremlin.com/community/tutorials/how-to-install-and-use-gremlin-on-ubuntu-16-04/" target="_blank" rel="noopener"
+>https://www.gremlin.com/community/tutorials/how-to-install-and-use-gremlin-on-ubuntu-16-04/&lt;/a>&lt;/p></description></item><item><title>Compiling and Running Sensu Go on OS X</title><link>https://aaron.sachs.blog/archive/sensu-go-on-osx/</link><pubDate>Thu, 16 May 2019 19:49:32 -0500</pubDate><guid>https://aaron.sachs.blog/archive/sensu-go-on-osx/</guid><description>&lt;p>I&amp;rsquo;ve been messing around with compiling Sensu Go for several different platforms lately. In my &lt;a class="link" href="../sensu-go-on-arm/" >last post&lt;/a>, I got Sensu Go agents running on my Raspberry Pis and Nvidia Jetson Nanos. I wanted to see if I could get an agent running on OS X as well, because who doesn&amp;rsquo;t want to monitor their laptop!&lt;/p>
+&lt;h1 id="the-setup">The Setup
+&lt;/h1>&lt;p>Similar to what I did previously (and subsequently learned a ton more about), we&amp;rsquo;ll need to compile the Sensu Go packages since they&amp;rsquo;re not currently packaged for OS X. Let&amp;rsquo;s take a look at what we&amp;rsquo;ll need to get started:&lt;/p>
+&lt;ol>
+&lt;li>Install Go on your system&lt;/li>
+&lt;li>Grab Sensu Go&lt;/li>
+&lt;li>Build your binaries&lt;/li>
+&lt;/ol>
+&lt;h2 id="installing-go">Installing Go
+&lt;/h2>&lt;p>If you&amp;rsquo;ve not already installed Go on your system, please see &lt;a class="link" href="https://golang.org/dl/" target="_blank" rel="noopener"
+>Go&amp;rsquo;s installation documentation&lt;/a>. You can either download Go there, or install it with &lt;code>brew install golang&lt;/code>&lt;/p>
+&lt;h2 id="obtaining-sensu-go">Obtaining Sensu Go
+&lt;/h2>&lt;p>If you haven&amp;rsquo;t read the last post, it&amp;rsquo;s trivial to download Sensu Go into your Go workspace. Just run the following:&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-fallback" data-lang="fallback">&lt;span class="line">&lt;span class="cl">go get github.com/sensu/sensu-go/...
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>And head to &lt;code>$GOPATH/src/github.com/sensu/sensu-go&lt;/code>.&lt;/p>
+&lt;h2 id="building-the-binaries">Building the Binaries
+&lt;/h2>&lt;p>So instead of using &lt;code>build.sh&lt;/code> to create our binaries, we&amp;rsquo;re going to do something a bit different, and use what I feel to be an easier way of building our binaries.&lt;/p>
+&lt;p>From inside &lt;code>$GOPATH/src/github.com/sensu/sensu-go&lt;/code>, we&amp;rsquo;re going to run this command:&lt;/p>
+&lt;p>&lt;code>GOOS=darwin GOARCH=amd64 go install ./...&lt;/code>&lt;/p>
+&lt;p>Once that&amp;rsquo;s finished, you should see the binaries in &lt;code>$GOPATH/bin/&lt;/code>:&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-gdscript3" data-lang="gdscript3">&lt;span class="line">&lt;span class="cl">&lt;span class="o">$&lt;/span> &lt;span class="n">ls&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">check_protoc&lt;/span> &lt;span class="n">gengraphql&lt;/span> &lt;span class="n">linux_arm64&lt;/span> &lt;span class="n">make_typemap&lt;/span> &lt;span class="n">sensu&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">agent&lt;/span> &lt;span class="n">sensuctl&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">example&lt;/span> &lt;span class="n">linux_arm&lt;/span> &lt;span class="n">loadit&lt;/span> &lt;span class="n">proto2graphql&lt;/span> &lt;span class="n">sensu&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">backend&lt;/span> &lt;span class="n">version&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>You&amp;rsquo;ll notice I have a couple of other builds there, but we&amp;rsquo;re concerned &lt;em>only&lt;/em> with the &lt;code>sensu-agent&lt;/code> binary.&lt;/p>
+&lt;p>Cool! Now that it&amp;rsquo;s built, let&amp;rsquo;s move on to actually running Sensu Go on OS X.&lt;/p>
+&lt;h1 id="running-sensu-go">Running Sensu Go
+&lt;/h1>&lt;p>Since Sensu Go isn&amp;rsquo;t currently packaged for OS X, there&amp;rsquo;s a bit of finagling we have to do to get it to run as a service.&lt;/p>
+&lt;p>Of course, you can always just start up the Sensu agent, but exiting will prevent it from running. So, we need a better approach. We&amp;rsquo;re going to follow a similar path from my last post, and do the following:&lt;/p>
+&lt;ol>
+&lt;li>Create the plist file for the respective services&lt;/li>
+&lt;li>Create the Sensu user/group&lt;/li>
+&lt;li>Create the respective directories needed for Sensu to operate&lt;/li>
+&lt;li>Grab config files for Sensu Go&lt;/li>
+&lt;/ol>
+&lt;h2 id="creating-the-plist-file">Creating the Plist File
+&lt;/h2>&lt;p>If you&amp;rsquo;ve never dived into running OS X services, plist files are property files written in XML that define how you want to run an application or service. We&amp;rsquo;ll need this in order to have the Sensu agent run whenever we log in.&lt;/p>
+&lt;p>The file looks like this:&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;span class="lnt">19
+&lt;/span>&lt;span class="lnt">20
+&lt;/span>&lt;span class="lnt">21
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-gdscript3" data-lang="gdscript3">&lt;span class="line">&lt;span class="cl">&lt;span class="o">&amp;lt;&lt;/span>&lt;span class="err">?&lt;/span>&lt;span class="n">xml&lt;/span> &lt;span class="n">version&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;1.0&amp;#34;&lt;/span> &lt;span class="n">encoding&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;UTF-8&amp;#34;&lt;/span>&lt;span class="err">?&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="o">&amp;lt;!&lt;/span>&lt;span class="n">DOCTYPE&lt;/span> &lt;span class="n">plist&lt;/span> &lt;span class="n">PUBLIC&lt;/span> &lt;span class="s2">&amp;#34;-//Apple//DTD PLIST 1.0//EN&amp;#34;&lt;/span> &lt;span class="s2">&amp;#34;http://www.apple.com/DTDs/PropertyList-1.0.dtd&amp;#34;&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="o">&amp;lt;&lt;/span>&lt;span class="n">plist&lt;/span> &lt;span class="n">version&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;1.0&amp;#34;&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">&amp;lt;&lt;/span>&lt;span class="n">dict&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">&amp;lt;&lt;/span>&lt;span class="n">key&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>&lt;span class="ne">Label&lt;/span>&lt;span class="o">&amp;lt;/&lt;/span>&lt;span class="n">key&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">&amp;lt;&lt;/span>&lt;span class="n">string&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>&lt;span class="n">io&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">sensu&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">sensu&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">agent&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">plist&lt;/span>&lt;span class="o">&amp;lt;/&lt;/span>&lt;span class="n">string&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">&amp;lt;&lt;/span>&lt;span class="n">key&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>&lt;span class="n">UserName&lt;/span>&lt;span class="o">&amp;lt;/&lt;/span>&lt;span class="n">key&lt;/span>&lt;span class="o">&amp;gt;&amp;lt;&lt;/span>&lt;span class="n">string&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>&lt;span class="n">_sensu&lt;/span>&lt;span class="o">&amp;lt;/&lt;/span>&lt;span class="n">string&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">&amp;lt;&lt;/span>&lt;span class="n">key&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>&lt;span class="n">GroupName&lt;/span>&lt;span class="o">&amp;lt;/&lt;/span>&lt;span class="n">key&lt;/span>&lt;span class="o">&amp;gt;&amp;lt;&lt;/span>&lt;span class="n">string&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>&lt;span class="n">_sensu&lt;/span>&lt;span class="o">&amp;lt;/&lt;/span>&lt;span class="n">string&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">&amp;lt;&lt;/span>&lt;span class="n">key&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>&lt;span class="n">ProgramArguments&lt;/span>&lt;span class="o">&amp;lt;/&lt;/span>&lt;span class="n">key&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">&amp;lt;&lt;/span>&lt;span class="n">array&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">&amp;lt;&lt;/span>&lt;span class="n">string&lt;/span>&lt;span class="o">&amp;gt;/&lt;/span>&lt;span class="n">usr&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">local&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">bin&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">sensu&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">agent&lt;/span>&lt;span class="o">&amp;lt;/&lt;/span>&lt;span class="n">string&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">&amp;lt;&lt;/span>&lt;span class="n">string&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>&lt;span class="n">start&lt;/span>&lt;span class="o">&amp;lt;/&lt;/span>&lt;span class="n">string&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">&amp;lt;/&lt;/span>&lt;span class="n">array&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">&amp;lt;&lt;/span>&lt;span class="n">key&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>&lt;span class="n">RunAtLoad&lt;/span>&lt;span class="o">&amp;lt;/&lt;/span>&lt;span class="n">key&lt;/span>&lt;span class="o">&amp;gt;&amp;lt;&lt;/span>&lt;span class="bp">true&lt;/span>&lt;span class="o">/&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">&amp;lt;&lt;/span>&lt;span class="n">key&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>&lt;span class="n">KeepAlive&lt;/span>&lt;span class="o">&amp;lt;/&lt;/span>&lt;span class="n">key&lt;/span>&lt;span class="o">&amp;gt;&amp;lt;&lt;/span>&lt;span class="bp">true&lt;/span>&lt;span class="o">/&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">&amp;lt;&lt;/span>&lt;span class="n">key&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>&lt;span class="n">StandardOutPath&lt;/span>&lt;span class="o">&amp;lt;/&lt;/span>&lt;span class="n">key&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">&amp;lt;&lt;/span>&lt;span class="n">string&lt;/span>&lt;span class="o">&amp;gt;/&lt;/span>&lt;span class="k">var&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="nb">log&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">sensu&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">sensu&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">agent&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">log&lt;/span>&lt;span class="o">&amp;lt;/&lt;/span>&lt;span class="n">string&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">&amp;lt;&lt;/span>&lt;span class="n">key&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>&lt;span class="n">StandardErrorPath&lt;/span>&lt;span class="o">&amp;lt;/&lt;/span>&lt;span class="n">key&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">&amp;lt;&lt;/span>&lt;span class="n">string&lt;/span>&lt;span class="o">&amp;gt;/&lt;/span>&lt;span class="k">var&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="nb">log&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">sensu&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">sensu&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">agent&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">log&lt;/span>&lt;span class="o">&amp;lt;/&lt;/span>&lt;span class="n">string&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">&amp;lt;/&lt;/span>&lt;span class="n">dict&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="o">&amp;lt;/&lt;/span>&lt;span class="n">plist&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>In the interest of making things slightly easier than a copy/paste, you can run this:&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-fallback" data-lang="fallback">&lt;span class="line">&lt;span class="cl">sudo curl -s -L x https://gist.githubusercontent.com/asachs01/ecf83fe92624e7f346d2c5362d825e1c/raw/ec9bec6b97fd89b671ce0ceba2a3780eca04fef6/io.sensu.sensu-agent.plist -o /Library/LaunchDaemons/io.sensu.sensu-agent.plist
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>It&amp;rsquo;s worth noting that we&amp;rsquo;re placing this in &lt;code>/Library/LaunchDaemons&lt;/code> versus &lt;code>/Library/LaunchAgents&lt;/code>. This is because we want to run the service at boot, not just login (you can read more &lt;a class="link" href="http://www.grivet-tools.com/blog/2014/launchdaemons-vs-launchagents/" target="_blank" rel="noopener"
+>here&lt;/a>)&lt;/p>
+&lt;p>Alright, now it&amp;rsquo;s time to create the Sensu user and group.&lt;/p>
+&lt;h2 id="create-the-sensu-usergroup">Create the Sensu User/Group
+&lt;/h2>&lt;p>This isn&amp;rsquo;t nearly as straighforward as I&amp;rsquo;d hoped. If you recall, for Linux systems, this is as easy as a &lt;code>useradd&lt;/code>. In OS X, however, we use the command &lt;code>dscl&lt;/code>, which takes a few different arguments.&lt;/p>
+&lt;p>In Sensu Core, the OS X package had a script to run this as part of its postinstall process. After doing some digging and dissecting of that package, it turns out that there&amp;rsquo;s a handy little function in the script that will do the trick. It looks like this:&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;span class="lnt">19
+&lt;/span>&lt;span class="lnt">20
+&lt;/span>&lt;span class="lnt">21
+&lt;/span>&lt;span class="lnt">22
+&lt;/span>&lt;span class="lnt">23
+&lt;/span>&lt;span class="lnt">24
+&lt;/span>&lt;span class="lnt">25
+&lt;/span>&lt;span class="lnt">26
+&lt;/span>&lt;span class="lnt">27
+&lt;/span>&lt;span class="lnt">28
+&lt;/span>&lt;span class="lnt">29
+&lt;/span>&lt;span class="lnt">30
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">&lt;span class="cp">#!/bin/sh
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp">&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">create_sensu_user_group&lt;span class="o">()&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="o">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1"># create sensu group&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nb">set&lt;/span> +e
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> dscl . -list /Groups &lt;span class="p">|&lt;/span> grep &lt;span class="s2">&amp;#34;^_sensu&amp;#34;&lt;/span> &amp;gt; /dev/null
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nv">RC&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="nv">$?&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nb">set&lt;/span> -e
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">if&lt;/span> &lt;span class="o">[&lt;/span> &lt;span class="s2">&amp;#34;&lt;/span>&lt;span class="si">${&lt;/span>&lt;span class="nv">RC&lt;/span>&lt;span class="si">}&lt;/span>&lt;span class="s2">&amp;#34;&lt;/span> !&lt;span class="o">=&lt;/span> &lt;span class="s2">&amp;#34;0&amp;#34;&lt;/span> &lt;span class="o">]&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="k">then&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nv">last_used_gid&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="sb">`&lt;/span>dscacheutil -q group &lt;span class="p">|&lt;/span> grep gid &lt;span class="p">|&lt;/span> tail -n &lt;span class="m">1&lt;/span> &lt;span class="p">|&lt;/span> awk &lt;span class="s1">&amp;#39;{ print $2 }&amp;#39;&lt;/span>&lt;span class="sb">`&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nv">sensu_gid&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="sb">`&lt;/span>&lt;span class="nb">echo&lt;/span> &lt;span class="s2">&amp;#34;&lt;/span>&lt;span class="nv">$last_used_gid&lt;/span>&lt;span class="s2"> + 1&amp;#34;&lt;/span> &lt;span class="p">|&lt;/span> bc&lt;span class="sb">`&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> dscl . -create Groups/_sensu
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> dscl . -create Groups/_sensu PrimaryGroupID &lt;span class="nv">$sensu_gid&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">fi&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1"># create sensu user&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nb">set&lt;/span> +e
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> dscl . -list /Users &lt;span class="p">|&lt;/span> grep &lt;span class="s2">&amp;#34;^_sensu&amp;#34;&lt;/span> &amp;gt; /dev/null
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nv">RC&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="nv">$?&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nb">set&lt;/span> -e
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">if&lt;/span> &lt;span class="o">[&lt;/span> &lt;span class="s2">&amp;#34;&lt;/span>&lt;span class="si">${&lt;/span>&lt;span class="nv">RC&lt;/span>&lt;span class="si">}&lt;/span>&lt;span class="s2">&amp;#34;&lt;/span> !&lt;span class="o">=&lt;/span> &lt;span class="s2">&amp;#34;0&amp;#34;&lt;/span> &lt;span class="o">]&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="k">then&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nv">sensu_gid&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="sb">`&lt;/span>dscl . -read /Groups/_sensu &lt;span class="p">|&lt;/span> awk &lt;span class="s1">&amp;#39;($1 == &amp;#34;PrimaryGroupID:&amp;#34;) { print $2 }&amp;#39;&lt;/span>&lt;span class="sb">`&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> dscl . -create /Users/_sensu UniqueID &lt;span class="nv">$sensu_gid&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> dscl . -create /Users/_sensu PrimaryGroupID &lt;span class="nv">$sensu_gid&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> dscl . -create /Users/_sensu UserShell /usr/bin/false
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">fi&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="o">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">create_sensu_user_group
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>You can pull this down by running:&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-fallback" data-lang="fallback">&lt;span class="line">&lt;span class="cl">curl -LO https://gist.githubusercontent.com/asachs01/ecf83fe92624e7f346d2c5362d825e1c/raw/ec9bec6b97fd89b671ce0ceba2a3780eca04fef6/create_sensu_user_group.sh
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>And then:&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-fallback" data-lang="fallback">&lt;span class="line">&lt;span class="cl">chmod +x create_sensu_user_group.sh
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>And run it:&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-fallback" data-lang="fallback">&lt;span class="line">&lt;span class="cl">./create_sensu_user_group.sh
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>Which will give us our user and group. Now, on to the directories.&lt;/p>
+&lt;h2 id="create-sensu-directories">Create Sensu Directories
+&lt;/h2>&lt;p>In this part of the exercise, we&amp;rsquo;re going to diverge slightly from how we did things on the Pis and Nanos. We&amp;rsquo;re going to just run:&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-fallback" data-lang="fallback">&lt;span class="line">&lt;span class="cl">sudo mkdir -p /etc/sensu/cache/sensu-agent
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>The reason for this is due to my own inability to figure out why I couldn&amp;rsquo;t have Sensu create and manage the &lt;code>/var/cache/sensu&lt;/code> directory like I&amp;rsquo;d expected. After several hours of pounding away at what I thought would be simple permissions issue, I decided that I&amp;rsquo;d just run the command above and change my cache directory in the config.&lt;/p>
+&lt;p>So from here, we need to run:&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-fallback" data-lang="fallback">&lt;span class="line">&lt;span class="cl">sudo chown -R _sensu:_sensu /etc/sensu
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>This should get us where we need to go in terms of files and permissions.&lt;/p>
+&lt;h2 id="obtaining-sensu-go-config-files">Obtaining Sensu Go Config Files
+&lt;/h2>&lt;p>Like the last post, this stays the same.&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-fallback" data-lang="fallback">&lt;span class="line">&lt;span class="cl">curl -LO http://docs.sensu.io/sensu-go/latest/files/agent.yml
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">sudo cp agent.yml /etc/sensu
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h2 id="starting-sensu-go">Starting Sensu Go
+&lt;/h2>&lt;p>Alright, now we&amp;rsquo;re pretty much set and just need to start up the Sensu agent:&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-gdscript3" data-lang="gdscript3">&lt;span class="line">&lt;span class="cl">&lt;span class="n">sudo&lt;/span> &lt;span class="n">launchctl&lt;/span> &lt;span class="nb">load&lt;/span> &lt;span class="o">-&lt;/span>&lt;span class="n">w&lt;/span> &lt;span class="o">/&lt;/span>&lt;span class="n">Library&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">LaunchDaemons&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">io&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">sensu&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">sensu&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">agent&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">plist&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>Now, let&amp;rsquo;s check to make sure the agent is running:&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-fallback" data-lang="fallback">&lt;span class="line">&lt;span class="cl">sudo ps -ef | grep -v grep |grep &amp;#34;sensu-agent&amp;#34;
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> 400 12927 1 0 11:51AM ?? 0:04.14 /usr/local/bin/sensu-agent start
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>And we can do a couple of other things to verify that the agent is doing what we expect:&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-gdscript3" data-lang="gdscript3">&lt;span class="line">&lt;span class="cl">&lt;span class="n">tail&lt;/span> &lt;span class="o">-&lt;/span>&lt;span class="n">f&lt;/span> &lt;span class="o">/&lt;/span>&lt;span class="k">var&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="nb">log&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">sensu&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">sensu&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">agent&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">log&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>Which should give us logs that show we&amp;rsquo;re doing things and then also check to see that the agent shows up in the dashboard:&lt;/p>
+&lt;p>&lt;img src="https://aaron.sachs.blog/img/sensu_osx.png"
+loading="lazy"
+alt="screenshot of sensu on osx"
+>&lt;/p>
+&lt;p>Boom! There you have it!&lt;/p>
+&lt;p>Cheers,&lt;/p>
+&lt;p>Aaron&lt;/p></description></item><item><title>Compiling and Running Sensu Go on ARM</title><link>https://aaron.sachs.blog/archive/sensu-go-on-arm/</link><pubDate>Thu, 09 May 2019 19:49:32 -0500</pubDate><guid>https://aaron.sachs.blog/archive/sensu-go-on-arm/</guid><description>&lt;h1 id="updates">UPDATES
+&lt;/h1>&lt;p>When I originally wrote this post, I was operating under some outdated assumptions when it comes to building Sensu on arm devices. I&amp;rsquo;ll post the updates here at the beginning of the article, and you can read on to see how I&amp;rsquo;d previously set up Sensu on my Nvidia Jetson Nanos.&lt;/p>
+&lt;h2 id="compiling-sensu-go">Compiling Sensu Go
+&lt;/h2>&lt;p>As a Go novice, I didn&amp;rsquo;t fully understand the workflow for compiling Sensu for arm devices. As it so happens, it&amp;rsquo;s fairly easy to cross-compile from whatever device you&amp;rsquo;re on and then just transfer the binaries to the system you want to run on. I found this out the hard way by trying to compile on the Raspberry Pi&amp;rsquo;s I have. This resulted in them locking up.&lt;/p>
+&lt;p>So let&amp;rsquo;s walk through the non-build-script way of doing this:&lt;/p>
+&lt;ol>
+&lt;li>Install Go&lt;/li>
+&lt;li>&lt;a class="link" href="#obtaining-sensu-go" >Obtain Sensu Go&lt;/a>&lt;/li>
+&lt;li>Build the binary for your arm system of choice using &lt;code>GOOS=linux GOARCH=arm go install ./...&lt;/code> from inside the project root (&lt;code>$GOPATH/src/github/sensu/sensu-go&lt;/code>)&lt;/li>
+&lt;li>Transfer to the binary/binaries to your Pi&amp;rsquo;s, Nano&amp;rsquo;s, or other arm board&lt;/li>
+&lt;li>Proceed through the &lt;a class="link" href="#running-sensu-go" >rest of the setup&lt;/a>&lt;/li>
+&lt;/ol>
+&lt;p>Now, you can absolutely run through the original post as it was and &lt;em>still&lt;/em> run Sensu. However, I find that cross compiling from a system with a bit more oomph is going to make things easier.&lt;/p>
+&lt;h1 id="original-post">Original post
+&lt;/h1>&lt;p>In this post, I&amp;rsquo;ll cover how I am running Sensu Go on several NVIDIA Jetson Nanos. Though this is being done on a Nano, you could use the same approach I use here on a Raspberry Pi, or any other armv7 board. I would note that this is a temporary until official Sensu Go arm packages are released.&lt;/p>
+&lt;h1 id="the-setup">The Setup
+&lt;/h1>&lt;p>There are several things you&amp;rsquo;ll need to do before you can start playing around with Sensu Go.&lt;/p>
+&lt;ol>
+&lt;li>Install Go on your system&lt;/li>
+&lt;li>Grab Sensu Go&lt;/li>
+&lt;li>Build the binaries&lt;/li>
+&lt;/ol>
+&lt;h2 id="installing-go">Installing Go
+&lt;/h2>&lt;p>While installing Go on the Jetson as fairly trivial, the goal here is to give you a complete accounting of how I did what I did.&lt;/p>
+&lt;p>To install Go, run:&lt;/p>
+&lt;p>&lt;code>sudo apt-get install golang&lt;/code>&lt;/p>
+&lt;p>You should then have it installed on your system. If you need more complete documentation on installing Go, please see &lt;a class="link" href="https://golang.org/dl/" target="_blank" rel="noopener"
+>Go&amp;rsquo;s docs on downloading and installing Go onto your system&lt;/a>.&lt;/p>
+&lt;h2 id="obtaining-sensu-go">Obtaining Sensu Go
+&lt;/h2>&lt;p>Once you&amp;rsquo;ve installed Go, the next step is to obtain Sensu Go. To get the package, run the following:&lt;/p>
+&lt;p>&lt;code>go get github.com/sensu/sensu-go/...&lt;/code>&lt;/p>
+&lt;p>This will put the package at &lt;code>$GOPATH/src/github.com/sensu/sensu-go&lt;/code>.&lt;/p>
+&lt;h2 id="building-the-binaries">Building the Binaries
+&lt;/h2>&lt;p>Next up, we&amp;rsquo;re going to build the binaries using a script provided in the repo. You&amp;rsquo;ll want to ensure that you&amp;rsquo;re in &lt;code>$GOPATH/src/github.com/sensu/sensu-go&lt;/code>. Once you&amp;rsquo;re there, you&amp;rsquo;ll find a script called &lt;code>build.sh&lt;/code>&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;span class="lnt">7
+&lt;/span>&lt;span class="lnt">8
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-fallback" data-lang="fallback">&lt;span class="line">&lt;span class="cl">❯❯❯❯ ls
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">agent dashboard rpc vendor Dockerfile.rhel_atomic build.ps1
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">api docker-scripts scripts version Dockerfile.testagent build.sh
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">asset examples system CHANGELOG.md FAQ.md docker-compose.yaml
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">backend graphql testing CONTRIBUTING.md Gopkg.lock
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">cli handler transport DCO Gopkg.toml
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">cmd js types Dockerfile LICENSE
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">command licenses util Dockerfile.rhel README.md
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>We&amp;rsquo;ll run that and build our binaries:&lt;/p>
+&lt;p>&lt;code>./build.sh&lt;/code>&lt;/p>
+&lt;p>Now, we&amp;rsquo;ll grab that binaries that were built:&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-fallback" data-lang="fallback">&lt;span class="line">&lt;span class="cl">cd $GOPATH/bin
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">sudo cp sensu-{agent,backend} /usr/sbin/
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>That&amp;rsquo;s it for the prep work. Now it&amp;rsquo;s on to actually running Sensu Go.&lt;/p>
+&lt;h1 id="running-sensu-go">Running Sensu Go
+&lt;/h1>&lt;p>To run Sensu Go, we&amp;rsquo;ll need to go through the following steps:&lt;/p>
+&lt;ol>
+&lt;li>Create the service files for the respective services&lt;/li>
+&lt;li>Create the Sensu user/group&lt;/li>
+&lt;li>Create the respective directories needed for Sensu to operate&lt;/li>
+&lt;li>Grab config files for Sensu Go&lt;/li>
+&lt;/ol>
+&lt;h2 id="creating-the-service-files">Creating the Service Files
+&lt;/h2>&lt;p>There are two service files that will need to be created in order to use systemd to manage Sensu Go as you&amp;rsquo;d find with RHEL/Debian packages:&lt;/p>
+&lt;p>&lt;strong>Sensu Backend Service File&lt;/strong>&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;span class="lnt">19
+&lt;/span>&lt;span class="lnt">20
+&lt;/span>&lt;span class="lnt">21
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-gdscript3" data-lang="gdscript3">&lt;span class="line">&lt;span class="cl">&lt;span class="p">[&lt;/span>&lt;span class="n">Unit&lt;/span>&lt;span class="p">]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">Description&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="n">The&lt;/span> &lt;span class="n">Sensu&lt;/span> &lt;span class="n">Backend&lt;/span> &lt;span class="n">service&lt;/span>&lt;span class="o">.&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">After&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="n">network&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">online&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">target&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">Wants&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="n">network&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">online&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">target&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">[&lt;/span>&lt;span class="n">Service&lt;/span>&lt;span class="p">]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">Type&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="n">simple&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">User&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="n">sensu&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">Group&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="n">sensu&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># Load env vars from /etc/default/ and /etc/sysconfig/ if they exist.&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># Prefixing the path with &amp;#39;-&amp;#39; makes it try to load, but if the file doesn&amp;#39;t&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># exist, it continues onward.&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">EnvironmentFile&lt;/span>&lt;span class="o">=-/&lt;/span>&lt;span class="n">etc&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">default&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">sensu&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">backend&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">EnvironmentFile&lt;/span>&lt;span class="o">=-/&lt;/span>&lt;span class="n">etc&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">sysconfig&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">sensu&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">backend&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">LimitNOFILE&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="mi">65535&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">ExecStart&lt;/span>&lt;span class="o">=/&lt;/span>&lt;span class="n">usr&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">sbin&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">sensu&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">backend&lt;/span> &lt;span class="n">start&lt;/span> &lt;span class="o">-&lt;/span>&lt;span class="n">c&lt;/span> &lt;span class="o">/&lt;/span>&lt;span class="n">etc&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">sensu&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">backend&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">yml&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">Restart&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="n">always&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">WorkingDirectory&lt;/span>&lt;span class="o">=/&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">[&lt;/span>&lt;span class="n">Install&lt;/span>&lt;span class="p">]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">WantedBy&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="n">multi&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">user&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">target&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>To make this a bit easier, you can do the following:&lt;/p>
+&lt;p>&lt;code>sudo curl -L https://gist.githubusercontent.com/asachs01/497ede01e9905e7917d577451ac51c1b/raw/141aa960a5481e4c536ff790561c5effd0f3b058/sensu-backend.service -o /lib/systemd/system/sensu-backend.service&lt;/code>&lt;/p>
+&lt;p>&lt;strong>Sensu Agent Service File&lt;/strong>&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;span class="lnt">19
+&lt;/span>&lt;span class="lnt">20
+&lt;/span>&lt;span class="lnt">21
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-gdscript3" data-lang="gdscript3">&lt;span class="line">&lt;span class="cl">&lt;span class="p">[&lt;/span>&lt;span class="n">Unit&lt;/span>&lt;span class="p">]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">Description&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="n">The&lt;/span> &lt;span class="n">Sensu&lt;/span> &lt;span class="n">Agent&lt;/span> &lt;span class="n">process&lt;/span>&lt;span class="o">.&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">After&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="n">network&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">online&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">target&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">Wants&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="n">network&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">online&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">target&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">[&lt;/span>&lt;span class="n">Service&lt;/span>&lt;span class="p">]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">Type&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="n">simple&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">User&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="n">sensu&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">Group&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="n">sensu&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># Load env vars from /etc/default/ and /etc/sysconfig/ if they exist.&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># Prefixing the path with &amp;#39;-&amp;#39; makes it try to load, but if the file doesn&amp;#39;t&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># exist, it continues onward.&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">EnvironmentFile&lt;/span>&lt;span class="o">=-/&lt;/span>&lt;span class="n">etc&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">default&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">sensu&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">agent&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">EnvironmentFile&lt;/span>&lt;span class="o">=-/&lt;/span>&lt;span class="n">etc&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">sysconfig&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">sensu&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">agent&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">LimitNOFILE&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="mi">65535&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">ExecStart&lt;/span>&lt;span class="o">=/&lt;/span>&lt;span class="n">usr&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">sbin&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">sensu&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">agent&lt;/span> &lt;span class="n">start&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">Restart&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="n">always&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">WorkingDirectory&lt;/span>&lt;span class="o">=/&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">[&lt;/span>&lt;span class="n">Install&lt;/span>&lt;span class="p">]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">WantedBy&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="n">multi&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">user&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">target&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>And the same with this one:&lt;/p>
+&lt;p>&lt;code>sudo curl -L https://gist.githubusercontent.com/asachs01/497ede01e9905e7917d577451ac51c1b/raw/141aa960a5481e4c536ff790561c5effd0f3b058/sensu-agent.service -o /lib/systemd/system/sensu-agent.service&lt;/code>&lt;/p>
+&lt;p>Again, these will need to live at &lt;code>/lib/systemd/system/sensu-backend.service&lt;/code> and &lt;code>/lib/systemd/system/sensu-agent.service&lt;/code> respectively. Once you&amp;rsquo;ve got those in place, let&amp;rsquo;s move onto the next step.&lt;/p>
+&lt;h2 id="create-the-sensu-usergroup">Create the Sensu User/Group
+&lt;/h2>&lt;p>This is fairly simple, as we&amp;rsquo;ll only need to create a service account for Sensu:&lt;/p>
+&lt;p>&lt;code>sudo useradd -r sensu&lt;/code>&lt;/p>
+&lt;p>Now, onto the next step of creating the requisite directories for Sensu.&lt;/p>
+&lt;h2 id="create-sensu-directories">Create Sensu Directories
+&lt;/h2>&lt;p>There are three directories that need to be created and owned by the Sensu user:&lt;/p>
+&lt;ul>
+&lt;li>&lt;code>/var/lib/sensu&lt;/code>&lt;/li>
+&lt;li>&lt;code>/var/cache/sensu&lt;/code>&lt;/li>
+&lt;li>&lt;code>/etc/sensu&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;p>Create each of these and change the ownership on them:&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;span class="lnt">7
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-gdscript3" data-lang="gdscript3">&lt;span class="line">&lt;span class="cl">&lt;span class="n">sudo&lt;/span> &lt;span class="o">/&lt;/span>&lt;span class="k">var&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">lib&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">sensu&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">sudo&lt;/span> &lt;span class="o">/&lt;/span>&lt;span class="k">var&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">cache&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">sensu&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">sudo&lt;/span> &lt;span class="n">mkdir&lt;/span> &lt;span class="o">/&lt;/span>&lt;span class="n">etc&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">sensu&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">sudo&lt;/span> &lt;span class="n">chown&lt;/span> &lt;span class="n">sensu&lt;/span>&lt;span class="o">.&lt;/span> &lt;span class="o">/&lt;/span>&lt;span class="k">var&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">lib&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">sensu&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">sudo&lt;/span> &lt;span class="n">chown&lt;/span> &lt;span class="n">sensu&lt;/span>&lt;span class="o">.&lt;/span> &lt;span class="o">/&lt;/span>&lt;span class="k">var&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">cache&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">sensu&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">sudo&lt;/span> &lt;span class="n">chown&lt;/span> &lt;span class="n">sensu&lt;/span>&lt;span class="o">.&lt;/span> &lt;span class="o">/&lt;/span>&lt;span class="n">etc&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">sensu&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>Alright, now for the last step: obtaining the config files.&lt;/p>
+&lt;h2 id="obtaining-sensu-go-config-files">Obtaining Sensu Go Config Files
+&lt;/h2>&lt;p>This is also a fairly quick step:&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-fallback" data-lang="fallback">&lt;span class="line">&lt;span class="cl">curl -LO http://docs.sensu.io/sensu-go/latest/files/\{agent,backend\}.yml
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">sudo cp {agent,backend}.yml /etc/sensu
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>Now, let&amp;rsquo;s get cooking.&lt;/p>
+&lt;h2 id="start-sensu-go">Start Sensu Go
+&lt;/h2>&lt;p>This is it. The moment you&amp;rsquo;ve been waiting for. It&amp;rsquo;s time to run Sensu!&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-fallback" data-lang="fallback">&lt;span class="line">&lt;span class="cl">sudo systemctl enable sensu-{agent,backend}
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">sudo systemctl start sensu-{agent,backend}
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>To ensure that Sensu is running as we expect, do a quick &lt;code>sudo journalctl -fu sensu-backend&lt;/code>. Journald should be free of any errors and if you go to http://IPOFYOURSYSTEM:3000, you should get a nice dashboard that looks like:&lt;/p>
+&lt;p>&lt;img src="https://p299.p4.n0.cdn.getcloudapp.com/items/OAuL7wme/Image&amp;#43;2020-01-17&amp;#43;at&amp;#43;12.25.47&amp;#43;PM.png?v=c53eadf0f22ed4865e2e5971c164b759"
+loading="lazy"
+alt="sensu go dashboard"
+>&lt;/p>
+&lt;p>There you have it! If you want to cluster a few Jetson Nanos, or Raspberry Pis up, head over to &lt;a class="link" href="https://docs.sensu.io/sensu-go/5.7/guides/clustering/" target="_blank" rel="noopener"
+>Sensu&amp;rsquo;s clustering guide&lt;/a>.&lt;/p>
+&lt;p>Cheers!&lt;/p></description></item><item><title>Monitoring Raspberry Pi's with Sensu</title><link>https://aaron.sachs.blog/archive/monitoring-raspberry-pis-with-sensu/</link><pubDate>Thu, 16 Nov 2017 20:16:08 +0000</pubDate><guid>https://aaron.sachs.blog/archive/monitoring-raspberry-pis-with-sensu/</guid><description>&lt;p>Back in August, I took a Customer Success role at &lt;a class="link" href="https://sensuapp.org" target="_blank" rel="noopener"
+>Sensu&lt;/a>. I&amp;rsquo;d been familiar with Sensu through my various bits of tinkering and dabbling with monitoring in the past, and was happy to take the role and work with the Sensu team officially.&lt;/p>
+&lt;p>Now that I&amp;rsquo;ve been working with Sensu for a few months (and am officially on paternity leave for the next several weeks), I decided it was time to revisit the idea of using Sensu to monitor my Kegpi&amp;rsquo;s various sensors. I&amp;rsquo;d hit some blocks previously, but came back to it with some fresh eyes. Lo and behold, I&amp;rsquo;ve got it working! Let&amp;rsquo;s walk through how I&amp;rsquo;ve got it running.&lt;/p>
+&lt;h3 id="the-setup">The Setup
+&lt;/h3>&lt;p>Here are the prerequisites for getting Sensu to work on your Raspberry Pi:&lt;/p>
+&lt;ul>
+&lt;li>Ruby &amp;gt; 2.0&lt;/li>
+&lt;li>Rubygems
+&lt;code>sudo apt-get install ruby ruby-dev&lt;/code> (this should install rubygems by default)&lt;/li>
+&lt;li>Sensu gem
+&lt;code>sudo gem install sensu&lt;/code>&lt;/li>
+&lt;li>A working Sensu server (you can snag one quick by downloading Vagrant, cloning my &lt;a class="link" href="https://github.com/asachs01/sensu-up-and-running" target="_blank" rel="noopener"
+>&amp;ldquo;Sensu Up and Running&amp;rdquo; repo&lt;/a>, and doing a &lt;code>vagrant up&lt;/code>)&lt;/li>
+&lt;/ul>
+&lt;h3 id="configuration">Configuration
+&lt;/h3>&lt;p>Before you get started, ensure you&amp;rsquo;ve added the &lt;code>sensu&lt;/code> user:&lt;/p>
+&lt;ul>
+&lt;li>&lt;code>useradd sensu&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;h4 id="sensu">Sensu
+&lt;/h4>&lt;p>By default, the Sensu gem installs three services: &lt;code>sensu-client&lt;/code>, &lt;code>sensu-server&lt;/code>, and &lt;code>sensu-api&lt;/code>. These form the core components of any Sensu installation, but we&amp;rsquo;re ultimately about getting a client up and running on the Raspi. Before we go too much futher into configuring Sensu, I recommend that if you&amp;rsquo;re not familiar with Sensu as a monitoring framework, you should take a moment and watch some of &lt;a class="link" href="https://www.youtube.com/playlist?list=PLqLtpBjHqwC-4o7HLtK3MM2V_GdtSh-Dw" target="_blank" rel="noopener"
+>Sensu&amp;rsquo;s free training videos&lt;/a>.&lt;/p>
+&lt;p>Presuming you&amp;rsquo;ve already installed the gem, the commands to manage the Sensu client are located in &lt;code>/usr/local/bin&lt;/code>. The configuration files, however, are located in &lt;code>/etc/sensu/conf.d&lt;/code>. You&amp;rsquo;ll likely have to create that directory:&lt;/p>
+&lt;p>&lt;code>sudo mkdir -p /etc/sensu/conf.d&lt;/code>&lt;/p>
+&lt;p>From there, we&amp;rsquo;ll add three different configuration files, as per the &lt;a class="link" href="https://sensuapp.org/docs" target="_blank" rel="noopener"
+>Sensu Documentation&lt;/a>:&lt;/p>
+&lt;ul>
+&lt;li>&lt;code>client.json&lt;/code>&lt;/li>
+&lt;li>&lt;code>rabbitmq.json&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;p>Here&amp;rsquo;s what they&amp;rsquo;ll look like:&lt;/p>
+&lt;p>client.json:&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;span class="lnt">7
+&lt;/span>&lt;span class="lnt">8
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-fallback" data-lang="fallback">&lt;span class="line">&lt;span class="cl">{
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &amp;#34;client&amp;#34;: {
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &amp;#34;environment&amp;#34;: &amp;#34;development&amp;#34;,
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &amp;#34;subscriptions&amp;#34;: [
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &amp;#34;dev&amp;#34;
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> ]
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> }
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">}
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>rabbitmq.json&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-fallback" data-lang="fallback">&lt;span class="line">&lt;span class="cl">{
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &amp;#34;rabbitmq&amp;#34;: {
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &amp;#34;host&amp;#34;: &amp;#34;127.0.0.1&amp;#34;,
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &amp;#34;port&amp;#34;: 5672,
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &amp;#34;vhost&amp;#34;: &amp;#34;/sensu&amp;#34;,
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &amp;#34;user&amp;#34;: &amp;#34;sensu&amp;#34;,
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &amp;#34;password&amp;#34;: &amp;#34;secret&amp;#34;,
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &amp;#34;heartbeat&amp;#34;: 30,
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &amp;#34;prefetch&amp;#34;: 50
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> }
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">}
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>Finish off by ensuring the permissions for all the files in &lt;code>/etc/sensu/&lt;/code> are owned by sensu:&lt;/p>
+&lt;ul>
+&lt;li>&lt;code>chown sensu. /etc/sensu/&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;p>&lt;strong>NOTE&lt;/strong>: The credentials listed above should be changed. They&amp;rsquo;re merely examples pulled straight from the Sensu documentation and should NOT be used as is on any system you care about. You&amp;rsquo;ll also need to chage the IP addresses for Rabbit to the IP of the system(s) you have those running on. If you&amp;rsquo;re using the Sensu Up and Running Vagrant box, the IP addresses will be the same.&lt;/p>
+&lt;h4 id="systemd">Systemd
+&lt;/h4>&lt;p>If you&amp;rsquo;re used to a system using systemd for service management, you&amp;rsquo;ll be familiar with the service files located in &lt;code>/etc/systemd/system&lt;/code>. Sensu includes service files for each of the components, but for them to work on a Raspberry Pi, they need to be slightly modified. You&amp;rsquo;ll need to create the service file like so:&lt;/p>
+&lt;p>&lt;code>sudo vim /etc/systemd/system/sensu-client.service&lt;/code>&lt;/p>
+&lt;p>With the following content:&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-fallback" data-lang="fallback">&lt;span class="line">&lt;span class="cl">[Unit]
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Description=sensu client
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">[Service]
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">User=sensu
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Group=sensu
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">ExecStart=/usr/local/bin/sensu-client
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">KillMode=process
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Restart=on-failure
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">RestartSec=1min
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">[Install]
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">WantedBy=multi-user.target
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>From there, start the service:
+&lt;code>sudo systemctl start sensu-client&lt;/code>&lt;/p>
+&lt;p>And set it to start at boot:
+&lt;code>sudo systemctl enable sensu-client&lt;/code>&lt;/p>
+&lt;p>Which, if you&amp;rsquo;re using the Sensu Up and Running repo I mentioned earlier, should get you something that looks like this:&lt;/p>
+&lt;p>&lt;img src="https://aaron.sachs.blog/img/kegpi-sensu.png"
+loading="lazy"
+alt="kegpi-sensu"
+>&lt;/p>
+&lt;h3 id="next-steps">Next Steps
+&lt;/h3>&lt;p>So what do you do after getting Sensu working on your Raspi? Well, it&amp;rsquo;s up to you! In my case, I&amp;rsquo;ll use it to monitor the temperature, whether or not the door is open, and remaining liquid in the kegs for my kegerator.&lt;/p>
+&lt;p>In your case, you may want to monitor some system-level activity, like load, available RAM, or something of the like. You could also use it to say, monitor a web app you&amp;rsquo;re running on the Raspi, or, since Sensu&amp;rsquo;s plugins can be written in any programming language, use it to monitor any number of sensors you can attach to the Pi. Again, if you haven&amp;rsquo;t already, take a look over &lt;a class="link" href="https://www.youtube.com/playlist?list=PLqLtpBjHqwC-4o7HLtK3MM2V_GdtSh-Dw" target="_blank" rel="noopener"
+>Sensu&amp;rsquo;s training videos&lt;/a> to get a better idea of how Sensu works and what you can do with it.&lt;/p></description></item></channel></rss>

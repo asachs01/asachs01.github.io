@@ -1,56 +1,36 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?>
-<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
-    <channel>
-        <title>Customer Success on Staring Blankly at a Screen</title>
-        <link>http://localhost:1313/tags/customer-success/</link>
-        <description>Recent content in Customer Success on Staring Blankly at a Screen</description>
-        <generator>Hugo -- gohugo.io</generator>
-        <language>en-us</language>
-        <copyright>© 2025 Aaron Sachs. All rights reserved.</copyright>
-        <lastBuildDate>Fri, 08 Jul 2016 00:39:00 +0000</lastBuildDate><atom:link href="http://localhost:1313/tags/customer-success/index.xml" rel="self" type="application/rss+xml" /><item>
-        <title>So You&#39;re In Customer Success, Now What?</title>
-        <link>http://localhost:1313/archive/so-youre-in-customer-success-now-what/</link>
-        <pubDate>Fri, 08 Jul 2016 00:39:00 +0000</pubDate>
-        
-        <guid>http://localhost:1313/archive/so-youre-in-customer-success-now-what/</guid>
-        <description>&lt;h3 id=&#34;starting-out&#34;&gt;Starting Out
-&lt;/h3&gt;&lt;p&gt;Back in April, I started a new role as a customer success engineer with &lt;a class=&#34;link&#34; href=&#34;http://digitalocean.com&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
-    &gt;DigitalOcean&lt;/a&gt;. Admittedly, I didn&amp;rsquo;t know what to expect coming from being a systems administrator. During the interview process, I got the impression that the role was a mixture of account management, solutions engineering, and support.&lt;/p&gt;
-&lt;p&gt;Now three months into the role, I can confidently say that with regard to duties, my impression was more or less spot on. But in practice, the role is so much more than that. It&amp;rsquo;s more than taking care of discounts, payments, and other account level issues. It&amp;rsquo;s more than specing out a solution for a customer, or writing scripts to provision that solution automatically. It&amp;rsquo;s more than just making sure that an issue is fixed, or that you have the answer to every technical question.&lt;/p&gt;
-&lt;p&gt;There&amp;rsquo;s a relational element to customer success that&amp;rsquo;s hard to quantify. The best way I can explain it is like this:&lt;/p&gt;
-&lt;p&gt;Suppose your grandmother, significant other, or best friend suddenly starts up a company. They come to you and ask you, &amp;ldquo;Heya! I want to use &lt;!-- raw HTML omitted --&gt; for my startup and need your help. Can you help me out?&amp;rdquo;&lt;/p&gt;
-&lt;p&gt;What would you do? If you&amp;rsquo;re invested in that person, you&amp;rsquo;d likely do everything you can to help them out. In practicality, it might look like:&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;Taking a hands-on approach to managing their account to ensure that they have a butter-smooth on-boarding process&lt;/li&gt;
-&lt;li&gt;Take an extended time to understand what they&amp;rsquo;re doing with their business and what they&amp;rsquo;re looking to do on the platform&lt;/li&gt;
-&lt;li&gt;Advising them about any pitfalls that they might encounter along the way&lt;/li&gt;
-&lt;li&gt;Making sure that they now about everything on the platform that will help their business grow&lt;/li&gt;
-&lt;li&gt;Showing genuine concern and empathy when things aren&amp;rsquo;t going so smoothly&lt;/li&gt;
-&lt;li&gt;Being transparent about the platform&amp;rsquo;s shortcomings/weak areas and suggesting ways that they might be able to work around those weaknesses&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;In short, you&amp;rsquo;d do everything you feasibly can to make sure that their company grows and succeeds. So yes, being a customer success engineer (or customer success manager, in other industry-specific parlance) is different than being an admin.&lt;/p&gt;
-&lt;p&gt;So how does one make the transition from being an admin to being a customer success engineer/manager?&lt;/p&gt;
-&lt;h3 id=&#34;moving-from-admin--customer-success&#34;&gt;Moving from Admin &amp;ndash;&amp;gt; Customer Success
-&lt;/h3&gt;&lt;p&gt;The last three months have been a challenge, I won&amp;rsquo;t lie. I&amp;rsquo;d developed some bad habits in my last role, and it comes down to two big ones:&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;Lack of empathy (largely due to ticket crunching&amp;hellip;when your team addresses hundreds of tickets a day, it&amp;rsquo;s hard to have enough time to be empathetic in every one)&lt;/li&gt;
-&lt;li&gt;The aforementioned being myopic when addressing issues/tickets&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;In short, I didn&amp;rsquo;t care. I didn&amp;rsquo;t have time to care. Don&amp;rsquo;t get me wrong, it&amp;rsquo;s not that I didn&amp;rsquo;t want to care. The last thing I think anyone wants in their job is to come off as apathetic and disinterested. However, high volumes of support tickets don&amp;rsquo;t lead to an environment that engenders empathy and a holistic focus on customer accounts.&lt;/p&gt;
-&lt;p&gt;So how did I get past that? Well, for one, starting a new role helped. I didn&amp;rsquo;t feel as burned out, and being in a new environment was refreshing. Also, accountability is another HUGE help. When you&amp;rsquo;re part of a team that calls you out for not being empathetic, or showing genuine care for your customers, you learn quick that you need to change your behavior. The other thing that&amp;rsquo;s helped is being involved in the customer success community. For me, that&amp;rsquo;s looked like:&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;Reading up on customer success literature (So far, the book that&amp;rsquo;s helped with the transition the most has been &lt;a class=&#34;link&#34; href=&#34;https://www.amazon.com/Farm-Dont-Hunt-Definitive-Customer-ebook/dp/B01BIBY8W0&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
-    &gt;Farm, Don&amp;rsquo;t Hunt&lt;/a&gt;)&lt;/li&gt;
-&lt;li&gt;Being present and (somewhat) active in the &lt;a class=&#34;link&#34; href=&#34;https://supportdriven.com/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
-    &gt;Support Driven&lt;/a&gt; Slack channel&lt;/li&gt;
-&lt;li&gt;Reaching out to other customer success organizations, like &lt;a class=&#34;link&#34; href=&#34;http://glideconsultingllc.com/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
-    &gt;Glide Consulting&lt;/a&gt; to see how they do Customer Success&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;Also, it&amp;rsquo;s taken asking myself the hard questions about how I approach customer issues and taking a step back when I realize I&amp;rsquo;m defaulting to a break/fix mentality. That&amp;rsquo;s definitely not fun.&lt;/p&gt;
-&lt;p&gt;Now, I&amp;rsquo;m prone to wanting to make everything repeatable and testable. I blame it on my training as an academic researcher. I love patterns and I love it when I can make something fit into a pattern that I just automate and set on autopilot. I&amp;rsquo;ve found that&amp;rsquo;s not how Customer Success works. Why? Relationships. Like I mentioned earlier, Customer Success is more than fixing a single problem. It&amp;rsquo;s about establishing trust and rapport with customers and being invested in their growth. There are patterns and methods that I&amp;rsquo;ve found in some of the interviews I&amp;rsquo;ve been doing, but they&amp;rsquo;re certainly well-suited to a &amp;ldquo;one-size-fits-all&amp;rdquo; approach. They take tweaking, adjusting, and above all, the ability to admit that those methods may just not work for a customer success organization. All that to say the journey into Customer Success requires hard work and for me, quite a bit of introspection to reflect on what I do on a daily basis to see if it fits within a Customer Success mold.&lt;/p&gt;
-&lt;p&gt;So if you&amp;rsquo;re just starting out in Customer Success from a more technical role, and you&amp;rsquo;re finding it hard, don&amp;rsquo;t worry. It&amp;rsquo;s not an easy transition. But if you take some time to reflect on your default habits, get involved in the customer success community and be open to the fact that it&amp;rsquo;s going to take some time to make the transition into the new role, you&amp;rsquo;ll be off to a good start.&lt;/p&gt;
-</description>
-        </item>
-        
-    </channel>
-</rss>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Customer Success on Staring Blankly at a Screen</title><link>https://aaron.sachs.blog/tags/customer-success/</link><description>Recent content in Customer Success on Staring Blankly at a Screen</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><copyright>© 2025 Aaron Sachs. All rights reserved.</copyright><lastBuildDate>Fri, 08 Jul 2016 00:39:00 +0000</lastBuildDate><atom:link href="https://aaron.sachs.blog/tags/customer-success/index.xml" rel="self" type="application/rss+xml"/><item><title>So You're In Customer Success, Now What?</title><link>https://aaron.sachs.blog/archive/so-youre-in-customer-success-now-what/</link><pubDate>Fri, 08 Jul 2016 00:39:00 +0000</pubDate><guid>https://aaron.sachs.blog/archive/so-youre-in-customer-success-now-what/</guid><description>&lt;h3 id="starting-out">Starting Out
+&lt;/h3>&lt;p>Back in April, I started a new role as a customer success engineer with &lt;a class="link" href="http://digitalocean.com" target="_blank" rel="noopener"
+>DigitalOcean&lt;/a>. Admittedly, I didn&amp;rsquo;t know what to expect coming from being a systems administrator. During the interview process, I got the impression that the role was a mixture of account management, solutions engineering, and support.&lt;/p>
+&lt;p>Now three months into the role, I can confidently say that with regard to duties, my impression was more or less spot on. But in practice, the role is so much more than that. It&amp;rsquo;s more than taking care of discounts, payments, and other account level issues. It&amp;rsquo;s more than specing out a solution for a customer, or writing scripts to provision that solution automatically. It&amp;rsquo;s more than just making sure that an issue is fixed, or that you have the answer to every technical question.&lt;/p>
+&lt;p>There&amp;rsquo;s a relational element to customer success that&amp;rsquo;s hard to quantify. The best way I can explain it is like this:&lt;/p>
+&lt;p>Suppose your grandmother, significant other, or best friend suddenly starts up a company. They come to you and ask you, &amp;ldquo;Heya! I want to use &lt;!-- raw HTML omitted --> for my startup and need your help. Can you help me out?&amp;rdquo;&lt;/p>
+&lt;p>What would you do? If you&amp;rsquo;re invested in that person, you&amp;rsquo;d likely do everything you can to help them out. In practicality, it might look like:&lt;/p>
+&lt;ul>
+&lt;li>Taking a hands-on approach to managing their account to ensure that they have a butter-smooth on-boarding process&lt;/li>
+&lt;li>Take an extended time to understand what they&amp;rsquo;re doing with their business and what they&amp;rsquo;re looking to do on the platform&lt;/li>
+&lt;li>Advising them about any pitfalls that they might encounter along the way&lt;/li>
+&lt;li>Making sure that they now about everything on the platform that will help their business grow&lt;/li>
+&lt;li>Showing genuine concern and empathy when things aren&amp;rsquo;t going so smoothly&lt;/li>
+&lt;li>Being transparent about the platform&amp;rsquo;s shortcomings/weak areas and suggesting ways that they might be able to work around those weaknesses&lt;/li>
+&lt;/ul>
+&lt;p>In short, you&amp;rsquo;d do everything you feasibly can to make sure that their company grows and succeeds. So yes, being a customer success engineer (or customer success manager, in other industry-specific parlance) is different than being an admin.&lt;/p>
+&lt;p>So how does one make the transition from being an admin to being a customer success engineer/manager?&lt;/p>
+&lt;h3 id="moving-from-admin--customer-success">Moving from Admin &amp;ndash;&amp;gt; Customer Success
+&lt;/h3>&lt;p>The last three months have been a challenge, I won&amp;rsquo;t lie. I&amp;rsquo;d developed some bad habits in my last role, and it comes down to two big ones:&lt;/p>
+&lt;ul>
+&lt;li>Lack of empathy (largely due to ticket crunching&amp;hellip;when your team addresses hundreds of tickets a day, it&amp;rsquo;s hard to have enough time to be empathetic in every one)&lt;/li>
+&lt;li>The aforementioned being myopic when addressing issues/tickets&lt;/li>
+&lt;/ul>
+&lt;p>In short, I didn&amp;rsquo;t care. I didn&amp;rsquo;t have time to care. Don&amp;rsquo;t get me wrong, it&amp;rsquo;s not that I didn&amp;rsquo;t want to care. The last thing I think anyone wants in their job is to come off as apathetic and disinterested. However, high volumes of support tickets don&amp;rsquo;t lead to an environment that engenders empathy and a holistic focus on customer accounts.&lt;/p>
+&lt;p>So how did I get past that? Well, for one, starting a new role helped. I didn&amp;rsquo;t feel as burned out, and being in a new environment was refreshing. Also, accountability is another HUGE help. When you&amp;rsquo;re part of a team that calls you out for not being empathetic, or showing genuine care for your customers, you learn quick that you need to change your behavior. The other thing that&amp;rsquo;s helped is being involved in the customer success community. For me, that&amp;rsquo;s looked like:&lt;/p>
+&lt;ul>
+&lt;li>Reading up on customer success literature (So far, the book that&amp;rsquo;s helped with the transition the most has been &lt;a class="link" href="https://www.amazon.com/Farm-Dont-Hunt-Definitive-Customer-ebook/dp/B01BIBY8W0" target="_blank" rel="noopener"
+>Farm, Don&amp;rsquo;t Hunt&lt;/a>)&lt;/li>
+&lt;li>Being present and (somewhat) active in the &lt;a class="link" href="https://supportdriven.com/" target="_blank" rel="noopener"
+>Support Driven&lt;/a> Slack channel&lt;/li>
+&lt;li>Reaching out to other customer success organizations, like &lt;a class="link" href="http://glideconsultingllc.com/" target="_blank" rel="noopener"
+>Glide Consulting&lt;/a> to see how they do Customer Success&lt;/li>
+&lt;/ul>
+&lt;p>Also, it&amp;rsquo;s taken asking myself the hard questions about how I approach customer issues and taking a step back when I realize I&amp;rsquo;m defaulting to a break/fix mentality. That&amp;rsquo;s definitely not fun.&lt;/p>
+&lt;p>Now, I&amp;rsquo;m prone to wanting to make everything repeatable and testable. I blame it on my training as an academic researcher. I love patterns and I love it when I can make something fit into a pattern that I just automate and set on autopilot. I&amp;rsquo;ve found that&amp;rsquo;s not how Customer Success works. Why? Relationships. Like I mentioned earlier, Customer Success is more than fixing a single problem. It&amp;rsquo;s about establishing trust and rapport with customers and being invested in their growth. There are patterns and methods that I&amp;rsquo;ve found in some of the interviews I&amp;rsquo;ve been doing, but they&amp;rsquo;re certainly well-suited to a &amp;ldquo;one-size-fits-all&amp;rdquo; approach. They take tweaking, adjusting, and above all, the ability to admit that those methods may just not work for a customer success organization. All that to say the journey into Customer Success requires hard work and for me, quite a bit of introspection to reflect on what I do on a daily basis to see if it fits within a Customer Success mold.&lt;/p>
+&lt;p>So if you&amp;rsquo;re just starting out in Customer Success from a more technical role, and you&amp;rsquo;re finding it hard, don&amp;rsquo;t worry. It&amp;rsquo;s not an easy transition. But if you take some time to reflect on your default habits, get involved in the customer success community and be open to the fact that it&amp;rsquo;s going to take some time to make the transition into the new role, you&amp;rsquo;ll be off to a good start.&lt;/p></description></item></channel></rss>

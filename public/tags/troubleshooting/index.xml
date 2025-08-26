@@ -1,35 +1,15 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?>
-<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
-    <channel>
-        <title>Troubleshooting on Staring Blankly at a Screen</title>
-        <link>http://localhost:1313/tags/troubleshooting/</link>
-        <description>Recent content in Troubleshooting on Staring Blankly at a Screen</description>
-        <generator>Hugo -- gohugo.io</generator>
-        <language>en-us</language>
-        <copyright>© 2025 Aaron Sachs. All rights reserved.</copyright>
-        <lastBuildDate>Mon, 04 Feb 2019 10:55:09 +0000</lastBuildDate><atom:link href="http://localhost:1313/tags/troubleshooting/index.xml" rel="self" type="application/rss+xml" /><item>
-        <title>Resetting Minikube&#39;s IP</title>
-        <link>http://localhost:1313/archive/resetting-minikubes-ip-address/</link>
-        <pubDate>Mon, 04 Feb 2019 10:55:09 +0000</pubDate>
-        
-        <guid>http://localhost:1313/archive/resetting-minikubes-ip-address/</guid>
-        <description>&lt;h2 id=&#34;updated&#34;&gt;UPDATED
-&lt;/h2&gt;&lt;p&gt;I found that there is an exception to what the solution is here, namely that this only applies to &lt;em&gt;VirtualBox 5.2&lt;/em&gt;. If you end up using Virtualbox 6.0, note that this won&amp;rsquo;t work. the longer term fix would be to downgrade your VirtualBox version.&lt;/p&gt;
-&lt;h2 id=&#34;original-post&#34;&gt;ORIGINAL POST
-&lt;/h2&gt;&lt;p&gt;I use &lt;a class=&#34;link&#34; href=&#34;https://github.com/kubernetes/minikube&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
-    &gt;minikube&lt;/a&gt; for a lot of quick troubleshooting and demos. I recently found myself in a situation where the IP address kept incrementing. Instead of the standard &lt;code&gt;192.168.99.100&lt;/code&gt;, every restart found the minikube VM with a new IP address, which made demos that relied on the standard IP difficult to demo.&lt;/p&gt;
-&lt;p&gt;I ended up finding the solution on &lt;a class=&#34;link&#34; href=&#34;https://stackoverflow.com/questions/53871053/how-to-completely-purge-minikube-config-or-reset-ip-back-to-192-168-99-100#comment94730403_53883894&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
-    &gt;Stackoverflow&lt;/a&gt;. To reset minikube&amp;rsquo;s IP back to normal, do the following:&lt;/p&gt;
-&lt;ol&gt;
-&lt;li&gt;&lt;code&gt;minikube stop&lt;/code&gt;&lt;/li&gt;
-&lt;li&gt;Open Virtualbox and go to &amp;ldquo;File&amp;rdquo;&amp;ndash;&amp;gt;Host Network Manager&lt;/li&gt;
-&lt;li&gt;Find the adapter that has the &lt;code&gt;192.168.99.1&lt;/code&gt; subnet assigned to it (likely &lt;code&gt;vbox0&lt;/code&gt;, though mine was &lt;code&gt;vbox2&lt;/code&gt;), and remove it.&lt;/li&gt;
-&lt;li&gt;&lt;code&gt;minkube start&lt;/code&gt;&lt;/li&gt;
-&lt;li&gt;&lt;code&gt;minikube ip&lt;/code&gt;&lt;/li&gt;
-&lt;/ol&gt;
-&lt;p&gt;That should give you the good ole &lt;code&gt;192.168.99.100&lt;/code&gt; IP address that you know and love.&lt;/p&gt;
-</description>
-        </item>
-        
-    </channel>
-</rss>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Troubleshooting on Staring Blankly at a Screen</title><link>https://aaron.sachs.blog/tags/troubleshooting/</link><description>Recent content in Troubleshooting on Staring Blankly at a Screen</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><copyright>© 2025 Aaron Sachs. All rights reserved.</copyright><lastBuildDate>Mon, 04 Feb 2019 10:55:09 +0000</lastBuildDate><atom:link href="https://aaron.sachs.blog/tags/troubleshooting/index.xml" rel="self" type="application/rss+xml"/><item><title>Resetting Minikube's IP</title><link>https://aaron.sachs.blog/archive/resetting-minikubes-ip-address/</link><pubDate>Mon, 04 Feb 2019 10:55:09 +0000</pubDate><guid>https://aaron.sachs.blog/archive/resetting-minikubes-ip-address/</guid><description>&lt;h2 id="updated">UPDATED
+&lt;/h2>&lt;p>I found that there is an exception to what the solution is here, namely that this only applies to &lt;em>VirtualBox 5.2&lt;/em>. If you end up using Virtualbox 6.0, note that this won&amp;rsquo;t work. the longer term fix would be to downgrade your VirtualBox version.&lt;/p>
+&lt;h2 id="original-post">ORIGINAL POST
+&lt;/h2>&lt;p>I use &lt;a class="link" href="https://github.com/kubernetes/minikube" target="_blank" rel="noopener"
+>minikube&lt;/a> for a lot of quick troubleshooting and demos. I recently found myself in a situation where the IP address kept incrementing. Instead of the standard &lt;code>192.168.99.100&lt;/code>, every restart found the minikube VM with a new IP address, which made demos that relied on the standard IP difficult to demo.&lt;/p>
+&lt;p>I ended up finding the solution on &lt;a class="link" href="https://stackoverflow.com/questions/53871053/how-to-completely-purge-minikube-config-or-reset-ip-back-to-192-168-99-100#comment94730403_53883894" target="_blank" rel="noopener"
+>Stackoverflow&lt;/a>. To reset minikube&amp;rsquo;s IP back to normal, do the following:&lt;/p>
+&lt;ol>
+&lt;li>&lt;code>minikube stop&lt;/code>&lt;/li>
+&lt;li>Open Virtualbox and go to &amp;ldquo;File&amp;rdquo;&amp;ndash;&amp;gt;Host Network Manager&lt;/li>
+&lt;li>Find the adapter that has the &lt;code>192.168.99.1&lt;/code> subnet assigned to it (likely &lt;code>vbox0&lt;/code>, though mine was &lt;code>vbox2&lt;/code>), and remove it.&lt;/li>
+&lt;li>&lt;code>minkube start&lt;/code>&lt;/li>
+&lt;li>&lt;code>minikube ip&lt;/code>&lt;/li>
+&lt;/ol>
+&lt;p>That should give you the good ole &lt;code>192.168.99.100&lt;/code> IP address that you know and love.&lt;/p></description></item></channel></rss>

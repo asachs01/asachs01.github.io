@@ -1,844 +1,158 @@
-<!DOCTYPE html>
-<html lang="en-us" dir="ltr">
-    <head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script><meta charset='utf-8'>
-<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="How to compile and run Sensu Go on arm boards">
-<title>Compiling and Running Sensu Go on ARM</title>
-
-<link rel='canonical' href='http://localhost:1313/archive/sensu-go-on-arm/'>
-
-<link rel="stylesheet" href="/scss/style.min.946cca6c6259ef94ac55abfae7c7bf3291ea3ed5eea17ef77500b257217c6710.css"><meta property='og:title' content="Compiling and Running Sensu Go on ARM">
-<meta property='og:description' content="How to compile and run Sensu Go on arm boards">
-<meta property='og:url' content='http://localhost:1313/archive/sensu-go-on-arm/'>
-<meta property='og:site_name' content='Staring Blankly at a Screen'>
-<meta property='og:type' content='article'><meta property='article:section' content='Archive' /><meta property='article:tag' content='sensu' /><meta property='article:tag' content='monitoring' /><meta property='article:tag' content='arm' /><meta property='article:tag' content='raspberry pi' /><meta property='article:tag' content='jetson' /><meta property='article:published_time' content='2019-05-09T19:49:32-05:00'/><meta property='article:modified_time' content='2019-05-09T19:49:32-05:00'/>
-<meta name="twitter:title" content="Compiling and Running Sensu Go on ARM">
-<meta name="twitter:description" content="How to compile and run Sensu Go on arm boards">
-    </head>
-    <body class="
-    article-page
-    ">
-    <script>
-        (function() {
-            const colorSchemeKey = 'StackColorScheme';
-            if(!localStorage.getItem(colorSchemeKey)){
-                localStorage.setItem(colorSchemeKey, "auto");
-            }
-        })();
-    </script><script>
-    (function() {
-        const colorSchemeKey = 'StackColorScheme';
-        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
-        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
-
-        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
-            
-
-            document.documentElement.dataset.scheme = 'dark';
-        } else {
-            document.documentElement.dataset.scheme = 'light';
-        }
-    })();
-</script>
-<div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky ">
-    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="Toggle Menu">
-        <span class="hamburger-box">
-            <span class="hamburger-inner"></span>
-        </span>
-    </button>
-
-    <header>
-        
-            
-            <figure class="site-avatar">
-                <a href="/">
-                
-                    
-                    
-                    
-                        
-                        <img src="/img/avatar_hu_f509edb42ecc0ebd.png" width="300"
-                            height="300" class="site-logo" loading="lazy" alt="Avatar">
-                    
-                
-                </a>
-                
-                    <span class="emoji">🎸</span>
-                
-            </figure>
-            
-        
-        
-        <div class="site-meta">
-            <h1 class="site-name"><a href="/">Staring Blankly at a Screen</a></h1>
-            <h2 class="site-description">Tech, beer, and the occasional banjo tune</h2>
-        </div>
-    </header><ol class="menu-social">
-            
-                <li>
-                    <a 
-                        href='https://github.com/asachs01'
-                        target="_blank"
-                        title="GitHub"
-                        rel="me"
-                    >
-                        
-                        
-                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-github" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
-  <path d="M9 19c-4.3 1.4 -4.3 -2.5 -6 -3m12 5v-3.5c0 -1 .1 -1.4 -.5 -2c2.8 -.3 5.5 -1.4 5.5 -6a4.6 4.6 0 0 0 -1.3 -3.2a4.2 4.2 0 0 0 -.1 -3.2s-1.1 -.3 -3.5 1.3a12.3 12.3 0 0 0 -6.2 0c-2.4 -1.6 -3.5 -1.3 -3.5 -1.3a4.2 4.2 0 0 0 -.1 3.2a4.6 4.6 0 0 0 -1.3 3.2c0 4.6 2.7 5.7 5.5 6c-.6 .6 -.6 1.2 -.5 2v3.5" />
-</svg>
-
-
-
-                        
-                    </a>
-                </li>
-            
-                <li>
-                    <a 
-                        href='https://twitter.com/asachs01'
-                        target="_blank"
-                        title="Twitter"
-                        rel="me"
-                    >
-                        
-                        
-                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-twitter" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
-  <path d="M22 4.01c-1 .49 -1.98 .689 -3 .99c-1.121 -1.265 -2.783 -1.335 -4.38 -.737s-2.643 2.06 -2.62 3.737v1c-3.245 .083 -6.135 -1.395 -8 -4c0 0 -4.182 7.433 4 11c-1.872 1.247 -3.739 2.088 -6 2c3.308 1.803 6.913 2.423 10.034 1.517c3.58 -1.04 6.522 -3.723 7.651 -7.742a13.84 13.84 0 0 0 .497 -3.753c-.002 -.249 1.51 -2.772 1.818 -4.013z" />
-</svg>
-
-
-
-                        
-                    </a>
-                </li>
-            
-        </ol><ol class="menu" id="main-menu">
-        
-        
-        
-        <li >
-            <a href='/' >
-                
-                
-                
-                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-  <path stroke="none" d="M0 0h24v24H0z"/>
-  <polyline points="5 12 3 12 12 3 21 12 19 12" />
-  <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7" />
-  <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6" />
-</svg>
-
-
-
-                
-                <span>Home</span>
-            </a>
-        </li>
-        
-        
-        <li >
-            <a href='/about/' >
-                
-                
-                
-                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-user" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-  <path stroke="none" d="M0 0h24v24H0z"/>
-  <circle cx="12" cy="7" r="4" />
-  <path d="M6 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2" />
-</svg>
-
-
-
-                
-                <span>About</span>
-            </a>
-        </li>
-        
-        
-        <li >
-            <a href='/talks/' >
-                
-                
-                
-                <span>Talks</span>
-            </a>
-        </li>
-        
-        
-        <li >
-            <a href='/archives/' >
-                
-                
-                
-                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-  <path stroke="none" d="M0 0h24v24H0z"/>
-  <rect x="3" y="4" width="18" height="4" rx="2" />
-  <path d="M5 8v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-10" />
-  <line x1="10" y1="12" x2="14" y2="12" />
-</svg>
-
-
-
-                
-                <span>Archives</span>
-            </a>
-        </li>
-        
-        
-        <li >
-            <a href='/archives/' >
-                
-                
-                
-                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-  <path stroke="none" d="M0 0h24v24H0z"/>
-  <rect x="3" y="4" width="18" height="4" rx="2" />
-  <path d="M5 8v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-10" />
-  <line x1="10" y1="12" x2="14" y2="12" />
-</svg>
-
-
-
-                
-                <span>Archives</span>
-            </a>
-        </li>
-        
-        
-        <li >
-            <a href='/search/' >
-                
-                
-                
-                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-  <path stroke="none" d="M0 0h24v24H0z"/>
-  <circle cx="10" cy="10" r="7" />
-  <line x1="21" y1="21" x2="15" y2="15" />
-</svg>
-
-
-
-                
-                <span>Search</span>
-            </a>
-        </li>
-        
-        
-        <li >
-            <a href='/search/' >
-                
-                
-                
-                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-  <path stroke="none" d="M0 0h24v24H0z"/>
-  <circle cx="10" cy="10" r="7" />
-  <line x1="21" y1="21" x2="15" y2="15" />
-</svg>
-
-
-
-                
-                <span>Search</span>
-            </a>
-        </li>
-        
-        <li class="menu-bottom-section">
-            <ol class="menu">
-
-                
-                    <li id="dark-mode-toggle">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-  <path stroke="none" d="M0 0h24v24H0z"/>
-  <circle cx="8" cy="12" r="2" />
-  <rect x="2" y="6" width="20" height="12" rx="6" />
-</svg>
-
-
-
-                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-  <path stroke="none" d="M0 0h24v24H0z"/>
-  <circle cx="16" cy="12" r="2" />
-  <rect x="2" y="6" width="20" height="12" rx="6" />
-</svg>
-
-
-
-                        <span>Dark Mode</span>
-                    </li>
-                
-            </ol>
-        </li>
-    </ol>
-</aside>
-
-    
-
-            <main class="main full-width">
-    <article class="main-article">
-    <header class="article-header">
-
-    <div class="article-details">
-    
-    <header class="article-category">
-        
-            <a href="/categories/monitoring/" >
-                Monitoring
-            </a>
-        
-            <a href="/categories/sensu/" >
-                Sensu
-            </a>
-        
-            <a href="/categories/arm/" >
-                Arm
-            </a>
-        
-    </header>
-    
-
-    <div class="article-title-wrapper">
-        <h2 class="article-title">
-            <a href="/archive/sensu-go-on-arm/">Compiling and Running Sensu Go on ARM</a>
-        </h2>
-    
-        
-        <h3 class="article-subtitle">
-            How to compile and run Sensu Go on arm boards
-        </h3>
-        
-    </div>
-
-    
-    
-    
-    
-    <footer class="article-time">
-        
-            <div>
-                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-  <path stroke="none" d="M0 0h24v24H0z"/>
-  <path d="M11.795 21h-6.795a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v4" />
-  <circle cx="18" cy="18" r="4" />
-  <path d="M15 3v4" />
-  <path d="M7 3v4" />
-  <path d="M3 11h16" />
-  <path d="M18 16.496v1.504l1 1" />
-</svg>
-                <time class="article-time--published">May 09, 2019</time>
-            </div>
-        
-
-        
-            <div>
-                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-  <path stroke="none" d="M0 0h24v24H0z"/>
-  <circle cx="12" cy="12" r="9" />
-  <polyline points="12 7 12 12 15 15" />
-</svg>
-
-
-
-                <time class="article-time--reading">
-                    5 minute read
-                </time>
-            </div>
-        
-    </footer>
-    
-
-    
-</div>
-
-</header>
-
-    <section class="article-content">
-    
-    
-    <h1 id="updates">UPDATES
-</h1><p>When I originally wrote this post, I was operating under some outdated assumptions when it comes to building Sensu on arm devices. I&rsquo;ll post the updates here at the beginning of the article, and you can read on to see how I&rsquo;d previously set up Sensu on my Nvidia Jetson Nanos.</p>
-<h2 id="compiling-sensu-go">Compiling Sensu Go
-</h2><p>As a Go novice, I didn&rsquo;t fully understand the workflow for compiling Sensu for arm devices. As it so happens, it&rsquo;s fairly easy to cross-compile from whatever device you&rsquo;re on and then just transfer the binaries to the system you want to run on. I found this out the hard way by trying to compile on the Raspberry Pi&rsquo;s I have. This resulted in them locking up.</p>
-<p>So let&rsquo;s walk through the non-build-script way of doing this:</p>
-<ol>
-<li>Install Go</li>
-<li><a class="link" href="#obtaining-sensu-go" >Obtain Sensu Go</a></li>
-<li>Build the binary for your arm system of choice using <code>GOOS=linux GOARCH=arm go install ./...</code> from inside the project root (<code>$GOPATH/src/github/sensu/sensu-go</code>)</li>
-<li>Transfer to the binary/binaries to your Pi&rsquo;s, Nano&rsquo;s, or other arm board</li>
-<li>Proceed through the <a class="link" href="#running-sensu-go" >rest of the setup</a></li>
-</ol>
-<p>Now, you can absolutely run through the original post as it was and <em>still</em> run Sensu. However, I find that cross compiling from a system with a bit more oomph is going to make things easier.</p>
-<h1 id="original-post">Original post
-</h1><p>In this post, I&rsquo;ll cover how I am running Sensu Go on several NVIDIA Jetson Nanos. Though this is being done on a Nano, you could use the same approach I use here on a Raspberry Pi, or any other armv7 board. I would note that this is a temporary until official Sensu Go arm packages are released.</p>
-<h1 id="the-setup">The Setup
-</h1><p>There are several things you&rsquo;ll need to do before you can start playing around with Sensu Go.</p>
-<ol>
-<li>Install Go on your system</li>
-<li>Grab Sensu Go</li>
-<li>Build the binaries</li>
-</ol>
-<h2 id="installing-go">Installing Go
-</h2><p>While installing Go on the Jetson as fairly trivial, the goal here is to give you a complete accounting of how I did what I did.</p>
-<p>To install Go, run:</p>
-<p><code>sudo apt-get install golang</code></p>
-<p>You should then have it installed on your system. If you need more complete documentation on installing Go, please see <a class="link" href="https://golang.org/dl/"  target="_blank" rel="noopener"
-    >Go&rsquo;s docs on downloading and installing Go onto your system</a>.</p>
-<h2 id="obtaining-sensu-go">Obtaining Sensu Go
-</h2><p>Once you&rsquo;ve installed Go, the next step is to obtain Sensu Go. To get the package, run the following:</p>
-<p><code>go get github.com/sensu/sensu-go/...</code></p>
-<p>This will put the package at <code>$GOPATH/src/github.com/sensu/sensu-go</code>.</p>
-<h2 id="building-the-binaries">Building the Binaries
-</h2><p>Next up, we&rsquo;re going to build the binaries using a script provided in the repo. You&rsquo;ll want to ensure that you&rsquo;re in <code>$GOPATH/src/github.com/sensu/sensu-go</code>. Once you&rsquo;re there, you&rsquo;ll find a script called <code>build.sh</code></p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre tabindex="0" class="chroma"><code><span class="lnt">1
-</span><span class="lnt">2
-</span><span class="lnt">3
-</span><span class="lnt">4
-</span><span class="lnt">5
-</span><span class="lnt">6
-</span><span class="lnt">7
-</span><span class="lnt">8
-</span></code></pre></td>
-<td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">❯❯❯❯ ls
-</span></span><span class="line"><span class="cl">agent    dashboard       rpc        vendor           Dockerfile.rhel_atomic  build.ps1
-</span></span><span class="line"><span class="cl">api      docker-scripts  scripts    version          Dockerfile.testagent    build.sh
-</span></span><span class="line"><span class="cl">asset    examples        system     CHANGELOG.md     FAQ.md                  docker-compose.yaml
-</span></span><span class="line"><span class="cl">backend  graphql         testing    CONTRIBUTING.md  Gopkg.lock
-</span></span><span class="line"><span class="cl">cli      handler         transport  DCO              Gopkg.toml
-</span></span><span class="line"><span class="cl">cmd      js              types      Dockerfile       LICENSE
-</span></span><span class="line"><span class="cl">command  licenses        util       Dockerfile.rhel  README.md
-</span></span></code></pre></td></tr></table>
-</div>
-</div><p>We&rsquo;ll run that and build our binaries:</p>
-<p><code>./build.sh</code></p>
-<p>Now, we&rsquo;ll grab that binaries that were built:</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre tabindex="0" class="chroma"><code><span class="lnt">1
-</span><span class="lnt">2
-</span><span class="lnt">3
-</span></code></pre></td>
-<td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">cd $GOPATH/bin
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">sudo cp sensu-{agent,backend} /usr/sbin/
-</span></span></code></pre></td></tr></table>
-</div>
-</div><p>That&rsquo;s it for the prep work. Now it&rsquo;s on to actually running Sensu Go.</p>
-<h1 id="running-sensu-go">Running Sensu Go
-</h1><p>To run Sensu Go, we&rsquo;ll need to go through the following steps:</p>
-<ol>
-<li>Create the service files for the respective services</li>
-<li>Create the Sensu user/group</li>
-<li>Create the respective directories needed for Sensu to operate</li>
-<li>Grab config files for Sensu Go</li>
-</ol>
-<h2 id="creating-the-service-files">Creating the Service Files
-</h2><p>There are two service files that will need to be created in order to use systemd to manage Sensu Go as you&rsquo;d find with RHEL/Debian packages:</p>
-<p><strong>Sensu Backend Service File</strong></p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
-</span><span class="lnt"> 2
-</span><span class="lnt"> 3
-</span><span class="lnt"> 4
-</span><span class="lnt"> 5
-</span><span class="lnt"> 6
-</span><span class="lnt"> 7
-</span><span class="lnt"> 8
-</span><span class="lnt"> 9
-</span><span class="lnt">10
-</span><span class="lnt">11
-</span><span class="lnt">12
-</span><span class="lnt">13
-</span><span class="lnt">14
-</span><span class="lnt">15
-</span><span class="lnt">16
-</span><span class="lnt">17
-</span><span class="lnt">18
-</span><span class="lnt">19
-</span><span class="lnt">20
-</span><span class="lnt">21
-</span></code></pre></td>
-<td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-gdscript3" data-lang="gdscript3"><span class="line"><span class="cl"><span class="p">[</span><span class="n">Unit</span><span class="p">]</span>
-</span></span><span class="line"><span class="cl"><span class="n">Description</span><span class="o">=</span><span class="n">The</span> <span class="n">Sensu</span> <span class="n">Backend</span> <span class="n">service</span><span class="o">.</span>
-</span></span><span class="line"><span class="cl"><span class="n">After</span><span class="o">=</span><span class="n">network</span><span class="o">-</span><span class="n">online</span><span class="o">.</span><span class="n">target</span>
-</span></span><span class="line"><span class="cl"><span class="n">Wants</span><span class="o">=</span><span class="n">network</span><span class="o">-</span><span class="n">online</span><span class="o">.</span><span class="n">target</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="p">[</span><span class="n">Service</span><span class="p">]</span>
-</span></span><span class="line"><span class="cl"><span class="n">Type</span><span class="o">=</span><span class="n">simple</span>
-</span></span><span class="line"><span class="cl"><span class="n">User</span><span class="o">=</span><span class="n">sensu</span>
-</span></span><span class="line"><span class="cl"><span class="n">Group</span><span class="o">=</span><span class="n">sensu</span>
-</span></span><span class="line"><span class="cl"><span class="c1"># Load env vars from /etc/default/ and /etc/sysconfig/ if they exist.</span>
-</span></span><span class="line"><span class="cl"><span class="c1"># Prefixing the path with &#39;-&#39; makes it try to load, but if the file doesn&#39;t</span>
-</span></span><span class="line"><span class="cl"><span class="c1"># exist, it continues onward.</span>
-</span></span><span class="line"><span class="cl"><span class="n">EnvironmentFile</span><span class="o">=-/</span><span class="n">etc</span><span class="o">/</span><span class="n">default</span><span class="o">/</span><span class="n">sensu</span><span class="o">-</span><span class="n">backend</span>
-</span></span><span class="line"><span class="cl"><span class="n">EnvironmentFile</span><span class="o">=-/</span><span class="n">etc</span><span class="o">/</span><span class="n">sysconfig</span><span class="o">/</span><span class="n">sensu</span><span class="o">-</span><span class="n">backend</span>
-</span></span><span class="line"><span class="cl"><span class="n">LimitNOFILE</span><span class="o">=</span><span class="mi">65535</span>
-</span></span><span class="line"><span class="cl"><span class="n">ExecStart</span><span class="o">=/</span><span class="n">usr</span><span class="o">/</span><span class="n">sbin</span><span class="o">/</span><span class="n">sensu</span><span class="o">-</span><span class="n">backend</span> <span class="n">start</span> <span class="o">-</span><span class="n">c</span> <span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="n">sensu</span><span class="o">/</span><span class="n">backend</span><span class="o">.</span><span class="n">yml</span>
-</span></span><span class="line"><span class="cl"><span class="n">Restart</span><span class="o">=</span><span class="n">always</span>
-</span></span><span class="line"><span class="cl"><span class="n">WorkingDirectory</span><span class="o">=/</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="p">[</span><span class="n">Install</span><span class="p">]</span>
-</span></span><span class="line"><span class="cl"><span class="n">WantedBy</span><span class="o">=</span><span class="n">multi</span><span class="o">-</span><span class="n">user</span><span class="o">.</span><span class="n">target</span>
-</span></span></code></pre></td></tr></table>
-</div>
-</div><p>To make this a bit easier, you can do the following:</p>
-<p><code>sudo curl -L https://gist.githubusercontent.com/asachs01/497ede01e9905e7917d577451ac51c1b/raw/141aa960a5481e4c536ff790561c5effd0f3b058/sensu-backend.service -o /lib/systemd/system/sensu-backend.service</code></p>
-<p><strong>Sensu Agent Service File</strong></p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
-</span><span class="lnt"> 2
-</span><span class="lnt"> 3
-</span><span class="lnt"> 4
-</span><span class="lnt"> 5
-</span><span class="lnt"> 6
-</span><span class="lnt"> 7
-</span><span class="lnt"> 8
-</span><span class="lnt"> 9
-</span><span class="lnt">10
-</span><span class="lnt">11
-</span><span class="lnt">12
-</span><span class="lnt">13
-</span><span class="lnt">14
-</span><span class="lnt">15
-</span><span class="lnt">16
-</span><span class="lnt">17
-</span><span class="lnt">18
-</span><span class="lnt">19
-</span><span class="lnt">20
-</span><span class="lnt">21
-</span></code></pre></td>
-<td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-gdscript3" data-lang="gdscript3"><span class="line"><span class="cl"><span class="p">[</span><span class="n">Unit</span><span class="p">]</span>
-</span></span><span class="line"><span class="cl"><span class="n">Description</span><span class="o">=</span><span class="n">The</span> <span class="n">Sensu</span> <span class="n">Agent</span> <span class="n">process</span><span class="o">.</span>
-</span></span><span class="line"><span class="cl"><span class="n">After</span><span class="o">=</span><span class="n">network</span><span class="o">-</span><span class="n">online</span><span class="o">.</span><span class="n">target</span>
-</span></span><span class="line"><span class="cl"><span class="n">Wants</span><span class="o">=</span><span class="n">network</span><span class="o">-</span><span class="n">online</span><span class="o">.</span><span class="n">target</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="p">[</span><span class="n">Service</span><span class="p">]</span>
-</span></span><span class="line"><span class="cl"><span class="n">Type</span><span class="o">=</span><span class="n">simple</span>
-</span></span><span class="line"><span class="cl"><span class="n">User</span><span class="o">=</span><span class="n">sensu</span>
-</span></span><span class="line"><span class="cl"><span class="n">Group</span><span class="o">=</span><span class="n">sensu</span>
-</span></span><span class="line"><span class="cl"><span class="c1"># Load env vars from /etc/default/ and /etc/sysconfig/ if they exist.</span>
-</span></span><span class="line"><span class="cl"><span class="c1"># Prefixing the path with &#39;-&#39; makes it try to load, but if the file doesn&#39;t</span>
-</span></span><span class="line"><span class="cl"><span class="c1"># exist, it continues onward.</span>
-</span></span><span class="line"><span class="cl"><span class="n">EnvironmentFile</span><span class="o">=-/</span><span class="n">etc</span><span class="o">/</span><span class="n">default</span><span class="o">/</span><span class="n">sensu</span><span class="o">-</span><span class="n">agent</span>
-</span></span><span class="line"><span class="cl"><span class="n">EnvironmentFile</span><span class="o">=-/</span><span class="n">etc</span><span class="o">/</span><span class="n">sysconfig</span><span class="o">/</span><span class="n">sensu</span><span class="o">-</span><span class="n">agent</span>
-</span></span><span class="line"><span class="cl"><span class="n">LimitNOFILE</span><span class="o">=</span><span class="mi">65535</span>
-</span></span><span class="line"><span class="cl"><span class="n">ExecStart</span><span class="o">=/</span><span class="n">usr</span><span class="o">/</span><span class="n">sbin</span><span class="o">/</span><span class="n">sensu</span><span class="o">-</span><span class="n">agent</span> <span class="n">start</span>
-</span></span><span class="line"><span class="cl"><span class="n">Restart</span><span class="o">=</span><span class="n">always</span>
-</span></span><span class="line"><span class="cl"><span class="n">WorkingDirectory</span><span class="o">=/</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="p">[</span><span class="n">Install</span><span class="p">]</span>
-</span></span><span class="line"><span class="cl"><span class="n">WantedBy</span><span class="o">=</span><span class="n">multi</span><span class="o">-</span><span class="n">user</span><span class="o">.</span><span class="n">target</span>
-</span></span></code></pre></td></tr></table>
-</div>
-</div><p>And the same with this one:</p>
-<p><code>sudo curl -L https://gist.githubusercontent.com/asachs01/497ede01e9905e7917d577451ac51c1b/raw/141aa960a5481e4c536ff790561c5effd0f3b058/sensu-agent.service -o /lib/systemd/system/sensu-agent.service</code></p>
-<p>Again, these will need to live at <code>/lib/systemd/system/sensu-backend.service</code> and <code>/lib/systemd/system/sensu-agent.service</code> respectively. Once you&rsquo;ve got those in place, let&rsquo;s move onto the next step.</p>
-<h2 id="create-the-sensu-usergroup">Create the Sensu User/Group
-</h2><p>This is fairly simple, as we&rsquo;ll only need to create a service account for Sensu:</p>
-<p><code>sudo useradd -r sensu</code></p>
-<p>Now, onto the next step of creating the requisite directories for Sensu.</p>
-<h2 id="create-sensu-directories">Create Sensu Directories
-</h2><p>There are three directories that need to be created and owned by the Sensu user:</p>
-<ul>
-<li><code>/var/lib/sensu</code></li>
-<li><code>/var/cache/sensu</code></li>
-<li><code>/etc/sensu</code></li>
-</ul>
-<p>Create each of these and change the ownership on them:</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre tabindex="0" class="chroma"><code><span class="lnt">1
-</span><span class="lnt">2
-</span><span class="lnt">3
-</span><span class="lnt">4
-</span><span class="lnt">5
-</span><span class="lnt">6
-</span><span class="lnt">7
-</span></code></pre></td>
-<td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-gdscript3" data-lang="gdscript3"><span class="line"><span class="cl"><span class="n">sudo</span> <span class="o">/</span><span class="k">var</span><span class="o">/</span><span class="n">lib</span><span class="o">/</span><span class="n">sensu</span>
-</span></span><span class="line"><span class="cl"><span class="n">sudo</span> <span class="o">/</span><span class="k">var</span><span class="o">/</span><span class="n">cache</span><span class="o">/</span><span class="n">sensu</span>
-</span></span><span class="line"><span class="cl"><span class="n">sudo</span> <span class="n">mkdir</span> <span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="n">sensu</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="n">sudo</span> <span class="n">chown</span> <span class="n">sensu</span><span class="o">.</span> <span class="o">/</span><span class="k">var</span><span class="o">/</span><span class="n">lib</span><span class="o">/</span><span class="n">sensu</span>
-</span></span><span class="line"><span class="cl"><span class="n">sudo</span> <span class="n">chown</span> <span class="n">sensu</span><span class="o">.</span> <span class="o">/</span><span class="k">var</span><span class="o">/</span><span class="n">cache</span><span class="o">/</span><span class="n">sensu</span>
-</span></span><span class="line"><span class="cl"><span class="n">sudo</span> <span class="n">chown</span> <span class="n">sensu</span><span class="o">.</span> <span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="n">sensu</span>
-</span></span></code></pre></td></tr></table>
-</div>
-</div><p>Alright, now for the last step: obtaining the config files.</p>
-<h2 id="obtaining-sensu-go-config-files">Obtaining Sensu Go Config Files
-</h2><p>This is also a fairly quick step:</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre tabindex="0" class="chroma"><code><span class="lnt">1
-</span><span class="lnt">2
-</span><span class="lnt">3
-</span></code></pre></td>
-<td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">curl -LO http://docs.sensu.io/sensu-go/latest/files/\{agent,backend\}.yml
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">sudo cp {agent,backend}.yml /etc/sensu
-</span></span></code></pre></td></tr></table>
-</div>
-</div><p>Now, let&rsquo;s get cooking.</p>
-<h2 id="start-sensu-go">Start Sensu Go
-</h2><p>This is it. The moment you&rsquo;ve been waiting for. It&rsquo;s time to run Sensu!</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre tabindex="0" class="chroma"><code><span class="lnt">1
-</span><span class="lnt">2
-</span><span class="lnt">3
-</span></code></pre></td>
-<td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">sudo systemctl enable sensu-{agent,backend}
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">sudo systemctl start sensu-{agent,backend}
-</span></span></code></pre></td></tr></table>
-</div>
-</div><p>To ensure that Sensu is running as we expect, do a quick <code>sudo journalctl -fu sensu-backend</code>. Journald should be free of any errors and if you go to http://IPOFYOURSYSTEM:3000, you should get a nice dashboard that looks like:</p>
-<p><img src="https://p299.p4.n0.cdn.getcloudapp.com/items/OAuL7wme/Image&#43;2020-01-17&#43;at&#43;12.25.47&#43;PM.png?v=c53eadf0f22ed4865e2e5971c164b759"
-	
-	
-	
-	loading="lazy"
-	
-		alt="sensu go dashboard"
-	
-	
-></p>
-<p>There you have it! If you want to cluster a few Jetson Nanos, or Raspberry Pis up, head over to <a class="link" href="https://docs.sensu.io/sensu-go/5.7/guides/clustering/"  target="_blank" rel="noopener"
-    >Sensu&rsquo;s clustering guide</a>.</p>
-<p>Cheers!</p>
-
-</section>
-
-
-    <footer class="article-footer">
-    
-    <section class="article-tags">
-        
-            <a href="/tags/sensu/">Sensu</a>
-        
-            <a href="/tags/monitoring/">Monitoring</a>
-        
-            <a href="/tags/arm/">Arm</a>
-        
-            <a href="/tags/raspberry-pi/">Raspberry Pi</a>
-        
-            <a href="/tags/jetson/">Jetson</a>
-        
-    </section>
-
-
-    </footer>
-
-
-    
-</article>
-
-    
-
-    
-
-<aside class="related-content--wrapper">
-    <h2 class="section-title">Related content</h2>
-    <div class="related-content">
-        <div class="flex article-list--tile">
-            
-                
-<article class="">
-    <a href="/archive/monitoring-raspberry-pis-with-sensu/">
-        
-        
-
-        <div class="article-details">
-            <h2 class="article-title">Monitoring Raspberry Pi&#39;s with Sensu</h2>
-        </div>
-    </a>
-</article>
-
-            
-                
-<article class="">
-    <a href="/archive/sensu-gremlin-part-2/">
-        
-        
-
-        <div class="article-details">
-            <h2 class="article-title">Badass Monitoring, Pt 2: The &#39;Why&#39;</h2>
-        </div>
-    </a>
-</article>
-
-            
-                
-<article class="">
-    <a href="/archive/sensu-gremlin-intro/">
-        
-        
-
-        <div class="article-details">
-            <h2 class="article-title">Badass Monitoring, Pt 1: Sensu &amp; Gremlin</h2>
-        </div>
-    </a>
-</article>
-
-            
-                
-<article class="">
-    <a href="/archive/sensu-go-on-osx/">
-        
-        
-
-        <div class="article-details">
-            <h2 class="article-title">Compiling and Running Sensu Go on OS X</h2>
-        </div>
-    </a>
-</article>
-
-            
-                
-<article class="">
-    <a href="/archive/minimal-sensu-docker/">
-        
-        
-
-        <div class="article-details">
-            <h2 class="article-title">A minimal Sensu environment with Docker</h2>
-        </div>
-    </a>
-</article>
-
-            
-        </div>
-    </div>
-</aside>
-
-     
-    
-        
-    
-
-    <footer class="site-footer">
-    <section class="copyright">
-        &copy; 
-        
-            2019 - 
-        
-        2025 © 2025 Aaron Sachs. All rights reserved.
-    </section>
-    
-    <section class="powerby">
-        Built with <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> <br />
-        Theme <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="3.30.0">Stack</a></b> designed by <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a>
-    </section>
-</footer>
-
-
-    
-<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
-
-    
-    <div class="pswp__bg"></div>
-
-    
-    <div class="pswp__scroll-wrap">
-
-        
-        <div class="pswp__container">
-            <div class="pswp__item"></div>
-            <div class="pswp__item"></div>
-            <div class="pswp__item"></div>
-        </div>
-
-        
-        <div class="pswp__ui pswp__ui--hidden">
-
-            <div class="pswp__top-bar">
-
-                
-
-                <div class="pswp__counter"></div>
-
-                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
-
-                <button class="pswp__button pswp__button--share" title="Share"></button>
-
-                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
-
-                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
-
-                
-                
-                <div class="pswp__preloader">
-                    <div class="pswp__preloader__icn">
-                        <div class="pswp__preloader__cut">
-                            <div class="pswp__preloader__donut"></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
-                <div class="pswp__share-tooltip"></div>
-            </div>
-
-            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
-            </button>
-
-            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
-            </button>
-
-            <div class="pswp__caption">
-                <div class="pswp__caption__center"></div>
-            </div>
-
-        </div>
-
-    </div>
-
-</div><script 
-                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js"integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo="crossorigin="anonymous"
-                defer
-                >
-            </script><script 
-                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js"integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU="crossorigin="anonymous"
-                defer
-                >
-            </script><link 
-                rel="stylesheet" 
-                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css"crossorigin="anonymous"
-            ><link 
-                rel="stylesheet" 
-                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css"crossorigin="anonymous"
-            >
-
-            </main>
-        </div>
-        <script 
-                src="https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js"integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z&#43;KMkF24hUW8WePSA9HM="crossorigin="anonymous"
-                
-                >
-            </script><script type="text/javascript" src="/ts/main.7e2744cab1d920655de661919fdfc920dbd054f5fb511380ecae20d388479363.js" defer></script>
-<script>
-    (function () {
-        const customFont = document.createElement('link');
-        customFont.href = "https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap";
-
-        customFont.type = "text/css";
-        customFont.rel = "stylesheet";
-
-        document.head.appendChild(customFont);
-    }());
-</script>
-
-    </body>
-</html>
+<!doctype html><html lang=en-us dir=ltr><head><meta charset=utf-8><meta name=viewport content='width=device-width,initial-scale=1'><meta name=description content="How to compile and run Sensu Go on arm boards"><title>Compiling and Running Sensu Go on ARM</title><link rel=canonical href=https://aaron.sachs.blog/archive/sensu-go-on-arm/><link rel=stylesheet href=/scss/style.min.946cca6c6259ef94ac55abfae7c7bf3291ea3ed5eea17ef77500b257217c6710.css><meta property='og:title' content="Compiling and Running Sensu Go on ARM"><meta property='og:description' content="How to compile and run Sensu Go on arm boards"><meta property='og:url' content='https://aaron.sachs.blog/archive/sensu-go-on-arm/'><meta property='og:site_name' content='Staring Blankly at a Screen'><meta property='og:type' content='article'><meta property='article:section' content='Archive'><meta property='article:tag' content='sensu'><meta property='article:tag' content='monitoring'><meta property='article:tag' content='arm'><meta property='article:tag' content='raspberry pi'><meta property='article:tag' content='jetson'><meta property='article:published_time' content='2019-05-09T19:49:32-05:00'><meta property='article:modified_time' content='2019-05-09T19:49:32-05:00'><meta name=twitter:title content="Compiling and Running Sensu Go on ARM"><meta name=twitter:description content="How to compile and run Sensu Go on arm boards"></head><body class=article-page><script>(function(){const e="StackColorScheme";localStorage.getItem(e)||localStorage.setItem(e,"auto")})()</script><script>(function(){const t="StackColorScheme",e=localStorage.getItem(t),n=window.matchMedia("(prefers-color-scheme: dark)").matches===!0;e=="dark"||e==="auto"&&n?document.documentElement.dataset.scheme="dark":document.documentElement.dataset.scheme="light"})()</script><div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky"><button class="hamburger hamburger--spin" type=button id=toggle-menu aria-label="Toggle Menu">
+<span class=hamburger-box><span class=hamburger-inner></span></span></button><header><figure class=site-avatar><a href=/><img src=/img/avatar_hu_f509edb42ecc0ebd.png width=300 height=300 class=site-logo loading=lazy alt=Avatar>
+</a><span class=emoji>🎸</span></figure><div class=site-meta><h1 class=site-name><a href=/>Staring Blankly at a Screen</a></h1><h2 class=site-description>Tech, beer, and the occasional banjo tune</h2></div></header><ol class=menu-social><li><a href=https://github.com/asachs01 target=_blank title=GitHub rel=me><svg class="icon icon-tabler icon-tabler-brand-github" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M9 19c-4.3 1.4-4.3-2.5-6-3m12 5v-3.5c0-1 .1-1.4-.5-2 2.8-.3 5.5-1.4 5.5-6a4.6 4.6.0 00-1.3-3.2 4.2 4.2.0 00-.1-3.2s-1.1-.3-3.5 1.3a12.3 12.3.0 00-6.2.0C6.5 2.8 5.4 3.1 5.4 3.1a4.2 4.2.0 00-.1 3.2A4.6 4.6.0 004 9.5c0 4.6 2.7 5.7 5.5 6-.6.6-.6 1.2-.5 2V21"/></svg></a></li><li><a href=https://twitter.com/asachs01 target=_blank title=Twitter rel=me><svg class="icon icon-tabler icon-tabler-brand-twitter" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M22 4.01c-1 .49-1.98.689-3 .99-1.121-1.265-2.783-1.335-4.38-.737S11.977 6.323 12 8v1c-3.245.083-6.135-1.395-8-4 0 0-4.182 7.433 4 11-1.872 1.247-3.739 2.088-6 2 3.308 1.803 6.913 2.423 10.034 1.517 3.58-1.04 6.522-3.723 7.651-7.742a13.84 13.84.0 00.497-3.753C20.18 7.773 21.692 5.25 22 4.009z"/></svg></a></li></ol><ol class=menu id=main-menu><li><a href=/><svg class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><polyline points="5 12 3 12 12 3 21 12 19 12"/><path d="M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7"/><path d="M9 21v-6a2 2 0 012-2h2a2 2 0 012 2v6"/></svg>
+<span>Home</span></a></li><li><a href=/about/><svg class="icon icon-tabler icon-tabler-user" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="12" cy="7" r="4"/><path d="M6 21v-2a4 4 0 014-4h4a4 4 0 014 4v2"/></svg>
+<span>About</span></a></li><li><a href=/talks/><span>Talks</span></a></li><li><a href=/archives/><svg class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><rect x="3" y="4" width="18" height="4" rx="2"/><path d="M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8"/><line x1="10" y1="12" x2="14" y2="12"/></svg>
+<span>Archives</span></a></li><li><a href=/archives/><svg class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><rect x="3" y="4" width="18" height="4" rx="2"/><path d="M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8"/><line x1="10" y1="12" x2="14" y2="12"/></svg>
+<span>Archives</span></a></li><li><a href=/search/><svg class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="10" cy="10" r="7"/><line x1="21" y1="21" x2="15" y2="15"/></svg>
+<span>Search</span></a></li><li><a href=/search/><svg class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="10" cy="10" r="7"/><line x1="21" y1="21" x2="15" y2="15"/></svg>
+<span>Search</span></a></li><li class=menu-bottom-section><ol class=menu><li id=dark-mode-toggle><svg class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="8" cy="12" r="2"/><rect x="2" y="6" width="20" height="12" rx="6"/></svg>
+<svg class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="16" cy="12" r="2"/><rect x="2" y="6" width="20" height="12" rx="6"/></svg>
+<span>Dark Mode</span></li></ol></li></ol></aside><main class="main full-width"><article class=main-article><header class=article-header><div class=article-details><header class=article-category><a href=/categories/monitoring/>Monitoring
+</a><a href=/categories/sensu/>Sensu
+</a><a href=/categories/arm/>Arm</a></header><div class=article-title-wrapper><h2 class=article-title><a href=/archive/sensu-go-on-arm/>Compiling and Running Sensu Go on ARM</a></h2><h3 class=article-subtitle>How to compile and run Sensu Go on arm boards</h3></div><footer class=article-time><div><svg class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><path d="M11.795 21H5a2 2 0 01-2-2V7a2 2 0 012-2h12a2 2 0 012 2v4"/><circle cx="18" cy="18" r="4"/><path d="M15 3v4"/><path d="M7 3v4"/><path d="M3 11h16"/><path d="M18 16.496V18l1 1"/></svg>
+<time class=article-time--published>May 09, 2019</time></div><div><svg class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 15"/></svg>
+<time class=article-time--reading>5 minute read</time></div></footer></div></header><section class=article-content><h1 id=updates>UPDATES</h1><p>When I originally wrote this post, I was operating under some outdated assumptions when it comes to building Sensu on arm devices. I&rsquo;ll post the updates here at the beginning of the article, and you can read on to see how I&rsquo;d previously set up Sensu on my Nvidia Jetson Nanos.</p><h2 id=compiling-sensu-go>Compiling Sensu Go</h2><p>As a Go novice, I didn&rsquo;t fully understand the workflow for compiling Sensu for arm devices. As it so happens, it&rsquo;s fairly easy to cross-compile from whatever device you&rsquo;re on and then just transfer the binaries to the system you want to run on. I found this out the hard way by trying to compile on the Raspberry Pi&rsquo;s I have. This resulted in them locking up.</p><p>So let&rsquo;s walk through the non-build-script way of doing this:</p><ol><li>Install Go</li><li><a class=link href=#obtaining-sensu-go>Obtain Sensu Go</a></li><li>Build the binary for your arm system of choice using <code>GOOS=linux GOARCH=arm go install ./...</code> from inside the project root (<code>$GOPATH/src/github/sensu/sensu-go</code>)</li><li>Transfer to the binary/binaries to your Pi&rsquo;s, Nano&rsquo;s, or other arm board</li><li>Proceed through the <a class=link href=#running-sensu-go>rest of the setup</a></li></ol><p>Now, you can absolutely run through the original post as it was and <em>still</em> run Sensu. However, I find that cross compiling from a system with a bit more oomph is going to make things easier.</p><h1 id=original-post>Original post</h1><p>In this post, I&rsquo;ll cover how I am running Sensu Go on several NVIDIA Jetson Nanos. Though this is being done on a Nano, you could use the same approach I use here on a Raspberry Pi, or any other armv7 board. I would note that this is a temporary until official Sensu Go arm packages are released.</p><h1 id=the-setup>The Setup</h1><p>There are several things you&rsquo;ll need to do before you can start playing around with Sensu Go.</p><ol><li>Install Go on your system</li><li>Grab Sensu Go</li><li>Build the binaries</li></ol><h2 id=installing-go>Installing Go</h2><p>While installing Go on the Jetson as fairly trivial, the goal here is to give you a complete accounting of how I did what I did.</p><p>To install Go, run:</p><p><code>sudo apt-get install golang</code></p><p>You should then have it installed on your system. If you need more complete documentation on installing Go, please see <a class=link href=https://golang.org/dl/ target=_blank rel=noopener>Go&rsquo;s docs on downloading and installing Go onto your system</a>.</p><h2 id=obtaining-sensu-go>Obtaining Sensu Go</h2><p>Once you&rsquo;ve installed Go, the next step is to obtain Sensu Go. To get the package, run the following:</p><p><code>go get github.com/sensu/sensu-go/...</code></p><p>This will put the package at <code>$GOPATH/src/github.com/sensu/sensu-go</code>.</p><h2 id=building-the-binaries>Building the Binaries</h2><p>Next up, we&rsquo;re going to build the binaries using a script provided in the repo. You&rsquo;ll want to ensure that you&rsquo;re in <code>$GOPATH/src/github.com/sensu/sensu-go</code>. Once you&rsquo;re there, you&rsquo;ll find a script called <code>build.sh</code></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span><span class=lnt>8
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>❯❯❯❯ ls
+</span></span><span class=line><span class=cl>agent    dashboard       rpc        vendor           Dockerfile.rhel_atomic  build.ps1
+</span></span><span class=line><span class=cl>api      docker-scripts  scripts    version          Dockerfile.testagent    build.sh
+</span></span><span class=line><span class=cl>asset    examples        system     CHANGELOG.md     FAQ.md                  docker-compose.yaml
+</span></span><span class=line><span class=cl>backend  graphql         testing    CONTRIBUTING.md  Gopkg.lock
+</span></span><span class=line><span class=cl>cli      handler         transport  DCO              Gopkg.toml
+</span></span><span class=line><span class=cl>cmd      js              types      Dockerfile       LICENSE
+</span></span><span class=line><span class=cl>command  licenses        util       Dockerfile.rhel  README.md
+</span></span></code></pre></td></tr></table></div></div><p>We&rsquo;ll run that and build our binaries:</p><p><code>./build.sh</code></p><p>Now, we&rsquo;ll grab that binaries that were built:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>cd $GOPATH/bin
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>sudo cp sensu-{agent,backend} /usr/sbin/
+</span></span></code></pre></td></tr></table></div></div><p>That&rsquo;s it for the prep work. Now it&rsquo;s on to actually running Sensu Go.</p><h1 id=running-sensu-go>Running Sensu Go</h1><p>To run Sensu Go, we&rsquo;ll need to go through the following steps:</p><ol><li>Create the service files for the respective services</li><li>Create the Sensu user/group</li><li>Create the respective directories needed for Sensu to operate</li><li>Grab config files for Sensu Go</li></ol><h2 id=creating-the-service-files>Creating the Service Files</h2><p>There are two service files that will need to be created in order to use systemd to manage Sensu Go as you&rsquo;d find with RHEL/Debian packages:</p><p><strong>Sensu Backend Service File</strong></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-gdscript3 data-lang=gdscript3><span class=line><span class=cl><span class=p>[</span><span class=n>Unit</span><span class=p>]</span>
+</span></span><span class=line><span class=cl><span class=n>Description</span><span class=o>=</span><span class=n>The</span> <span class=n>Sensu</span> <span class=n>Backend</span> <span class=n>service</span><span class=o>.</span>
+</span></span><span class=line><span class=cl><span class=n>After</span><span class=o>=</span><span class=n>network</span><span class=o>-</span><span class=n>online</span><span class=o>.</span><span class=n>target</span>
+</span></span><span class=line><span class=cl><span class=n>Wants</span><span class=o>=</span><span class=n>network</span><span class=o>-</span><span class=n>online</span><span class=o>.</span><span class=n>target</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=p>[</span><span class=n>Service</span><span class=p>]</span>
+</span></span><span class=line><span class=cl><span class=n>Type</span><span class=o>=</span><span class=n>simple</span>
+</span></span><span class=line><span class=cl><span class=n>User</span><span class=o>=</span><span class=n>sensu</span>
+</span></span><span class=line><span class=cl><span class=n>Group</span><span class=o>=</span><span class=n>sensu</span>
+</span></span><span class=line><span class=cl><span class=c1># Load env vars from /etc/default/ and /etc/sysconfig/ if they exist.</span>
+</span></span><span class=line><span class=cl><span class=c1># Prefixing the path with &#39;-&#39; makes it try to load, but if the file doesn&#39;t</span>
+</span></span><span class=line><span class=cl><span class=c1># exist, it continues onward.</span>
+</span></span><span class=line><span class=cl><span class=n>EnvironmentFile</span><span class=o>=-/</span><span class=n>etc</span><span class=o>/</span><span class=n>default</span><span class=o>/</span><span class=n>sensu</span><span class=o>-</span><span class=n>backend</span>
+</span></span><span class=line><span class=cl><span class=n>EnvironmentFile</span><span class=o>=-/</span><span class=n>etc</span><span class=o>/</span><span class=n>sysconfig</span><span class=o>/</span><span class=n>sensu</span><span class=o>-</span><span class=n>backend</span>
+</span></span><span class=line><span class=cl><span class=n>LimitNOFILE</span><span class=o>=</span><span class=mi>65535</span>
+</span></span><span class=line><span class=cl><span class=n>ExecStart</span><span class=o>=/</span><span class=n>usr</span><span class=o>/</span><span class=n>sbin</span><span class=o>/</span><span class=n>sensu</span><span class=o>-</span><span class=n>backend</span> <span class=n>start</span> <span class=o>-</span><span class=n>c</span> <span class=o>/</span><span class=n>etc</span><span class=o>/</span><span class=n>sensu</span><span class=o>/</span><span class=n>backend</span><span class=o>.</span><span class=n>yml</span>
+</span></span><span class=line><span class=cl><span class=n>Restart</span><span class=o>=</span><span class=n>always</span>
+</span></span><span class=line><span class=cl><span class=n>WorkingDirectory</span><span class=o>=/</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=p>[</span><span class=n>Install</span><span class=p>]</span>
+</span></span><span class=line><span class=cl><span class=n>WantedBy</span><span class=o>=</span><span class=n>multi</span><span class=o>-</span><span class=n>user</span><span class=o>.</span><span class=n>target</span>
+</span></span></code></pre></td></tr></table></div></div><p>To make this a bit easier, you can do the following:</p><p><code>sudo curl -L https://gist.githubusercontent.com/asachs01/497ede01e9905e7917d577451ac51c1b/raw/141aa960a5481e4c536ff790561c5effd0f3b058/sensu-backend.service -o /lib/systemd/system/sensu-backend.service</code></p><p><strong>Sensu Agent Service File</strong></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-gdscript3 data-lang=gdscript3><span class=line><span class=cl><span class=p>[</span><span class=n>Unit</span><span class=p>]</span>
+</span></span><span class=line><span class=cl><span class=n>Description</span><span class=o>=</span><span class=n>The</span> <span class=n>Sensu</span> <span class=n>Agent</span> <span class=n>process</span><span class=o>.</span>
+</span></span><span class=line><span class=cl><span class=n>After</span><span class=o>=</span><span class=n>network</span><span class=o>-</span><span class=n>online</span><span class=o>.</span><span class=n>target</span>
+</span></span><span class=line><span class=cl><span class=n>Wants</span><span class=o>=</span><span class=n>network</span><span class=o>-</span><span class=n>online</span><span class=o>.</span><span class=n>target</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=p>[</span><span class=n>Service</span><span class=p>]</span>
+</span></span><span class=line><span class=cl><span class=n>Type</span><span class=o>=</span><span class=n>simple</span>
+</span></span><span class=line><span class=cl><span class=n>User</span><span class=o>=</span><span class=n>sensu</span>
+</span></span><span class=line><span class=cl><span class=n>Group</span><span class=o>=</span><span class=n>sensu</span>
+</span></span><span class=line><span class=cl><span class=c1># Load env vars from /etc/default/ and /etc/sysconfig/ if they exist.</span>
+</span></span><span class=line><span class=cl><span class=c1># Prefixing the path with &#39;-&#39; makes it try to load, but if the file doesn&#39;t</span>
+</span></span><span class=line><span class=cl><span class=c1># exist, it continues onward.</span>
+</span></span><span class=line><span class=cl><span class=n>EnvironmentFile</span><span class=o>=-/</span><span class=n>etc</span><span class=o>/</span><span class=n>default</span><span class=o>/</span><span class=n>sensu</span><span class=o>-</span><span class=n>agent</span>
+</span></span><span class=line><span class=cl><span class=n>EnvironmentFile</span><span class=o>=-/</span><span class=n>etc</span><span class=o>/</span><span class=n>sysconfig</span><span class=o>/</span><span class=n>sensu</span><span class=o>-</span><span class=n>agent</span>
+</span></span><span class=line><span class=cl><span class=n>LimitNOFILE</span><span class=o>=</span><span class=mi>65535</span>
+</span></span><span class=line><span class=cl><span class=n>ExecStart</span><span class=o>=/</span><span class=n>usr</span><span class=o>/</span><span class=n>sbin</span><span class=o>/</span><span class=n>sensu</span><span class=o>-</span><span class=n>agent</span> <span class=n>start</span>
+</span></span><span class=line><span class=cl><span class=n>Restart</span><span class=o>=</span><span class=n>always</span>
+</span></span><span class=line><span class=cl><span class=n>WorkingDirectory</span><span class=o>=/</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=p>[</span><span class=n>Install</span><span class=p>]</span>
+</span></span><span class=line><span class=cl><span class=n>WantedBy</span><span class=o>=</span><span class=n>multi</span><span class=o>-</span><span class=n>user</span><span class=o>.</span><span class=n>target</span>
+</span></span></code></pre></td></tr></table></div></div><p>And the same with this one:</p><p><code>sudo curl -L https://gist.githubusercontent.com/asachs01/497ede01e9905e7917d577451ac51c1b/raw/141aa960a5481e4c536ff790561c5effd0f3b058/sensu-agent.service -o /lib/systemd/system/sensu-agent.service</code></p><p>Again, these will need to live at <code>/lib/systemd/system/sensu-backend.service</code> and <code>/lib/systemd/system/sensu-agent.service</code> respectively. Once you&rsquo;ve got those in place, let&rsquo;s move onto the next step.</p><h2 id=create-the-sensu-usergroup>Create the Sensu User/Group</h2><p>This is fairly simple, as we&rsquo;ll only need to create a service account for Sensu:</p><p><code>sudo useradd -r sensu</code></p><p>Now, onto the next step of creating the requisite directories for Sensu.</p><h2 id=create-sensu-directories>Create Sensu Directories</h2><p>There are three directories that need to be created and owned by the Sensu user:</p><ul><li><code>/var/lib/sensu</code></li><li><code>/var/cache/sensu</code></li><li><code>/etc/sensu</code></li></ul><p>Create each of these and change the ownership on them:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-gdscript3 data-lang=gdscript3><span class=line><span class=cl><span class=n>sudo</span> <span class=o>/</span><span class=k>var</span><span class=o>/</span><span class=n>lib</span><span class=o>/</span><span class=n>sensu</span>
+</span></span><span class=line><span class=cl><span class=n>sudo</span> <span class=o>/</span><span class=k>var</span><span class=o>/</span><span class=n>cache</span><span class=o>/</span><span class=n>sensu</span>
+</span></span><span class=line><span class=cl><span class=n>sudo</span> <span class=n>mkdir</span> <span class=o>/</span><span class=n>etc</span><span class=o>/</span><span class=n>sensu</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=n>sudo</span> <span class=n>chown</span> <span class=n>sensu</span><span class=o>.</span> <span class=o>/</span><span class=k>var</span><span class=o>/</span><span class=n>lib</span><span class=o>/</span><span class=n>sensu</span>
+</span></span><span class=line><span class=cl><span class=n>sudo</span> <span class=n>chown</span> <span class=n>sensu</span><span class=o>.</span> <span class=o>/</span><span class=k>var</span><span class=o>/</span><span class=n>cache</span><span class=o>/</span><span class=n>sensu</span>
+</span></span><span class=line><span class=cl><span class=n>sudo</span> <span class=n>chown</span> <span class=n>sensu</span><span class=o>.</span> <span class=o>/</span><span class=n>etc</span><span class=o>/</span><span class=n>sensu</span>
+</span></span></code></pre></td></tr></table></div></div><p>Alright, now for the last step: obtaining the config files.</p><h2 id=obtaining-sensu-go-config-files>Obtaining Sensu Go Config Files</h2><p>This is also a fairly quick step:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>curl -LO http://docs.sensu.io/sensu-go/latest/files/\{agent,backend\}.yml
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>sudo cp {agent,backend}.yml /etc/sensu
+</span></span></code></pre></td></tr></table></div></div><p>Now, let&rsquo;s get cooking.</p><h2 id=start-sensu-go>Start Sensu Go</h2><p>This is it. The moment you&rsquo;ve been waiting for. It&rsquo;s time to run Sensu!</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>sudo systemctl enable sensu-{agent,backend}
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>sudo systemctl start sensu-{agent,backend}
+</span></span></code></pre></td></tr></table></div></div><p>To ensure that Sensu is running as we expect, do a quick <code>sudo journalctl -fu sensu-backend</code>. Journald should be free of any errors and if you go to http://IPOFYOURSYSTEM:3000, you should get a nice dashboard that looks like:</p><p><img src="https://p299.p4.n0.cdn.getcloudapp.com/items/OAuL7wme/Image+2020-01-17+at+12.25.47+PM.png?v=c53eadf0f22ed4865e2e5971c164b759" loading=lazy alt="sensu go dashboard"></p><p>There you have it! If you want to cluster a few Jetson Nanos, or Raspberry Pis up, head over to <a class=link href=https://docs.sensu.io/sensu-go/5.7/guides/clustering/ target=_blank rel=noopener>Sensu&rsquo;s clustering guide</a>.</p><p>Cheers!</p></section><footer class=article-footer><section class=article-tags><a href=/tags/sensu/>Sensu</a>
+<a href=/tags/monitoring/>Monitoring</a>
+<a href=/tags/arm/>Arm</a>
+<a href=/tags/raspberry-pi/>Raspberry Pi</a>
+<a href=/tags/jetson/>Jetson</a></section></footer></article><aside class=related-content--wrapper><h2 class=section-title>Related content</h2><div class=related-content><div class="flex article-list--tile"><article><a href=/archive/monitoring-raspberry-pis-with-sensu/><div class=article-details><h2 class=article-title>Monitoring Raspberry Pi's with Sensu</h2></div></a></article><article><a href=/archive/sensu-gremlin-part-2/><div class=article-details><h2 class=article-title>Badass Monitoring, Pt 2: The 'Why'</h2></div></a></article><article><a href=/archive/sensu-gremlin-intro/><div class=article-details><h2 class=article-title>Badass Monitoring, Pt 1: Sensu & Gremlin</h2></div></a></article><article><a href=/archive/sensu-go-on-osx/><div class=article-details><h2 class=article-title>Compiling and Running Sensu Go on OS X</h2></div></a></article><article><a href=/archive/minimal-sensu-docker/><div class=article-details><h2 class=article-title>A minimal Sensu environment with Docker</h2></div></a></article></div></div></aside><footer class=site-footer><section class=copyright>&copy;
+2019 -
+2025 © 2025 Aaron Sachs. All rights reserved.</section><section class=powerby>Built with <a href=https://gohugo.io/ target=_blank rel=noopener>Hugo</a><br>Theme <b><a href=https://github.com/CaiJimmy/hugo-theme-stack target=_blank rel=noopener data-version=3.30.0>Stack</a></b> designed by <a href=https://jimmycai.com target=_blank rel=noopener>Jimmy</a></section></footer><div class=pswp tabindex=-1 role=dialog aria-hidden=true><div class=pswp__bg></div><div class=pswp__scroll-wrap><div class=pswp__container><div class=pswp__item></div><div class=pswp__item></div><div class=pswp__item></div></div><div class="pswp__ui pswp__ui--hidden"><div class=pswp__top-bar><div class=pswp__counter></div><button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+<button class="pswp__button pswp__button--share" title=Share></button>
+<button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+<button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button><div class=pswp__preloader><div class=pswp__preloader__icn><div class=pswp__preloader__cut><div class=pswp__preloader__donut></div></div></div></div></div><div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap"><div class=pswp__share-tooltip></div></div><button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+</button>
+<button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)"></button><div class=pswp__caption><div class=pswp__caption__center></div></div></div></div></div><script src=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo=" crossorigin=anonymous defer></script><script src=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU=" crossorigin=anonymous defer></script><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css crossorigin=anonymous><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css crossorigin=anonymous></main></div><script src=https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z+KMkF24hUW8WePSA9HM=" crossorigin=anonymous></script><script type=text/javascript src=/ts/main.1e9a3bafd846ced4c345d084b355fb8c7bae75701c338f8a1f8a82c780137826.js defer></script><script>(function(){const e=document.createElement("link");e.href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap",e.type="text/css",e.rel="stylesheet",document.head.appendChild(e)})()</script></body></html>
