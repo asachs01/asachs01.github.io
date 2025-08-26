@@ -21,6 +21,7 @@ permalinks:
 params:
     mainSections:
         - post
+        - archive
     featuredImageField: image
     rssFullContent: true
     
