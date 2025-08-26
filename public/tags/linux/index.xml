@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+    <channel>
+        <title>Linux on Staring Blankly at a Screen</title>
+        <link>http://localhost:1313/tags/linux/</link>
+        <description>Recent content in Linux on Staring Blankly at a Screen</description>
+        <generator>Hugo -- gohugo.io</generator>
+        <language>en-us</language>
+        <copyright>© 2025 Aaron Sachs. All rights reserved.</copyright>
+        <lastBuildDate>Wed, 21 Dec 2016 01:58:00 +0000</lastBuildDate><atom:link href="http://localhost:1313/tags/linux/index.xml" rel="self" type="application/rss+xml" /><item>
+        <title>BeerSmith2 RPM</title>
+        <link>http://localhost:1313/archive/beersmith2-rpm/</link>
+        <pubDate>Wed, 21 Dec 2016 01:58:00 +0000</pubDate>
+        
+        <guid>http://localhost:1313/archive/beersmith2-rpm/</guid>
+        <description>&lt;p&gt;I&amp;rsquo;ve been trying to up my beer-making game, and remembered that I had a license to &lt;a class=&#34;link&#34; href=&#34;http://beersmith.com/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;BeerSmith2&lt;/a&gt;, but didn&amp;rsquo;t see that they had any packages available for Fedora/Fedora remixes. So, I did a thing and have &lt;a class=&#34;link&#34; href=&#34;https://github.com/asachs01/beersmith2rpm&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;BeerSmith2 2.3.7 in RPM format&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;Cheers,&lt;/p&gt;
+&lt;p&gt;Aaron&lt;/p&gt;
+</description>
+        </item>
+        
+    </channel>
+</rss>
