@@ -21,7 +21,6 @@ permalinks:
 params:
     mainSections:
         - post
-        - archive
     featuredImageField: image
     rssFullContent: true
     
@@ -103,6 +102,8 @@ menu:
           name: Talks
           url: /talks/
           weight: -80
+          params:
+              icon: messages
 
     social:
         - identifier: github
@@ -111,11 +112,11 @@ menu:
           params:
               icon: brand-github
 
-        - identifier: twitter
-          name: Twitter
-          url: https://twitter.com/asachs01
+        - identifier: linkedin
+          name: LinkedIn
+          url: https://www.linkedin.com/in/asachs01
           params:
-              icon: brand-twitter
+              icon: link
 
 related:
     includeNewer: true
