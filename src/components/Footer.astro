@@ -6,9 +6,9 @@ const currentYear = new Date().getFullYear();
 
 <footer>
 	<div class="group">
-		<p>
-			Built with <a href="https://astro.build/">Astro</a>
-			<Icon icon="rocket-launch" size="1.2em" />
+		<p class="built-with">
+			<span class="prompt" aria-hidden="true">>_</span>
+			Built with <a href="https://astro.build/">Astro</a>, caffeine, and questionable life choices
 		</p>
 		<p>&copy; {currentYear} Aaron Sachs</p>
 	</div>
@@ -31,14 +31,23 @@ const currentYear = new Date().getFullYear();
 
 	footer a {
 		color: var(--gray-400);
-		text-decoration: 1px solid underline transparent;
-		text-underline-offset: 0.25em;
-		transition: text-decoration-color var(--theme-transition);
+		text-decoration: none;
+		background-image: var(--gradient-accent-text);
+		background-size: 0% 2px;
+		background-position: 0 100%;
+		background-repeat: no-repeat;
+		transition: background-size 0.3s ease;
 	}
 
 	footer a:hover,
 	footer a:focus {
-		text-decoration-color: currentColor;
+		background-size: 100% 2px;
+	}
+
+	.prompt {
+		font-family: var(--font-mono);
+		color: var(--gray-500);
+		margin-right: 0.25rem;
 	}
 
 	.group {

@@ -89,6 +89,12 @@ const { Content } = await render(post);
 		border-radius: 0.25rem;
 		background-color: var(--gray-800);
 		color: var(--gray-300);
+		display: inline-block;
+		transition: transform var(--theme-transition);
+	}
+
+	.tag:hover {
+		transform: scale(1.05);
 	}
 
 	.content {
@@ -153,6 +159,16 @@ const { Content } = await render(post);
 
 	.content :global(a) {
 		color: var(--link-color);
+		text-decoration: none;
+		background-image: var(--gradient-accent-text);
+		background-size: 0% 2px;
+		background-position: 0 100%;
+		background-repeat: no-repeat;
+		transition: background-size 0.3s ease;
+	}
+
+	.content :global(a:hover) {
+		background-size: 100% 2px;
 	}
 
 	.content :global(iframe) {

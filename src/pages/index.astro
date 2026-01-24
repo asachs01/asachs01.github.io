@@ -13,8 +13,8 @@ const projects = (await getCollection('projects'))
 <BaseLayout>
 	<div class="stack gap-10 lg:gap-15">
 		<header class="wrapper stack gap-4">
-			<h1>Staring Blankly at a Screen</h1>
-			<p class="tagline">Tech, beer, and the occasional banjo tune.</p>
+			<h1 class="gradient-text">Staring Blankly at a Screen</h1>
+			<p class="tagline">Tech, beer, and the occasional banjo tune.<span class="cursor" aria-hidden="true">|</span></p>
 		</header>
 
 		<main class="wrapper stack gap-10 lg:gap-15">
@@ -84,6 +84,13 @@ const projects = (await getCollection('projects'))
 		font-size: var(--text-md);
 	}
 
+	.cursor {
+		font-family: var(--font-mono);
+		color: var(--gray-400);
+		animation: blink 1s step-end infinite;
+		margin-left: 2px;
+	}
+
 	.post-list {
 		display: flex;
 		flex-direction: column;
@@ -98,11 +105,12 @@ const projects = (await getCollection('projects'))
 		background-color: var(--gray-900);
 		text-decoration: none;
 		color: inherit;
-		transition: box-shadow var(--theme-transition);
+		transition: box-shadow var(--theme-transition), transform var(--theme-transition);
 	}
 
 	.post-card:hover {
 		box-shadow: var(--shadow-md);
+		transform: translateY(-2px);
 	}
 
 	.post-card h4 {
@@ -138,6 +146,12 @@ const projects = (await getCollection('projects'))
 		border-radius: 0.375rem;
 		overflow: hidden;
 		background-color: var(--gray-900);
+		transition: box-shadow var(--theme-transition), transform var(--theme-transition);
+	}
+
+	.project-card:hover {
+		transform: translateY(-2px);
+		box-shadow: 0 4px 20px rgba(139, 92, 246, 0.15), 0 0 0 1px rgba(139, 92, 246, 0.2);
 	}
 
 	.project-img {
@@ -175,6 +189,12 @@ const projects = (await getCollection('projects'))
 		border-radius: 0.25rem;
 		background-color: var(--gray-800);
 		color: var(--gray-300);
+		display: inline-block;
+		transition: transform var(--theme-transition);
+	}
+
+	.tag:hover {
+		transform: scale(1.05);
 	}
 
 	.project-link {

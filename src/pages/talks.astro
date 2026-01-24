@@ -105,4 +105,17 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 	.content li ul {
 		margin-top: 0.25rem;
 	}
+
+	.content a {
+		text-decoration: none;
+		background-image: var(--gradient-accent-text);
+		background-size: 0% 2px;
+		background-position: 0 100%;
+		background-repeat: no-repeat;
+		transition: background-size 0.3s ease;
+	}
+
+	.content a:hover {
+		background-size: 100% 2px;
+	}
 </style>
