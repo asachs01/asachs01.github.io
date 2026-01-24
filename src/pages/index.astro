@@ -147,8 +147,8 @@ const projects = (await getCollection('projects'))
 		display: block;
 		padding: 1.5rem;
 		border: 1px solid var(--gray-800);
-		border-radius: 0.75rem;
-		background: var(--gradient-subtle);
+		border-radius: 0.375rem;
+		background-color: var(--gray-900);
 		text-decoration: none;
 		color: inherit;
 		transition: box-shadow var(--theme-transition);
@@ -188,9 +188,9 @@ const projects = (await getCollection('projects'))
 
 	.project-card {
 		border: 1px solid var(--gray-800);
-		border-radius: 0.75rem;
+		border-radius: 0.375rem;
 		overflow: hidden;
-		background: var(--gradient-subtle);
+		background-color: var(--gray-900);
 	}
 
 	.project-img {
@@ -225,7 +225,7 @@ const projects = (await getCollection('projects'))
 	.tag {
 		font-size: 0.75rem;
 		padding: 0.2rem 0.5rem;
-		border-radius: 999rem;
+		border-radius: 0.25rem;
 		background-color: var(--gray-800);
 		color: var(--gray-300);
 	}
