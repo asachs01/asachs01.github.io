@@ -1,6 +1,5 @@
 ---
 import { getCollection } from 'astro:content';
-import Hero from '../components/Hero.astro';
 import BaseLayout from '../layouts/BaseLayout.astro';
 
 const posts = (await getCollection('posts'))
@@ -12,31 +11,16 @@ const projects = (await getCollection('projects'))
 ---
 
 <BaseLayout>
-	<div class="stack gap-20 lg:gap-48">
-		<div class="wrapper stack gap-8 lg:gap-20">
-			<header class="hero">
-				<Hero
-					title="Staring Blankly at a Screen"
-					tagline="Tech, beer, and the occasional banjo tune."
-					align="start"
-				/>
-				<img
-					alt="Aaron Sachs avatar"
-					width="200"
-					height="200"
-					src="/img/avatar.png"
-					class="avatar"
-				/>
-			</header>
-		</div>
+	<div class="stack gap-10 lg:gap-15">
+		<header class="wrapper stack gap-4">
+			<h1>Staring Blankly at a Screen</h1>
+			<p class="tagline">Tech, beer, and the occasional banjo tune.</p>
+		</header>
 
-		<main class="wrapper stack gap-20 lg:gap-48">
+		<main class="wrapper stack gap-10 lg:gap-15">
 			{posts.length > 0 && (
-				<section class="section">
-					<header class="section-header stack gap-2 lg:gap-4">
-						<h3>Recent Posts</h3>
-						<p>What I've been writing about lately.</p>
-					</header>
+				<section>
+					<h2 class="section-title">Recent Posts</h2>
 					<div class="post-list">
 						{posts.map((post) => (
 							<a href={`/p/${post.data.slug}/`} class="post-card">
@@ -56,11 +40,8 @@ const projects = (await getCollection('projects'))
 			)}
 
 			{projects.length > 0 && (
-				<section class="section">
-					<header class="section-header stack gap-2 lg:gap-4">
-						<h3>Projects</h3>
-						<p>Things I've built and tinkered with.</p>
-					</header>
+				<section>
+					<h2 class="section-title">Projects</h2>
 					<div class="project-grid">
 						{projects.map((project) => (
 							<div class="project-card">
@@ -93,48 +74,14 @@ const projects = (await getCollection('projects'))
 </BaseLayout>
 
 <style>
-	.hero {
-		display: flex;
-		flex-direction: column;
-		align-items: center;
-		gap: 2rem;
+	h1 {
+		font-size: var(--text-3xl);
+		color: var(--gray-0);
 	}
 
-	.avatar {
-		border-radius: 50%;
-		box-shadow: var(--shadow-md);
-	}
-
-	@media (min-width: 50em) {
-		.hero {
-			display: grid;
-			grid-template-columns: 6fr 4fr;
-			padding-inline: 2.5rem;
-			gap: 3.75rem;
-		}
-
-		.avatar {
-			width: 200px;
-			height: 200px;
-			justify-self: center;
-		}
-	}
-
-	.section {
-		display: grid;
-		gap: 2rem;
-	}
-
-	.section-header {
-		justify-self: center;
-		text-align: center;
-		max-width: 50ch;
+	.tagline {
+		color: var(--gray-400);
 		font-size: var(--text-md);
-		color: var(--gray-300);
-	}
-
-	.section-header h3 {
-		font-size: var(--text-2xl);
 	}
 
 	.post-list {

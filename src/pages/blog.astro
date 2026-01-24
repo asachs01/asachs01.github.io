@@ -1,6 +1,5 @@
 ---
 import { getCollection } from 'astro:content';
-import Hero from '../components/Hero.astro';
 import BaseLayout from '../layouts/BaseLayout.astro';
 
 const posts = (await getCollection('posts'))
@@ -9,35 +8,34 @@ const posts = (await getCollection('posts'))
 ---
 
 <BaseLayout title="Blog - Aaron Sachs" description="Recent blog posts">
-	<div class="stack gap-20">
-		<div class="wrapper stack gap-8">
-			<Hero title="Blog" tagline="Recent posts on tech, beer, and life." />
+	<main class="wrapper stack gap-8">
+		<header class="page-header">
+			<h1>Blog</h1>
+			<p>Recent posts on tech, beer, and life.</p>
+		</header>
+		<div class="post-list">
+			{posts.map((post) => (
+				<a href={`/p/${post.data.slug}/`} class="post-card">
+					<div class="post-meta">
+						<time datetime={post.data.date.toISOString()}>
+							{post.data.date.toLocaleDateString('en-US', {
+								year: 'numeric',
+								month: 'long',
+								day: 'numeric',
+							})}
+						</time>
+						{post.data.categories.length > 0 && (
+							<span class="categories">
+								{post.data.categories.join(', ')}
+							</span>
+						)}
+					</div>
+					<h3>{post.data.title}</h3>
+					{post.data.description && <p>{post.data.description}</p>}
+				</a>
+			))}
 		</div>
-		<main class="wrapper">
-			<div class="post-list">
-				{posts.map((post) => (
-					<a href={`/p/${post.data.slug}/`} class="post-card">
-						<div class="post-meta">
-							<time datetime={post.data.date.toISOString()}>
-								{post.data.date.toLocaleDateString('en-US', {
-									year: 'numeric',
-									month: 'long',
-									day: 'numeric',
-								})}
-							</time>
-							{post.data.categories.length > 0 && (
-								<span class="categories">
-									{post.data.categories.join(', ')}
-								</span>
-							)}
-						</div>
-						<h3>{post.data.title}</h3>
-						{post.data.description && <p>{post.data.description}</p>}
-					</a>
-				))}
-			</div>
-		</main>
-	</div>
+	</main>
 </BaseLayout>
 
 <style>

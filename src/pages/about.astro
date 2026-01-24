@@ -1,14 +1,13 @@
 ---
-import Hero from '../components/Hero.astro';
 import BaseLayout from '../layouts/BaseLayout.astro';
 ---
 
 <BaseLayout title="About - Aaron Sachs" description="About Aaron Sachs">
-	<div class="stack gap-20">
-		<div class="wrapper stack gap-8">
-			<Hero title="About Me" />
-		</div>
-		<main class="wrapper content">
+	<main class="wrapper stack gap-8">
+		<header class="page-header">
+			<h1>About Me</h1>
+		</header>
+		<div class="content">
 			<p>
 				Hi, I'm Aaron. I'm an Engineering Lead at <a href="https://wyretech.com">WYRE Technology</a> in Chattanooga, where I help
 				businesses actually make sense of AI instead of just talking about it. I also do a lot of
@@ -27,17 +26,12 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 				technical stuff, sometimes it's not. If you want to get in touch,
 				<a href="https://www.linkedin.com/in/asachs01">LinkedIn</a> is probably the best way.
 			</p>
-		</main>
-	</div>
+		</div>
+	</main>
 </BaseLayout>
 
 <style>
-	.content {
-		max-width: 65ch;
-		margin-inline: auto;
-	}
-
-.content p {
+	.content p {
 		margin-bottom: 1rem;
 		line-height: 1.7;
 		color: var(--gray-200);

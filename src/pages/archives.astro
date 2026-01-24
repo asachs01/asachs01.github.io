@@ -1,6 +1,5 @@
 ---
 import { getCollection } from 'astro:content';
-import Hero from '../components/Hero.astro';
 import BaseLayout from '../layouts/BaseLayout.astro';
 
 const allPosts = (await getCollection('archives'))
@@ -21,33 +20,32 @@ const years = Object.keys(postsByYear)
 ---
 
 <BaseLayout title="Archives - Aaron Sachs" description="All archived blog posts">
-	<div class="stack gap-20">
-		<div class="wrapper stack gap-8">
-			<Hero title="Archives" tagline="All posts from the vault, grouped by year." />
-		</div>
-		<main class="wrapper">
-			{years.map((year) => (
-				<section class="year-group">
-					<h2>{year}</h2>
-					<ul class="post-list">
-						{postsByYear[year].map((post) => (
-							<li>
-								<a href={`/p/${post.data.slug}/`} class="post-link">
-									<time datetime={post.data.date.toISOString()}>
-										{post.data.date.toLocaleDateString('en-US', {
-											month: 'short',
-											day: 'numeric',
-										})}
-									</time>
-									<span>{post.data.title}</span>
-								</a>
-							</li>
-						))}
-					</ul>
-				</section>
-			))}
-		</main>
-	</div>
+	<main class="wrapper stack gap-8">
+		<header class="page-header">
+			<h1>Archives</h1>
+			<p>All posts from the vault, grouped by year.</p>
+		</header>
+		{years.map((year) => (
+			<section class="year-group">
+				<h2>{year}</h2>
+				<ul class="post-list">
+					{postsByYear[year].map((post) => (
+						<li>
+							<a href={`/p/${post.data.slug}/`} class="post-link">
+								<time datetime={post.data.date.toISOString()}>
+									{post.data.date.toLocaleDateString('en-US', {
+										month: 'short',
+										day: 'numeric',
+									})}
+								</time>
+								<span>{post.data.title}</span>
+							</a>
+						</li>
+					))}
+				</ul>
+			</section>
+		))}
+	</main>
 </BaseLayout>
 
 <style>

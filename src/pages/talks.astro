@@ -1,14 +1,14 @@
 ---
-import Hero from '../components/Hero.astro';
 import BaseLayout from '../layouts/BaseLayout.astro';
 ---
 
 <BaseLayout title="Talks - Aaron Sachs" description="Talks and podcast appearances">
-	<div class="stack gap-20">
-		<div class="wrapper stack gap-8">
-			<Hero title="Talks" tagline="Various and sundry public chats, at conferences or otherwise." />
-		</div>
-		<main class="wrapper content">
+	<main class="wrapper stack gap-8">
+		<header class="page-header">
+			<h1>Talks</h1>
+			<p>Various and sundry public chats, at conferences or otherwise.</p>
+		</header>
+		<div class="content">
 			<section>
 				<h2>Talks</h2>
 
@@ -67,16 +67,11 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 					</li>
 				</ul>
 			</section>
-		</main>
-	</div>
+		</div>
+	</main>
 </BaseLayout>
 
 <style>
-	.content {
-		max-width: 65ch;
-		margin-inline: auto;
-	}
-
 	.content section {
 		margin-bottom: 3rem;
 	}
