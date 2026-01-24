@@ -1,0 +1,86 @@
+---
+import { getCollection } from 'astro:content';
+import Hero from '../components/Hero.astro';
+import BaseLayout from '../layouts/BaseLayout.astro';
+
+const posts = (await getCollection('posts'))
+	.filter(p => !p.data.draft)
+	.sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
+---
+
+<BaseLayout title="Blog - Aaron Sachs" description="Recent blog posts">
+	<div class="stack gap-20">
+		<div class="wrapper stack gap-8">
+			<Hero title="Blog" tagline="Recent posts on tech, beer, and life." />
+		</div>
+		<main class="wrapper">
+			<div class="post-list">
+				{posts.map((post) => (
+					<a href={`/p/${post.data.slug}/`} class="post-card">
+						<div class="post-meta">
+							<time datetime={post.data.date.toISOString()}>
+								{post.data.date.toLocaleDateString('en-US', {
+									year: 'numeric',
+									month: 'long',
+									day: 'numeric',
+								})}
+							</time>
+							{post.data.categories.length > 0 && (
+								<span class="categories">
+									{post.data.categories.join(', ')}
+								</span>
+							)}
+						</div>
+						<h3>{post.data.title}</h3>
+						{post.data.description && <p>{post.data.description}</p>}
+					</a>
+				))}
+			</div>
+		</main>
+	</div>
+</BaseLayout>
+
+<style>
+	.post-list {
+		display: flex;
+		flex-direction: column;
+		gap: 1.5rem;
+	}
+
+	.post-card {
+		display: block;
+		padding: 1.5rem;
+		border: 1px solid var(--gray-800);
+		border-radius: 0.75rem;
+		background: var(--gradient-subtle);
+		text-decoration: none;
+		color: inherit;
+		transition: box-shadow var(--theme-transition);
+	}
+
+	.post-card:hover {
+		box-shadow: var(--shadow-md);
+	}
+
+	.post-card h3 {
+		color: var(--gray-0);
+		font-size: var(--text-xl);
+		margin-bottom: 0.5rem;
+	}
+
+	.post-card p {
+		color: var(--gray-300);
+	}
+
+	.post-meta {
+		display: flex;
+		gap: 1rem;
+		font-size: var(--text-sm);
+		color: var(--gray-400);
+		margin-bottom: 0.5rem;
+	}
+
+	.categories {
+		text-transform: capitalize;
+	}
+</style>

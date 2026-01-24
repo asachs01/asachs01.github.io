@@ -1,0 +1,20 @@
+---
+import Hero from '../components/Hero.astro';
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+
+<BaseLayout title="404 - Not Found">
+	<div class="stack gap-20">
+		<main class="wrapper">
+			<Hero title="404" tagline="This page doesn't exist. Maybe it's been archived?" />
+			<p class="back-link"><a href="/">Back to home</a></p>
+		</main>
+	</div>
+</BaseLayout>
+
+<style>
+	.back-link {
+		text-align: center;
+		margin-top: 2rem;
+	}
+</style>

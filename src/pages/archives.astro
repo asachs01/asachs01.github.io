@@ -1,0 +1,97 @@
+---
+import { getCollection } from 'astro:content';
+import Hero from '../components/Hero.astro';
+import BaseLayout from '../layouts/BaseLayout.astro';
+
+const allPosts = (await getCollection('archives'))
+	.filter(p => !p.data.draft)
+	.sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
+
+// Group by year
+const postsByYear = allPosts.reduce((acc, post) => {
+	const year = post.data.date.getFullYear();
+	if (!acc[year]) acc[year] = [];
+	acc[year].push(post);
+	return acc;
+}, {} as Record<number, typeof allPosts>);
+
+const years = Object.keys(postsByYear)
+	.map(Number)
+	.sort((a, b) => b - a);
+---
+
+<BaseLayout title="Archives - Aaron Sachs" description="All archived blog posts">
+	<div class="stack gap-20">
+		<div class="wrapper stack gap-8">
+			<Hero title="Archives" tagline="All posts from the vault, grouped by year." />
+		</div>
+		<main class="wrapper">
+			{years.map((year) => (
+				<section class="year-group">
+					<h2>{year}</h2>
+					<ul class="post-list">
+						{postsByYear[year].map((post) => (
+							<li>
+								<a href={`/p/${post.data.slug}/`} class="post-link">
+									<time datetime={post.data.date.toISOString()}>
+										{post.data.date.toLocaleDateString('en-US', {
+											month: 'short',
+											day: 'numeric',
+										})}
+									</time>
+									<span>{post.data.title}</span>
+								</a>
+							</li>
+						))}
+					</ul>
+				</section>
+			))}
+		</main>
+	</div>
+</BaseLayout>
+
+<style>
+	.year-group {
+		margin-bottom: 3rem;
+	}
+
+	.year-group h2 {
+		font-size: var(--text-2xl);
+		color: var(--gray-0);
+		margin-bottom: 1rem;
+		padding-bottom: 0.5rem;
+		border-bottom: 1px solid var(--gray-800);
+	}
+
+	.post-list {
+		list-style: none;
+		padding: 0;
+		display: flex;
+		flex-direction: column;
+		gap: 0.5rem;
+	}
+
+	.post-link {
+		display: flex;
+		gap: 1.5rem;
+		align-items: baseline;
+		padding: 0.5rem 0;
+		text-decoration: none;
+		color: var(--gray-300);
+		transition: color var(--theme-transition);
+	}
+
+	.post-link:hover {
+		color: var(--gray-0);
+	}
+
+	.post-link time {
+		font-size: var(--text-sm);
+		color: var(--gray-400);
+		min-width: 5rem;
+	}
+
+	.post-link span {
+		font-size: var(--text-md);
+	}
+</style>
