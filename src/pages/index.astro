@@ -1,0 +1,236 @@
+---
+import { getCollection } from 'astro:content';
+import Hero from '../components/Hero.astro';
+import BaseLayout from '../layouts/BaseLayout.astro';
+
+const posts = (await getCollection('posts'))
+	.filter(p => !p.data.draft)
+	.sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
+
+const projects = (await getCollection('projects'))
+	.sort((a, b) => b.data.publishDate.valueOf() - a.data.publishDate.valueOf());
+---
+
+<BaseLayout>
+	<div class="stack gap-20 lg:gap-48">
+		<div class="wrapper stack gap-8 lg:gap-20">
+			<header class="hero">
+				<Hero
+					title="Staring Blankly at a Screen"
+					tagline="Tech, beer, and the occasional banjo tune."
+					align="start"
+				/>
+				<img
+					alt="Aaron Sachs avatar"
+					width="200"
+					height="200"
+					src="/img/avatar.png"
+					class="avatar"
+				/>
+			</header>
+		</div>
+
+		<main class="wrapper stack gap-20 lg:gap-48">
+			{posts.length > 0 && (
+				<section class="section">
+					<header class="section-header stack gap-2 lg:gap-4">
+						<h3>Recent Posts</h3>
+						<p>What I've been writing about lately.</p>
+					</header>
+					<div class="post-list">
+						{posts.map((post) => (
+							<a href={`/p/${post.data.slug}/`} class="post-card">
+								<h4>{post.data.title}</h4>
+								<p class="post-date">
+									{post.data.date.toLocaleDateString('en-US', {
+										year: 'numeric',
+										month: 'long',
+										day: 'numeric',
+									})}
+								</p>
+								{post.data.description && <p class="post-desc">{post.data.description}</p>}
+							</a>
+						))}
+					</div>
+				</section>
+			)}
+
+			{projects.length > 0 && (
+				<section class="section">
+					<header class="section-header stack gap-2 lg:gap-4">
+						<h3>Projects</h3>
+						<p>Things I've built and tinkered with.</p>
+					</header>
+					<div class="project-grid">
+						{projects.map((project) => (
+							<div class="project-card">
+								{project.data.img && (
+									<img
+										src={project.data.img}
+										alt={project.data.img_alt || project.data.title}
+										class="project-img"
+									/>
+								)}
+								<div class="project-info">
+									<h4>{project.data.title}</h4>
+									<p>{project.data.description}</p>
+									<div class="project-tags">
+										{project.data.tags.map((tag) => (
+											<span class="tag">{tag}</span>
+										))}
+									</div>
+									{project.data.repoUrl && (
+										<a href={project.data.repoUrl} class="project-link">View on GitHub</a>
+									)}
+								</div>
+							</div>
+						))}
+					</div>
+				</section>
+			)}
+		</main>
+	</div>
+</BaseLayout>
+
+<style>
+	.hero {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: 2rem;
+	}
+
+	.avatar {
+		border-radius: 50%;
+		box-shadow: var(--shadow-md);
+	}
+
+	@media (min-width: 50em) {
+		.hero {
+			display: grid;
+			grid-template-columns: 6fr 4fr;
+			padding-inline: 2.5rem;
+			gap: 3.75rem;
+		}
+
+		.avatar {
+			width: 200px;
+			height: 200px;
+			justify-self: center;
+		}
+	}
+
+	.section {
+		display: grid;
+		gap: 2rem;
+	}
+
+	.section-header {
+		justify-self: center;
+		text-align: center;
+		max-width: 50ch;
+		font-size: var(--text-md);
+		color: var(--gray-300);
+	}
+
+	.section-header h3 {
+		font-size: var(--text-2xl);
+	}
+
+	.post-list {
+		display: flex;
+		flex-direction: column;
+		gap: 1rem;
+	}
+
+	.post-card {
+		display: block;
+		padding: 1.5rem;
+		border: 1px solid var(--gray-800);
+		border-radius: 0.75rem;
+		background: var(--gradient-subtle);
+		text-decoration: none;
+		color: inherit;
+		transition: box-shadow var(--theme-transition);
+	}
+
+	.post-card:hover {
+		box-shadow: var(--shadow-md);
+	}
+
+	.post-card h4 {
+		color: var(--gray-0);
+		font-size: var(--text-lg);
+		margin-bottom: 0.25rem;
+	}
+
+	.post-date {
+		font-size: var(--text-sm);
+		color: var(--gray-400);
+		margin-bottom: 0.5rem;
+	}
+
+	.post-desc {
+		color: var(--gray-300);
+		font-size: var(--text-sm);
+	}
+
+	.project-grid {
+		display: grid;
+		gap: 1.5rem;
+	}
+
+	@media (min-width: 50em) {
+		.project-grid {
+			grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+		}
+	}
+
+	.project-card {
+		border: 1px solid var(--gray-800);
+		border-radius: 0.75rem;
+		overflow: hidden;
+		background: var(--gradient-subtle);
+	}
+
+	.project-img {
+		width: 100%;
+		height: 180px;
+		object-fit: cover;
+	}
+
+	.project-info {
+		padding: 1.25rem;
+	}
+
+	.project-info h4 {
+		color: var(--gray-0);
+		font-size: var(--text-lg);
+		margin-bottom: 0.5rem;
+	}
+
+	.project-info p {
+		color: var(--gray-300);
+		font-size: var(--text-sm);
+		margin-bottom: 0.75rem;
+	}
+
+	.project-tags {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.375rem;
+		margin-bottom: 0.75rem;
+	}
+
+	.tag {
+		font-size: 0.75rem;
+		padding: 0.2rem 0.5rem;
+		border-radius: 999rem;
+		background-color: var(--gray-800);
+		color: var(--gray-300);
+	}
+
+	.project-link {
+		font-size: var(--text-sm);
+	}
+</style>

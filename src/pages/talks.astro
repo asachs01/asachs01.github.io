@@ -1,0 +1,113 @@
+---
+import Hero from '../components/Hero.astro';
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+
+<BaseLayout title="Talks - Aaron Sachs" description="Talks and podcast appearances">
+	<div class="stack gap-20">
+		<div class="wrapper stack gap-8">
+			<Hero title="Talks" tagline="Various and sundry public chats, at conferences or otherwise." />
+		</div>
+		<main class="wrapper content">
+			<section>
+				<h2>Talks</h2>
+
+				<h3>2021</h3>
+				<ul>
+					<li>Pay (no) attention to the index behind the curtain — Graylog GO</li>
+				</ul>
+
+				<h3>2019</h3>
+				<ul>
+					<li>
+						Intro to Sensu Go —
+						<a href="https://www.meetup.com/chadevops/events/258601724/">ChaDevOps</a>
+					</li>
+				</ul>
+
+				<h3>2018</h3>
+				<ul>
+					<li>
+						Where's My Beer? Building a Better Kegerator with a Raspberry Pi & Sensu
+						<ul>
+							<li><a href="https://www.youtube.com/watch?v=bFICVwvlBXM">Texas Linuxfest 2018</a></li>
+							<li><a href="https://www.youtube.com/watch?v=bn9FDCzlyG0&list=PLqLtpBjHqwC8S6D_VaVEf8aaXixNEvjIC&index=7">Sensu Summit 2018</a></li>
+						</ul>
+					</li>
+					<li>
+						Intro to Sensu —
+						<a href="https://soapbox.wistia.com/videos/lC5d35JbkB">Texas Linuxfest 2018</a>
+					</li>
+				</ul>
+
+				<h3>2017</h3>
+				<ul>
+					<li>
+						<a href="https://www.youtube.com/watch?v=-j6-PVKs-X8&list=PLqLtpBjHqwC-4o7HLtK3MM2V_GdtSh-Dw">
+							Sensu Fall 2017 Training
+						</a>
+					</li>
+				</ul>
+			</section>
+
+			<section>
+				<h2>Podcasts</h2>
+
+				<h3>2019</h3>
+				<ul>
+					<li>
+						<a href="https://www.listennotes.com/podcasts/pragmatic-ops-weekly/episode-18-customer-_1uJqCXVGem/">
+							Pragmatic Ops — Customer Reliability Engineering
+						</a>
+					</li>
+					<li>
+						<a href="https://www.realworlddevops.com/episodes/mentorship-in-tech-with-aaron-sachs">
+							Real World DevOps — Mentoring
+						</a>
+					</li>
+				</ul>
+			</section>
+		</main>
+	</div>
+</BaseLayout>
+
+<style>
+	.content {
+		max-width: 65ch;
+		margin-inline: auto;
+	}
+
+	.content section {
+		margin-bottom: 3rem;
+	}
+
+	.content h2 {
+		font-size: var(--text-2xl);
+		color: var(--gray-0);
+		margin-bottom: 1.5rem;
+		padding-bottom: 0.5rem;
+		border-bottom: 1px solid var(--gray-800);
+	}
+
+	.content h3 {
+		font-size: var(--text-lg);
+		color: var(--gray-100);
+		margin-top: 1.5rem;
+		margin-bottom: 0.75rem;
+	}
+
+	.content ul {
+		padding-left: 1.5rem;
+		margin-bottom: 1rem;
+	}
+
+	.content li {
+		margin-bottom: 0.5rem;
+		line-height: 1.6;
+		color: var(--gray-200);
+	}
+
+	.content li ul {
+		margin-top: 0.25rem;
+	}
+</style>
