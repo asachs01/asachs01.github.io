@@ -9,28 +9,24 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 			<Hero title="About Me" />
 		</div>
 		<main class="wrapper content">
-			<section>
-				<h3>A Quick Intro</h3>
-				<p>
-					Hi there and thank you for stopping by! I'm Aaron. I'm an academic-turned-Linux geek who
-					loves beer (not just consuming, but making beer), tinkering with all sorts of things, and
-					am what you might call a "<a href="http://puttylike.com/terminology/">multipotentialite</a>".
-				</p>
-				<p>
-					I've been a Linux dude for a while, and am currently at <a href="https://sensu.io">Sensu</a>,
-					where I'm a Customer Reliability Engineer.
-				</p>
-			</section>
-			<section>
-				<h3>What this Blog is About</h3>
-				<p>
-					I'm mostly using the blog right now to document the things that I'm learning along the way
-					in Customer Reliability, Linux stuff, and general tech. For the most part, it's one-liners,
-					as well as the things I tinker with. There will be other topics that I cover, just stay tuned.
-					If you're wanting to reach out, you can contact me via
-					<a href="https://www.linkedin.com/in/asachs01">LinkedIn</a>.
-				</p>
-			</section>
+			<p>
+				Hi, I'm Aaron. I'm an Engineering Lead at <a href="https://wyretech.com">WYRE Technology</a> in Chattanooga, where I help
+				businesses actually make sense of AI instead of just talking about it. I also do a lot of
+				infrastructure work for higher education clients and build way too many side projects.
+			</p>
+			<p>
+				I got into tech from an academic background, which mostly means I ask a lot of questions
+				and can't stop tinkering with things.
+			</p>
+			<p>
+				Outside of work, I play bluegrass around town—it's a good excuse to unplug and pick
+				with people. I've got kids, so free time is relative.
+			</p>
+			<p>
+				This blog is where I write about whatever I'm learning or building. Sometimes that's
+				technical stuff, sometimes it's not. If you want to get in touch,
+				<a href="https://www.linkedin.com/in/asachs01">LinkedIn</a> is probably the best way.
+			</p>
 		</main>
 	</div>
 </BaseLayout>
@@ -41,17 +37,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 		margin-inline: auto;
 	}
 
-	.content section {
-		margin-bottom: 2rem;
-	}
-
-	.content h3 {
-		font-size: var(--text-xl);
-		color: var(--gray-0);
-		margin-bottom: 1rem;
-	}
-
-	.content p {
+.content p {
 		margin-bottom: 1rem;
 		line-height: 1.7;
 		color: var(--gray-200);
