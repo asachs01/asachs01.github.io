@@ -4,28 +4,142 @@ import '../styles/global.css';
 interface Props {
 	title?: string | undefined;
 	description?: string | undefined;
+	image?: string | undefined;
+	canonicalURL?: URL | string | undefined;
+	type?: 'website' | 'article';
+	publishedDate?: Date | undefined;
+	modifiedDate?: Date | undefined;
+	author?: string | undefined;
+	tags?: string[] | undefined;
 }
 
+const siteUrl = 'https://aaron.sachs.blog';
+const defaultImage = '/img/og-default.png';
+const siteName = 'Aaron Sachs';
+
 const {
-	title = 'Aaron Sachs - Staring Blankly at a Screen',
-	description = 'Tech, beer, and the occasional banjo tune',
+	title = 'Aaron Sachs - DevOps Engineer & Tech Writer',
+	description = 'DevOps engineer writing about monitoring, observability, Raspberry Pi projects, homebrewing, and tech tutorials. Practical guides with real code examples.',
+	image = defaultImage,
+	canonicalURL = new URL(Astro.url.pathname, siteUrl),
+	type = 'website',
+	publishedDate,
+	modifiedDate,
+	author = 'Aaron Sachs',
+	tags = [],
 } = Astro.props;
+
+// Ensure canonical URL is absolute
+const canonical = typeof canonicalURL === 'string' ? canonicalURL : canonicalURL.href;
+
+// Ensure image URL is absolute
+const ogImage = image.startsWith('http') ? image : new URL(image, siteUrl).href;
+
+// Format dates for schema
+const publishedISO = publishedDate?.toISOString();
+const modifiedISO = modifiedDate?.toISOString() || publishedISO;
 ---
 
 <meta charset="UTF-8" />
-<meta name="description" property="og:description" content={description} />
-<meta name="viewport" content="width=device-width" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <meta name="generator" content={Astro.generator} />
-<title>{title}</title>
 
+<!-- Primary Meta Tags -->
+<title>{title}</title>
+<meta name="title" content={title} />
+<meta name="description" content={description} />
+<meta name="author" content={author} />
+{tags.length > 0 && <meta name="keywords" content={tags.join(', ')} />}
+
+<!-- Canonical URL -->
+<link rel="canonical" href={canonical} />
+
+<!-- Open Graph / Facebook -->
+<meta property="og:type" content={type} />
+<meta property="og:url" content={canonical} />
+<meta property="og:title" content={title} />
+<meta property="og:description" content={description} />
+<meta property="og:image" content={ogImage} />
+<meta property="og:site_name" content={siteName} />
+<meta property="og:locale" content="en_US" />
+
+{type === 'article' && publishedISO && (
+	<>
+		<meta property="article:published_time" content={publishedISO} />
+		{modifiedISO && <meta property="article:modified_time" content={modifiedISO} />}
+		<meta property="article:author" content={author} />
+		{tags.map((tag) => <meta property="article:tag" content={tag} />)}
+	</>
+)}
+
+<!-- Twitter -->
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:url" content={canonical} />
+<meta name="twitter:title" content={title} />
+<meta name="twitter:description" content={description} />
+<meta name="twitter:image" content={ogImage} />
+
+<!-- Favicons -->
 <link rel="icon" href="/img/favicon.ico" />
-<link rel="alternate" type="application/rss+xml" title="Aaron Sachs" href="/rss.xml" />
+
+<!-- RSS Feed -->
+<link rel="alternate" type="application/rss+xml" title={siteName} href="/rss.xml" />
+
+<!-- Preconnect for performance -->
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link
 	href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Public+Sans:ital,wght@0,400;0,700;1,400&family=Space+Grotesk:wght@500;600;700&display=swap"
 	rel="stylesheet"
 />
+
+<!-- JSON-LD Schema Markup -->
+{type === 'website' ? (
+	<script type="application/ld+json" set:html={JSON.stringify({
+		"@context": "https://schema.org",
+		"@type": "WebSite",
+		"name": siteName,
+		"url": siteUrl,
+		"description": description,
+		"author": {
+			"@type": "Person",
+			"name": "Aaron Sachs",
+			"url": siteUrl,
+			"sameAs": [
+				"https://github.com/asachs01",
+				"https://www.linkedin.com/in/asachs01"
+			]
+		}
+	})} />
+) : (
+	<script type="application/ld+json" set:html={JSON.stringify({
+		"@context": "https://schema.org",
+		"@type": "Article",
+		"headline": title,
+		"description": description,
+		"image": ogImage,
+		"url": canonical,
+		"datePublished": publishedISO,
+		"dateModified": modifiedISO,
+		"author": {
+			"@type": "Person",
+			"name": author,
+			"url": siteUrl
+		},
+		"publisher": {
+			"@type": "Person",
+			"name": "Aaron Sachs",
+			"url": siteUrl
+		},
+		"keywords": tags.join(', '),
+		"mainEntityOfPage": {
+			"@type": "WebPage",
+			"@id": canonical
+		}
+	})} />
+)}
+
+<!-- Theme Script -->
 <script is:inline>
 	const getThemePreference = () => {
 		if (typeof localStorage !== 'undefined' && localStorage.getItem('theme')) {

@@ -16,9 +16,18 @@ export async function getStaticPaths() {
 
 const { post } = Astro.props;
 const { Content } = await render(post);
+
+// Combine categories and tags for keywords
+const allTags = [...(post.data.tags || []), ...(post.data.categories || [])];
 ---
 
-<BaseLayout title={`${post.data.title} - Aaron Sachs`} description={post.data.description}>
+<BaseLayout
+	title={`${post.data.title} - Aaron Sachs`}
+	description={post.data.description}
+	type="article"
+	publishedDate={post.data.date}
+	tags={allTags}
+>
 	<div class="stack gap-20">
 		<main class="wrapper">
 			<article class="post">
