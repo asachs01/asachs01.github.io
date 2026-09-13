@@ -5,6 +5,7 @@ description: "A Raspberry Pi project that displays how long it's been since the 
 categories: ["tech", "projects"]
 tags: ["raspberry-pi", "docker", "prometheus", "python", "dns"]
 slug: "building-a-dns-incident-timer"
+ogImage: /img/og/og-building-a-dns-incident-timer.png
 draft: false
 updated: 2026-09-12T21:00:00-04:00
 ---

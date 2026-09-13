@@ -5,6 +5,7 @@ description: "Every smart wake-up solution I found was loud, harsh, and one wron
 categories: ["personal", "projects", "home-assistant"]
 tags: ["home-assistant", "homekit", "smart-home", "family", "automation"]
 slug: "gentle-wake-up-alarm-home-assistant"
+ogImage: /img/og/og-gentle-wake-up-alarm-home-assistant.png
 draft: false
 updated: 2026-09-12T21:00:00-04:00
 ---

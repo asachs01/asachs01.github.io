@@ -3,8 +3,9 @@ title: "Getting Back to Blogging"
 date: 2025-08-25T21:00:00-05:00
 description: "After a 5-year hiatus, I'm reviving my blog with a fresh theme and renewed enthusiasm"
 categories: ["personal", "blogging"]
-tags: ["hugo", "blog", "writing"]
+tags: ["astro", "blog", "writing"]
 slug: "getting-back-to-blogging"
+ogImage: /img/og/og-getting-back-to-blogging.png
 draft: false
 ---
 
@@ -14,7 +15,7 @@ After letting this blog gather digital dust, I decided it was time to breathe so
 
 ## The Migration
 
-I've just migrated from the old Blackburn theme to the modern [Stack theme](https://github.com/CaiJimmy/hugo-theme-stack). It's clean, it's fast, and most importantly - it's actively maintained. 
+I started this revival on Hugo, migrating from the old Blackburn theme to the modern [Stack theme](https://github.com/CaiJimmy/hugo-theme-stack). It's clean, it's fast, and most importantly - it's actively maintained. *Update: the site has since been rebuilt in [Astro](https://astro.build) and moved to [sachsha.us](https://sachsha.us). The lesson held: keeping the stack boring and maintained matters more than which stack.* 
 
 The old posts are archived, and I'm starting fresh with a few select pieces that still feel relevant. Sometimes you need to clear the deck to move forward.
 

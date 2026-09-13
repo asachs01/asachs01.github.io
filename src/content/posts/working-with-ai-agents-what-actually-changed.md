@@ -5,6 +5,7 @@ description: "I run a small fleet of AI agents that manage my house, help run an
 categories: ["ai", "productivity"]
 tags: ["ai", "agents", "automation", "hermes", "workflow"]
 slug: "working-with-ai-agents-what-actually-changed"
+ogImage: /img/og/og-working-with-ai-agents-what-actually-changed.png
 draft: false
 ---
 

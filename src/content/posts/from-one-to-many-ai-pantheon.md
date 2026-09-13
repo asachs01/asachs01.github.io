@@ -5,6 +5,7 @@ description: "How a single home-management AI agent evolved into a team of speci
 categories: ["engineering", "ai"]
 tags: ["ai", "agents", "mcp", "openclaw", "architecture"]
 slug: "from-one-to-many-ai-pantheon"
+ogImage: /img/og/og-from-one-to-many-ai-pantheon.png
 draft: false
 updated: 2026-09-12T21:00:00-04:00
 ---

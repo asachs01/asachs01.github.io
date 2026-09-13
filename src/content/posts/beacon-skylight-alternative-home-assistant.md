@@ -5,6 +5,7 @@ description: "Skylight Calendar 2 costs $300 plus $79/year for the good features
 categories: ["personal", "projects", "home-assistant"]
 tags: ["beacon", "home-assistant", "open-source", "raspberry-pi", "skylight", "mcp", "family"]
 slug: "beacon-skylight-alternative-home-assistant"
+ogImage: /img/og/og-beacon-skylight-alternative-home-assistant.png
 draft: false
 updated: 2026-09-12T21:00:00-04:00
 ---

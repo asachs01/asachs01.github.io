@@ -5,6 +5,7 @@ description: "Why I built HomeClaw, a purpose-built AI agent for managing househ
 categories: ["personal", "ai", "projects"]
 tags: ["ai", "homeclaw", "openclaw", "mental-load", "open-source", "home-automation"]
 slug: "using-ai-to-lighten-the-mental-load"
+ogImage: /img/og/og-using-ai-to-lighten-the-mental-load.png
 draft: false
 updated: 2026-09-12T21:00:00-04:00
 ---

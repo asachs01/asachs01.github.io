@@ -5,6 +5,7 @@ description: "Finding balance between tech and craft through the art of brewing"
 categories: ["personal", "brewing"]
 tags: ["homebrewing", "burnout", "work-life-balance"]
 slug: "how-homebrewing-saved-me"
+ogImage: /img/og/og-how-homebrewing-saved-me.png
 draft: false
 ---
 
