@@ -6,9 +6,10 @@ categories: ["beer", "homebrew", "homebrewing", "kegerator"]
 tags: ["beer", "homebrew", "homebrewing", "kegerator"]
 slug: "moving-to-kegging"
 draft: false
+updated: 2026-09-12T21:00:00-04:00
 ---
 
-I've posted previously about [homebrewing](http://aaron.sachs.blog/how-homebrewing-saved-me-from-burnout/) and have been brewing for almost three years now. Back in April, I took to destroying a perfectly good mini fridge to turn it into a kegerator. 
+I've posted previously about [homebrewing](https://sachsha.us/p/how-homebrewing-saved-me/) and have been brewing for almost three years now. Back in April, I took to destroying a perfectly good mini fridge to turn it into a kegerator. 
 
 ![IMG_20170403_105320](/img/IMG_20170403_105320.jpg)
 

@@ -1,4 +1,4 @@
-# robots.txt for aaron.sachs.blog
+# robots.txt for sachsha.us
 # Allow all crawlers by default
 
 User-agent: *
@@ -37,4 +37,4 @@ User-agent: cohere-ai
 Allow: /
 
 # Sitemap location
-Sitemap: https://aaron.sachs.blog/sitemap-index.xml
+Sitemap: https://sachsha.us/sitemap-index.xml

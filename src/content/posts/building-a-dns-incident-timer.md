@@ -6,13 +6,14 @@ categories: ["tech", "projects"]
 tags: ["raspberry-pi", "docker", "prometheus", "python", "dns"]
 slug: "building-a-dns-incident-timer"
 draft: false
+updated: 2026-09-12T21:00:00-04:00
 ---
 
 If you've worked in tech long enough, you've experienced it: the dreaded DNS failure. Whether it's a misconfigured record, an expired zone transfer, or the classic "it's always DNS" moment, these incidents have a way of humbling even the most seasoned engineers.
 
 At some point, I thought: what if we could track these moments in a fun, tangible way?
 
-Enter the DNS Incident Timer—a physical "days since last incident" counter that sits on a shelf, counting the seconds, minutes, hours, and days since someone last broke DNS. And when it inevitably gets reset? It plays an audio clip. Because sometimes you just need a little fanfare when things go sideways.
+Enter the DNS Incident Timer: a physical "days since last incident" counter that sits on a shelf, counting the seconds, minutes, hours, and days since someone last broke DNS. And when it inevitably gets reset? It plays an audio clip. Because sometimes you just need a little fanfare when things go sideways.
 
 ## The Hardware
 
@@ -29,10 +30,10 @@ The LED matrix displays two lines: "DAYS SINCE DNS" in white, and the elapsed ti
 
 Here's where things get interesting. I wanted this to be:
 
-1. **Persistent** — survives reboots and remembers the last reset time
-2. **Accessible** — viewable and resettable from a web browser
-3. **Observable** — because what's an ops project without Prometheus metrics?
-4. **Containerized** — because I'm not a monster
+1. **Persistent**: survives reboots and remembers the last reset time
+2. **Accessible**: viewable and resettable from a web browser
+3. **Observable**: because what's an ops project without Prometheus metrics?
+4. **Containerized**: because I'm not a monster
 
 The core is a Python application that handles:
 
@@ -90,7 +91,7 @@ exec python dns_counter.py "$@"
 
 ## The Web Interface
 
-The web UI is minimal but functional—a dark theme with a red accent (fitting for incidents), showing the same elapsed time as the physical display. Click the reset button, and it:
+The web UI is minimal but functional: a dark theme with a red accent (fitting for incidents), showing the same elapsed time as the physical display. Click the reset button, and it:
 
 1. Resets the timer
 2. Plays audio through your browser speakers
@@ -122,9 +123,9 @@ Now I can track how often we're resetting (and whether it's via the physical but
 
 A few things I picked up along the way:
 
-- **Docker audio on Pi is tricky** — device permissions and timing matter more than you'd expect
-- **gpiod v1 vs v2 APIs are different** — if you're writing GPIO code, detect the version and handle both
-- **Browser autoplay policies are strict** — audio triggered by a button click works, but preloading helps
+- **Docker audio on Pi is tricky**: device permissions and timing matter more than you'd expect
+- **gpiod v1 vs v2 APIs are different**: if you're writing GPIO code, detect the version and handle both
+- **Browser autoplay policies are strict**: audio triggered by a button click works, but preloading helps
 
 ## What's Next?
 

@@ -11,6 +11,8 @@ const posts = defineCollection({
     tags: z.array(z.string()).optional().default([]),
     slug: z.string(),
     draft: z.boolean().optional().default(false),
+    updated: z.coerce.date().optional(),
+    ogImage: z.string().optional(),
   }),
 });
 
@@ -24,6 +26,8 @@ const archives = defineCollection({
     tags: z.array(z.string()).optional().default([]),
     slug: z.string(),
     draft: z.boolean().optional().default(false),
+    updated: z.coerce.date().optional(),
+    ogImage: z.string().optional(),
   }),
 });
 

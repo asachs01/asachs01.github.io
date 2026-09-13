@@ -6,6 +6,7 @@ categories: ["personal", "projects", "home-assistant"]
 tags: ["home-assistant", "homekit", "smart-home", "family", "automation"]
 slug: "gentle-wake-up-alarm-home-assistant"
 draft: false
+updated: 2026-09-12T21:00:00-04:00
 ---
 
 My household has a 6:30am problem. Getting everyone up on time is a daily fight, and every "smart" wake-up solution I looked at solves it by being loud, harsh, and one wrong Siri command away from a fight with my wife.
@@ -28,7 +29,7 @@ The mechanism itself is simple. Three Home Assistant automations fire at 6:30am,
 
 What "kills it" needs to mean is where I actually had to think. My own words to myself going in: this has to be dead simple to turn off, because my wife and my girls will not tolerate an alarm they can't kill easily. She especially will be furious with me if it's a hassle.
 
-That wasn't a nice-to-have, it was the whole point of the project. So there are three ways to dismiss any single alarm. Say "Hey Siri, turn off Lennon's Alarm" (or Elie's, or the main bedroom's, each one is its own HomeKit switch). Tap the speaker to stop it, the way you'd stop any device making noise at you. Or hit a toggle on our family dashboard, which sits right on the home screen where nobody has to hunt for it.
+That wasn't a nice-to-have, it was the whole point of the project. So there are three ways to dismiss any single alarm. Say "Hey Siri, turn off Lennon's Alarm" (or Elie's, or the main bedroom's, each one is its own HomeKit switch). Tap the speaker to stop it, the way you'd stop any device making noise at you. Or hit a toggle on [our family dashboard](https://sachsha.us/p/beacon-skylight-alternative-home-assistant/), which sits right on the home screen where nobody has to hunt for it.
 
 ## The bug that would have made it worse
 

@@ -26,6 +26,8 @@ const allTags = [...(post.data.tags || []), ...(post.data.categories || [])];
 	description={post.data.description}
 	type="article"
 	publishedDate={post.data.date}
+	modifiedDate={post.data.updated || post.data.date}
+	image={post.data.ogImage || post.data.image || '/img/og-default.png'}
 	tags={allTags}
 >
 	<div class="stack gap-20">
